@@ -1,0 +1,105 @@
+{
+    "gender": "female",
+    "body": "Caucasian 3",
+    "muscular": 0.1,
+    "overweight": 0.1,
+    "skinny": 0.1,
+    "height": 170.5,
+    "face": "variation_2",
+    "skin": {
+        "tone": 1.116,
+        "redness": 0.562,
+        "saturation": 0.151,
+        "normal_strength": 3,
+        "roughness_multiplier": 1.291,
+        "dark_areas": 1.472,
+        "light_areas": 0.193,
+        "freckles": 0.233,
+        "splotches": 0.322,
+        "beauty_spots_amount_": 75,
+        "beauty_spots_amount": 0.88,
+        "beauty_spots_opacity": 0.269,
+        "sagging": 0.2,
+        "wrinkles": 0.1
+    },
+    "eyes": {
+        "iris_color": [
+            0.40800024994503614,
+            0.3687507010634772,
+            0.9700041622455899,
+            1.0
+        ],
+        "eyebrows_style": 2,
+        "eyebrows_length": null,
+        "eyelashes_lenght": null,
+        "hair_lightness": 0.1,
+        "hair_redness": 0.4,
+        "hair_roughness": 0.1
+    },
+    "hair": {
+        "hair_style": "Bob Bangs",
+        "length": 0.939,
+        "lightness": 0.2,
+        "redness": 0.55,
+        "roughness": 0.3,
+        "salt_and_pepper": 0.0,
+        "roots": 0.0
+    },
+    "makeup": {
+        "foundation_amount": 0,
+        "foundation_color": [
+            0.655761,
+            0.332872,
+            0.191478,
+            1.0
+        ],
+        "blush_opacity": 0.687,
+        "blush_color": [
+            0.553053,
+            0.138596,
+            0.109141,
+            1.0
+        ],
+        "eyeshadow_opacity": 0.757,
+        "eyeshadow_color": [
+            0.239424,
+            0.041744,
+            0.013199,
+            1.0
+        ],
+        "lipstick_opacity": 0.734,
+        "lipstick_color": [
+            0.309741,
+            0.091615,
+            0.073231,
+            1.0
+        ],
+        "eyeliner_opacity": 0.458,
+        "eyeliner_color": [
+            0.001578,
+            0.010979,
+            0.060677,
+            1.0
+        ]
+    },
+    "outfit": {
+        "outfit_style": "Casual/Relaxed_Weekday",
+        "outfit_pattern": {
+            "TSHIRT": false,
+            "Jeans": false
+        },
+        "outfit_color": {
+            "TSHIRT": "purple",
+            "Jeans": "dark_blue"
+        },
+        "outfit_brightness": {
+            "TSHIRT": 0.6,
+            "Jeans": 0.7
+        }
+    },
+    "footwear": {
+        "footwear_style":  "/footwear/female/Sports/HG_Running_Shoe_1.blend"
+    },
+    "# expression": "/expressions/Base Shapekeys/Smile.txt",
+    "posefilename": null
+}

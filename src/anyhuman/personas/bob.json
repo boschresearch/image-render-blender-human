@@ -1,0 +1,77 @@
+{
+    "gender": "male",
+    "body": "Caucasian 1",
+    "muscular": 0.1,
+    "overweight": 0.1,
+    "skinny": 0.1,
+    "height": 177.6,
+    "face": "variation_7",
+    "skin": {
+        "tone": 1.216,
+        "redness": 0.692,
+        "saturation": 0.251,
+        "normal_strength": 4,
+        "roughness_multiplier": 1.791,
+        "dark_areas": 1.772,
+        "light_areas": 0.193,
+        "freckles": 0.133,
+        "splotches": 0.422,
+        "beauty_spots_amount_": 95,
+        "beauty_spots_amount": 0.588,
+        "beauty_spots_opacity": 0.369,
+        "sagging": 0.7,
+        "wrinkles": 1.8
+    },
+    "eyes": {
+        "iris_color": [
+            0.40800024994503614,
+            0.9700041622455899,
+            0.3687507010634772,
+            1.0
+        ],
+        "eyebrows_style": 0,
+        "eyebrows_length": null,
+        "eyelashes_lenght": null,
+        "hair_lightness": 0.3,
+        "hair_redness": 0.9,
+        "hair_roughness": 0.3
+    },
+    "hair": {
+        "hair_style": "Pixie Messy",
+        "length": 0.639,
+        "lightness": 0.3,
+        "redness": 0.9,
+        "roughness": 0.3,
+        "salt_and_pepper": 0.3,
+        "roots": 0.3
+    },
+    "beard": {
+        "beard_style": null,
+        "shadow_mustache": 0,
+        "shadow_beard": 0.1
+    },
+    "outfit": {
+        "outfit_style": "Casual/Casual_Weekday",
+        "outfit_pattern": {
+            "TSHIRT": false,
+            "Jeans": false
+        },
+        "outfit_color": {
+            "TSHIRT": "turquise",
+            "Jeans": "grey"
+        },
+        "outfit_brightness": {
+            "TSHIRT": 0.8,
+            "Jeans": 0.6
+        },
+        "outfit_saturation": {
+            "TSHIRT": 1.2,
+            "Jeans": 1.0
+        }
+    },
+    "footwear": {
+        "footwear_style":  "/footwear/male/Sneakers/HG_Leather_Sneakers_Male.blend"
+    },
+    "# expression": "/expressions/Base Shapekeys/Smile.txt",
+    "posefilename": null
+}
