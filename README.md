@@ -1,6 +1,10 @@
 # Image-Render Blender AddOn `anyhuman`
 
+**Check out the `stable` branch for the latest stable version**
+
 Implements a wrapper for the Blender addon [HumanGenerator3D](https://www.humgen3d.com/) that is used by the `image-render` automation system. To effectivly use it, the original plugin has to be modified slightly. This is currently not available on GitHub. 
+
+See the repository `image-render-setup` for more information and documentation on the `image-render` automation system.
 
 ## Purpose of the project
 
