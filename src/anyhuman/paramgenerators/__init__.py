@@ -113,7 +113,7 @@ def GetParams(mode, params, generator_params):
     elif mode == "ZWICKY":
         new_params = zwicky.ZwickyParams(params, generator_params)
     elif mode == "PERSONA":
-        new_params = persona.PersonaParams(params)
+        new_params = persona.PersonaParams(params, generator_params)
     elif mode == "FILE":
         new_params = file.FileParams(params)
     else:

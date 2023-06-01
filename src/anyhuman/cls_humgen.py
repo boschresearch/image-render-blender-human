@@ -227,13 +227,13 @@ class HumGenWrapper:
         }
 
         try:
-            self.persona_path = Path(
+            self.generator_config.persona_path = Path(
                 bpy.context.space_data.text.filepath
             ).parent.resolve()
         except AttributeError:
-            self.persona_path = Path(__file__).parent.resolve()
+            self.generator_config.persona_path = Path(__file__).parent.resolve()
         # endtry
-        self.persona_path = Path.joinpath(self.persona_path, "personas")
+        self.generator_config.persona_path = Path.joinpath(self.generator_config.persona_path, "personas")
 
     # enddef
 

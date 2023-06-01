@@ -31,7 +31,7 @@ import random
 from ..tools import RandomUniformDiscrete
 
 ######################################################################
-def ZwickyParams(self, zwicky_params, generator_params):
+def ZwickyParams(zwicky_params, generator_params):
     """ """
 
     def _get_param(key, defaults):

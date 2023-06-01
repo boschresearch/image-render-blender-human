@@ -43,7 +43,8 @@
         "redness": 0.9,
         "roughness": 0.3,
         "salt_and_pepper": 0.3,
-        "roots": 0.3
+        "roots": 0.3,
+        "hue": 0.5
     },
     "beard": {
         "beard_style": null,
