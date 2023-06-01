@@ -31,11 +31,11 @@ import json
 from pathlib import Path
 
 ######################################################################
-def PersonaParams(self, params):
+def PersonaParams(params, generator_params):
     """ """
     persona_id = (params["sPersonaId"]).lower()
 
-    filename = Path.joinpath(self.persona_path, persona_id + ".json")
+    filename = Path.joinpath(generator_params.persona_path, persona_id + ".json")
     with open(filename, "r") as file:
         params = json.load(file)
 
