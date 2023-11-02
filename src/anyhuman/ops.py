@@ -35,6 +35,7 @@ import random
 import warnings
 import json
 
+from typing import Optional
 from anybase import convert
 
 from .cls_humgen import SingletonHumGenWrapper
@@ -201,15 +202,15 @@ def ModifyHumanPostCreation(_objX, _dicParams, sMode, **kwargs):
 
 ##############################################################################################################
 def DoPlaceHumanOnSeat(
-    object,
-    seat_basename,
-    fRotateZ,
-    xShift,
-    bApplyConstraints,
-    **kwargs,
+    _objArmature,
+    _sSeatBasename,
+    _fRotateZ,
+    _xShift,
+    _bApplyConstraints,
+    _iFrameNumber: Optional[int] = None,
 ):
     """
-    Place a generated human (Armature) on a seat defined by empties in the Blender scene.
+    Place a generated human (its Armature) on a seat defined by empties in the Blender scene.
 
     Seats in a vehicle are expected to be:
     - seat_1: driver seat
@@ -227,66 +228,70 @@ def DoPlaceHumanOnSeat(
 
     Parameters
     ----------
-    object : Blender object
-        Human to be posed
-    seat_basename : str
+    _objArmature : Blender armature object 
+        the linked Human Skeleton to be posed
+    _sSeatBasename : str
         Name of the seat the human will be placed on. Should be in the format
         'seat_x'
-    fRotateZ : float
-        Rotation around z Axis in radians, default value is math.pi
-    xShift : mathutil.vector[3]
-        Shift in Armature Coordinates to fine tune asset placement
+    _fRotateZ : float
+        Rotation around z-Axis (i.e. up-Axis) in radians, default value is math.pi
+    _xShift : mathutil.Vector[3]
+        Shift in Armature coordinates to fine tune asset placement
+    _bApplyConstraints: bool
+        Whether to apply the Blender rotation and location constraint and copying to armature's pose.
+    _iFrameNumber: Optional[int]
+        The frame number to insert the keyframe in the pose animation (only applies if _bApplyConstraints=True)
     """
 
-    seat_obj_name = "{}_seat".format(seat_basename)
+    sSeatObjectName = "{}_seat".format(_sSeatBasename)
 
     # first, switch to edit mode
-    bpy.context.view_layer.objects.active = object
+    bpy.context.view_layer.objects.active = _objArmature
     bpy.ops.object.mode_set(mode="EDIT", toggle=False)
 
     # add constraints
 
     # set object origin to spine to add object constraint to seat empty
     bpy.ops.object.mode_set(mode="POSE")
-    scene = bpy.context.scene
-    spine_pose = object.pose.bones["spine"]
+    xScene = bpy.context.scene
+    xRootBone = _objArmature.pose.bones["spine"]
     # armature.edit_bones.active = spine
 
     # set cursor to position of spine bone
-    xTargetLocation = object.matrix_local @ (spine_pose.head + xShift)
+    xTargetLocation = _objArmature.matrix_local @ (xRootBone.head + _xShift)
     # set orgin to position of cursor (spine bone location)
-    scene.cursor.location = xTargetLocation
+    xScene.cursor.location = xTargetLocation
     bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
-    object.select_set(True)
+    _objArmature.select_set(True)
     bpy.ops.object.origin_set(type="ORIGIN_CURSOR")
     # Rotation around z axis, default 180 degree.
-    object.rotation_euler[2] = fRotateZ
+    _objArmature.rotation_euler[2] = _fRotateZ
 
     # create additonal empty at seat location and rotate around z axis
-    seat_placement_name = "{}_placement".format(seat_basename)
-    seat_placement = bpy.data.objects.new(seat_placement_name, None)
-    bpy.context.scene.collection.objects.link(seat_placement)
-    seat_placement.scale = mathutils.Vector([0.1, 0.1, 0.1])
-    seat_placement.parent = bpy.data.objects[seat_obj_name]
+    sSeatPlacementName = "{}_placement".format(_sSeatBasename)
+    objSeatPlacementEmpty = bpy.data.objects.new(sSeatPlacementName, None)
+    bpy.context.scene.collection.objects.link(objSeatPlacementEmpty)
+    objSeatPlacementEmpty.scale = mathutils.Vector([0.1, 0.1, 0.1])
+    objSeatPlacementEmpty.parent = bpy.data.objects[sSeatObjectName]
 
     # create constraints to glue human origin to seat location and rotation
-    object.constraints.new("COPY_LOCATION")
-    object.constraints["Copy Location"].target = seat_placement
-    object.constraints.new("COPY_ROTATION")
-    xCopyRot = object.constraints["Copy Rotation"]
+    _objArmature.constraints.new("COPY_LOCATION")
+    _objArmature.constraints["Copy Location"].target = objSeatPlacementEmpty
+    _objArmature.constraints.new("COPY_ROTATION")
+    xCopyRot = _objArmature.constraints["Copy Rotation"]
     xCopyRot.use_y = False
     xCopyRot.use_x = False
     xCopyRot.use_z = True
-    xCopyRot.target = seat_placement
+    xCopyRot.target = objSeatPlacementEmpty
     
-    if bApplyConstraints:
+    if _bApplyConstraints:
         # ------------ new part ---------------
         # apply the copy-rotation and copy-location modifiers and move all global transformation 
         # into the root pose-bone transformation
         bpy.context.view_layer.update()
         bpy.ops.object.select_all(action="DESELECT")
-        object.select_set(True)
-        bpy.context.view_layer.objects.active = object
+        _objArmature.select_set(True)
+        bpy.context.view_layer.objects.active = _objArmature
         bpy.ops.constraint.apply(constraint="Copy Rotation", owner='OBJECT')
         bpy.ops.constraint.apply(constraint="Copy Location", owner='OBJECT')
         bpy.context.view_layer.update()
@@ -295,41 +300,54 @@ def DoPlaceHumanOnSeat(
         # location and rotation parameters
         # however, we need to apply it to the root bone transformation in pose mode
         
-        object.rotation_mode = "QUATERNION"
-        Mw = object.matrix_world
+        _objArmature.rotation_mode = "QUATERNION"
+        xMatrixWorld = _objArmature.matrix_world
         
-        bpy.context.view_layer.objects.active = object
+        bpy.context.view_layer.objects.active = _objArmature
         bpy.ops.object.mode_set(mode="POSE")
 
-        spine_pose = object.pose.bones["spine"]
-        spine_pose.rotation_mode = "QUATERNION"
+        xRootBone = _objArmature.pose.bones["spine"]
+        xRootBone.rotation_mode = "QUATERNION"
         
-        rest_bone = object.data.bones["spine"]
-        bone_rest_matrix = rest_bone.matrix_local
-        bone_rest_matrix_inv = mathutils.Matrix(bone_rest_matrix)
-        bone_rest_matrix_inv.invert()
+        xRootRestBone = _objArmature.data.bones["spine"]
+        xRootRestMatrix = xRootRestBone.matrix_local
+        xRootRestMatrix_inv = mathutils.Matrix(xRootRestMatrix)
+        xRootRestMatrix_inv.invert()
 
-        # Blender computes the global armature transformation as Object_transfrom * Rest_pose_transform * pose_transform * inverse_Rest_pose_transform
-        # Hence, we need to take care of the rest-pose matrix when moving the global object transformation to the root's pose-bone transformation
+        # Blender computes the global armature transformation as:
+        #   Object_transfrom * Rest_pose_transform * pose_transform * inverse_Rest_pose_transform
+        # Hence, we need to take care of the rest-pose matrix when moving the global object transformation 
+        # to the root's pose-bone transformation
         # Rot_obj * Rot_rest * Rot_pose * Rot_rest^-1 = Rot_rest * Rot_posenew * Rot_rest^-1
         # => R_posenew = Rot_rest^-1 * Rot_obj * Rot_rest * Rot_pose
         # same applies to the translation... 
-        new_rot = bone_rest_matrix_inv.to_3x3() @ Mw.to_3x3() @ bone_rest_matrix.to_3x3() @ spine_pose.rotation_quaternion.to_matrix()
-        spine_pose.rotation_quaternion = new_rot.to_quaternion()
         
-        new_loc = bone_rest_matrix_inv @ Mw @ bone_rest_matrix @ spine_pose.location
-        spine_pose.location = new_loc
+        xTransformRoot = xRootRestMatrix_inv @ xMatrixWorld @ xRootRestMatrix 
+        xRootRotationNew = xTransformRoot.to_3x3() @ xRootBone.rotation_quaternion.to_matrix()
+        xRootBone.rotation_quaternion = xRootRotationNew.to_quaternion()
+        xRootLocationNew = xTransformRoot @ xRootBone.location
+        xRootBone.location = xRootLocationNew
         
         # iCurFrame = bpy.context.scene.frame_current
         # spine_pose.keyframe_insert(data_path='rotation_quaternion',frame=iCurFrame)
         # spine_pose.keyframe_insert(data_path='location',frame=iCurFrame)
-        spine_pose.keyframe_insert(data_path='rotation_quaternion', frame=1)
-        spine_pose.keyframe_insert(data_path='location', frame=1)
+        
+        # We need to insert the root pose as a keyframe otherwise it seems to be overwritten when the scene 
+        # is updated in Blender and the frame is set at a later point (via bpy.context.scene.frame_current)
+        # TODO: this is not clear what frame to set, hence keep it as an optional argument
+        iFrameNumber = 1
+        if _iFrameNumber is not None:
+            iFrameNumber = _iFrameNumber
+            
+        xRootBone.keyframe_insert(data_path='rotation_quaternion', frame=iFrameNumber)
+        xRootBone.keyframe_insert(data_path='location', frame=iFrameNumber)
 
-        object.data.bones["spine"].use_local_location = True
+        # not sure what this does but it needs to be set to false
+        _objArmature.data.bones["spine"].use_local_location = True
 
-        object.location = mathutils.Vector((0,0,0))
-        object.rotation_quaternion = mathutils.Matrix.Identity(3).to_quaternion()
+        # set the transform in the armature object to identity since it is now copied to the pose (via xMatrixWorld)
+        _objArmature.location = mathutils.Vector((0,0,0))
+        _objArmature.rotation_quaternion = mathutils.Matrix.Identity(3).to_quaternion()
 
         bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
         
@@ -368,6 +386,7 @@ def PlaceHumanOnSeat(obj, args, sMode, **kwargs):
     fShiftZ = convert.DictElementToFloat(args, "fShiftZ", fDefault=0.0)
     lShift = convert.DictElementToFloatList(args, "lShift", iLen=3, lDefault=[0.0, 0.0, 0.0])
     bApplyConstraints = convert.DictElementToBool(args, "bApplyConstraints", bDefault=False)
+    iFrameNumber = convert.DictElementToInt(args, "iFrameNumber", iDefault=1)
 
     # construct complete shift vector from shift passed as list and individual shifts
     lShift[0] += fShiftX
@@ -390,11 +409,12 @@ def PlaceHumanOnSeat(obj, args, sMode, **kwargs):
         print(e)
 
     DoPlaceHumanOnSeat(
-        object=obj,
-        fRotateZ=fRotateZ,
-        xShift=xShift,
-        seat_basename=args["sEmptyBaseName"],
-        bApplyConstraints=bApplyConstraints,
+        _objArmature=obj,
+        _fRotateZ=fRotateZ,
+        _xShift=xShift,
+        _sSeatBasename=args["sEmptyBaseName"],
+        _bApplyConstraints=bApplyConstraints,
+        _iFrameNumber=iFrameNumber
     )
 
     lRevertHandler = []
