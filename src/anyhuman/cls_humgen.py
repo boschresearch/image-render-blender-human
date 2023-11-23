@@ -151,9 +151,7 @@ class HumGenWrapper:
                 if "head" in rel_file and ".json" in rel_file:
                     file_name = os.path.splitext(os.path.basename(rel_file))[0]
                     if "female" in rel_file:
-                        self.generator_config.dict_female_head_hair[
-                            file_name
-                        ] = rel_file
+                        self.generator_config.dict_female_head_hair[file_name] = rel_file
                     elif "male" in rel_file:
                         self.generator_config.dict_male_head_hair[file_name] = rel_file
                     # endif gender
@@ -179,13 +177,9 @@ class HumGenWrapper:
                         continue
 
                     if "female" in rel_file:
-                        self.generator_config.dict_female_outfits[set_name].append(
-                            file_name
-                        )
+                        self.generator_config.dict_female_outfits[set_name].append(file_name)
                     elif "male" in rel_file:
-                        self.generator_config.dict_male_outfits[set_name].append(
-                            file_name
-                        )
+                        self.generator_config.dict_male_outfits[set_name].append(file_name)
                     # endif gender
                 # endif face/head hair
             # endif hair
@@ -227,9 +221,7 @@ class HumGenWrapper:
         }
 
         try:
-            self.generator_config.persona_path = Path(
-                bpy.context.space_data.text.filepath
-            ).parent.resolve()
+            self.generator_config.persona_path = Path(bpy.context.space_data.text.filepath).parent.resolve()
         except AttributeError:
             self.generator_config.persona_path = Path(__file__).parent.resolve()
         # endtry
@@ -365,11 +357,7 @@ class HumGenWrapper:
                 bpy.context.area.type = original_type
             # endif
         except Exception as xEx:
-            print(
-                "Error setting context area type back to '{}':\n{}".format(
-                    original_type, str(xEx)
-                )
-            )
+            print("Error setting context area type back to '{}':\n{}".format(original_type, str(xEx)))
         # endtry
 
         return self.human_obj.rig_object
@@ -388,15 +376,9 @@ class HumGenWrapper:
         # set skinny value to 0-0.2 as  persons too skinny look odd
         for number, key in enumerate(bpy.data.shape_keys):
             try:
-                bpy.data.shape_keys[number].key_blocks["bp_Muscular"].value = params[
-                    "muscular"
-                ]
-                bpy.data.shape_keys[number].key_blocks["bp_Overweight"].value = params[
-                    "overweight"
-                ]
-                bpy.data.shape_keys[number].key_blocks["bp_Skinny"].value = params[
-                    "skinny"
-                ]
+                bpy.data.shape_keys[number].key_blocks["bp_Muscular"].value = params["muscular"]
+                bpy.data.shape_keys[number].key_blocks["bp_Overweight"].value = params["overweight"]
+                bpy.data.shape_keys[number].key_blocks["bp_Skinny"].value = params["skinny"]
             except Exception as e:
                 print(e)
             # endtry
@@ -413,9 +395,7 @@ class HumGenWrapper:
                     bpy.data.shape_keys[number].key_blocks["pr_asian"].value = 0.0
                     bpy.data.shape_keys[number].key_blocks["pr_black"].value = 0.0
                     bpy.data.shape_keys[number].key_blocks["pr_caucasian"].value = 0.0
-                    bpy.data.shape_keys[number].key_blocks[
-                        "pr_{}".format(params["face"])
-                    ].value = 1.0
+                    bpy.data.shape_keys[number].key_blocks["pr_{}".format(params["face"])].value = 1.0
                 except Exception as e:
                     print(e)
                 # endtry
@@ -449,14 +429,19 @@ class HumGenWrapper:
         nodes["BS_Control"].inputs[2].default_value = dicSkin["beauty_spots_amount"]
         nodes["BS_Opacity"].inputs[1].default_value = dicSkin["beauty_spots_opacity"]
 
-        nodes["Principled BSDF"].inputs["Subsurface"].default_value = 0.07
+        xPriBsdfIns = nodes["Principled BSDF"].inputs
+        if "Subsurface" in xPriBsdfIns:
+            xPriBsdfIns["Subsurface"].default_value = 0.07
+        elif "Subsurface Weight" in xPriBsdfIns:
+            xPriBsdfIns["Subsurface Weight"].default_value = 0.07
+        else:
+            RuntimeError("Cannot find subsurface parameter of 'Principled BSDF' node")
+        # endif
 
         # set sacked skin
         for number, key in enumerate(bpy.data.shape_keys):
             try:
-                bpy.data.shape_keys[number].key_blocks[
-                    "age_old.Transferred"
-                ].value = dicSkin["sagging"]
+                bpy.data.shape_keys[number].key_blocks["age_old.Transferred"].value = dicSkin["sagging"]
             except Exception as e:
                 print(e)
             # endtry
@@ -468,12 +453,8 @@ class HumGenWrapper:
         # setting beard shadow for male and make-up for female
         if _sGender == "male":
             try:
-                nodes["Gender_Group"].inputs[2].default_value = _mParams["beard"][
-                    "shadow_mustache"
-                ]
-                nodes["Gender_Group"].inputs[3].default_value = _mParams["beard"][
-                    "shadow_beard"
-                ]
+                nodes["Gender_Group"].inputs[2].default_value = _mParams["beard"]["shadow_mustache"]
+                nodes["Gender_Group"].inputs[3].default_value = _mParams["beard"]["shadow_beard"]
             except TypeError:
                 pass
             except ValueError:
@@ -557,9 +538,7 @@ class HumGenWrapper:
 
             # bpy.data.scenes["Scene"].HG3D.hair_length_ui = dicHair['length']
 
-            hair_head_nodes = self.human_obj.body_object.material_slots[
-                2
-            ].material.node_tree.nodes["HG_Hair_V3"]
+            hair_head_nodes = self.human_obj.body_object.material_slots[2].material.node_tree.nodes["HG_Hair_V3"]
 
             hair_head_nodes.inputs[0].default_value = dicHair["lightness"]
             hair_head_nodes.inputs[1].default_value = dicHair["redness"]
@@ -568,9 +547,7 @@ class HumGenWrapper:
             hair_head_nodes.inputs[4].default_value = dicHair["roots"]
             hair_head_nodes.inputs[8].default_value = dicHair["hue"]
 
-            hair_eye_nodes = self.human_obj.body_object.material_slots[
-                1
-            ].material.node_tree.nodes["HG_Hair_V3"]
+            hair_eye_nodes = self.human_obj.body_object.material_slots[1].material.node_tree.nodes["HG_Hair_V3"]
 
             dicEyes = _mParams["eyes"]
             hair_eye_nodes.inputs[0].default_value = dicEyes["hair_lightness"]
@@ -595,7 +572,6 @@ class HumGenWrapper:
 
     ############################################################################################
     def _prepare_outfit(self, _sGender, _mParams):
-
         ##################################################################
         def getValue(set, key, name, index, default):
             try:
@@ -624,15 +600,12 @@ class HumGenWrapper:
 
         ##################################################################
         def adjustDefaultColorHSV(_xNodeCtr, _fFacH, _fFacS, _fFacV):
-
             fR = _xNodeCtr.default_value[0]
             fG = _xNodeCtr.default_value[1]
             fB = _xNodeCtr.default_value[2]
 
             tHsv = colorsys.rgb_to_hsv(fR, fG, fB)
-            tRgbDark = colorsys.hsv_to_rgb(
-                tHsv[0] * _fFacH, tHsv[1] * _fFacS, tHsv[2] * _fFacV
-            )
+            tRgbDark = colorsys.hsv_to_rgb(tHsv[0] * _fFacH, tHsv[1] * _fFacS, tHsv[2] * _fFacV)
 
             _xNodeCtr.default_value[0] = tRgbDark[0]
             _xNodeCtr.default_value[1] = tRgbDark[1]
@@ -714,22 +687,14 @@ class HumGenWrapper:
             print("> HG_Control node found")
 
             # brightnessMod = params['outfit'].get(, 1.0)
-            fBrightnessFactor = getValue(
-                dicOutfit, "outfit_brightness", objCloth.name, index, 0.8
-            )
-            fSaturationFactor = getValue(
-                dicOutfit, "outfit_saturation", objCloth.name, index, 0.8
-            )
+            fBrightnessFactor = getValue(dicOutfit, "outfit_brightness", objCloth.name, index, 0.8)
+            fSaturationFactor = getValue(dicOutfit, "outfit_saturation", objCloth.name, index, 0.8)
 
             # contrastMod = getValue(dicOutfit, 'outfit_contrast', objCloth.name, index, 2.2)
-            outfit_color = getValue(
-                dicOutfit, "outfit_color", objCloth.name, index, "random"
-            )
+            outfit_color = getValue(dicOutfit, "outfit_color", objCloth.name, index, "random")
             palette = getValue(dicOutfit, "outfit_palette", objCloth.name, index, "C0")
 
-            sOutfitPattern = getValue(
-                dicOutfit, "outfit_pattern", objCloth.name, index, False
-            )
+            sOutfitPattern = getValue(dicOutfit, "outfit_pattern", objCloth.name, index, False)
 
             bpy.context.view_layer.objects.active = objCloth
             bpy.context.object.active_material = matCloth
@@ -745,15 +710,9 @@ class HumGenWrapper:
             # endif
 
             ndHgCtrl.inputs["Main Color_C0"].default_value = (fR, fG, fB, 1.0)
-            tryAdjustDefaultInputColorHSV(
-                ndHgCtrl, "Main Color_C0", 1.0, fSaturationFactor, fBrightnessFactor
-            )
-            tryAdjustDefaultInputColorHSV(
-                ndHgCtrl, "Stitches", 1.0, fSaturationFactor, fBrightnessFactor
-            )
-            tryAdjustDefaultInputColorHSV(
-                ndHgCtrl, "Buttons", 1.0, fSaturationFactor, fBrightnessFactor
-            )
+            tryAdjustDefaultInputColorHSV(ndHgCtrl, "Main Color_C0", 1.0, fSaturationFactor, fBrightnessFactor)
+            tryAdjustDefaultInputColorHSV(ndHgCtrl, "Stitches", 1.0, fSaturationFactor, fBrightnessFactor)
+            tryAdjustDefaultInputColorHSV(ndHgCtrl, "Buttons", 1.0, fSaturationFactor, fBrightnessFactor)
 
             # insert bright/contrast node
             # base_color_node = ndHgCtrl.inputs["Diffuse"].links[0].from_node
@@ -767,14 +726,10 @@ class HumGenWrapper:
             # mat.node_tree.links.new(ndHgCtrl.inputs["Diffuse"], bright_node["Color"])
 
             # randomize roughness multiplier
-            ndHgCtrl.inputs[
-                "Roughness Multiplier"
-            ].default_value = tools.RandomUniformDiscrete(0.8, 1.2, 11)
+            ndHgCtrl.inputs["Roughness Multiplier"].default_value = tools.RandomUniformDiscrete(0.8, 1.2, 11)
 
             # randomize normal strength
-            ndHgCtrl.inputs[
-                "Normal Strength"
-            ].default_value = tools.RandomUniformDiscrete(1.8, 2.2, 11)
+            ndHgCtrl.inputs["Normal Strength"].default_value = tools.RandomUniformDiscrete(1.8, 2.2, 11)
 
             if sOutfitPattern == "random":
                 bpy.ops.hg3d.pattern(add=True)
@@ -833,16 +788,10 @@ class HumGenWrapper:
             bpy.context.view_layer.objects.active = objFootwear
             bpy.context.object.active_material = matFootwear
 
-            footwear_color = getValue(
-                dicFootwear, "footwear_color", objFootwear.name, index, None
-            )
-            palette = getValue(
-                dicFootwear, "footwear_palette", objFootwear.name, index, "C0"
-            )
+            footwear_color = getValue(dicFootwear, "footwear_color", objFootwear.name, index, None)
+            palette = getValue(dicFootwear, "footwear_palette", objFootwear.name, index, "C0")
 
-            sOutfitPattern = getValue(
-                dicOutfit, "outfit_pattern", objCloth.name, index, False
-            )
+            sOutfitPattern = getValue(dicOutfit, "outfit_pattern", objCloth.name, index, False)
 
             bpy.context.view_layer.objects.active = objCloth
             bpy.context.object.active_material = matCloth
