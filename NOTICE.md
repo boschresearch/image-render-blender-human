@@ -29,7 +29,7 @@ organization's name, optionally also the contributor's name:
 **Please keep the list sorted.**
 
 - Bosch Engineering GmbH
-    - Dirk Fortmeier <Dirk.Fortmeier@de.bosch.com>
+    - Dirk Fortmeier <Dirk.Fortmeier@de.bosch.com> [A16FD50BAC26F353]
     - Jorina Baum-Renken <Jorina.Baum-Renken@de.bosch.com>
 
 - Robert Bosch GmbH
