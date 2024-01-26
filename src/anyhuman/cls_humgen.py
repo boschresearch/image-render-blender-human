@@ -43,12 +43,8 @@ from pathlib import Path
 from anyblend import node
 from anyblend.util.node import GetByLabelOrId
 from anyblend.collection import RemoveCollection
+import addon_utils 
 
-try:
-    from humgen3d.API import HG_Human, HG_Batch_Generator
-except Exception as xEx:
-    print("Error initializing anyhuman module:\n{}".format(str(xEx)))
-# endtry
 
 from . import tools
 
@@ -105,8 +101,23 @@ class HumGenWrapper:
         """
         Sets lists for base humans/hair/beard styles from humgen content folder
         """
-        addon_name = "humgen3d"
-        addon_path = bpy.context.preferences.addons[addon_name].preferences["filepath"]
+
+    # enddef
+        version_info = self.get_installed_humgen_version()
+        # Set addon_name based on the version
+        if version_info and version_info[0] == 4:
+            # Check only MAJOR version number
+            self.addon_name = "HumGen3D"
+            from HumGen3D import Human, HG_Batch
+        elif version_info and version_info[0] == 3:
+            self.addon_name = "humgen3d"
+        else:
+            # Default to "HumGen3D" if version information is not available
+            self.addon_name = "HumGen3D"
+        # enddef
+        print(self.addon_name)
+            
+        addon_path = bpy.context.preferences.addons[self.addon_name].preferences["filepath"]
         base_human_path = os.path.join(addon_path, "models")
         hair_path = os.path.join(addon_path, "hair")
         outfit_path = os.path.join(addon_path, "outfits")
@@ -238,6 +249,16 @@ class HumGenWrapper:
     # enddef
 
     ############################################################################################
+    def get_installed_humgen_version(self):
+        humgen_version = None  # Default value if addon not found
+        for mod in addon_utils.modules():
+            if mod.bl_info.get("name") == "Human Generator 3D":
+                humgen_version = mod.bl_info.get("version")
+                print(f'HumGen3D Version is: {".".join(map(str, humgen_version))}')
+                break  # Stop searching once addon is found
+        return humgen_version 
+    #enddef
+         
     def CreateHuman(self, _sName, _mParams, _bDeleteBackup=True):
         """
         generates a random human given gender and name
