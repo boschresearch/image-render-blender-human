@@ -64,9 +64,9 @@ def _testHumanGeneration():
             obj = ops.GenerateHuman(
                 {
                     "xSeed": 1,
-                    "sId": "Alice",
+                    "sId": "Anna",
                     "sMode": "PERSONA",
-                    "mParamConfig": {"sPersonaId": "alice"},
+                    "mParamConfig": {"sPersonaId": "Anna"},
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
