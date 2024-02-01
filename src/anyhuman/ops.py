@@ -43,10 +43,15 @@ from .cls_humgen import SingletonHumGenWrapper
 from .paramgenerators import ComputeParams, ResolveRandomParams
 
 try:
-    from humgen3d.API import HG_Human, HG_Batch_Generator
+    from HumGen3D import Human as HG_Human
 except Exception as xEx:
     print("Error initializing anyhuman module:\n{}".format(str(xEx)))
-# endtry
+# HumGen V3 Legacy
+# try:
+#     from humgen3d.API import HG_Human, HG_Batch_Generator
+# except Exception as xEx:
+#     print("Error initializing anyhuman module:\n{}".format(str(xEx)))
+# # endtry
 
 
 ##############################################################################################################
