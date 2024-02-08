@@ -60,6 +60,7 @@ if bInBlenderContext is True:
 
 
 def register():
+    from . import cls_gen_random_human
     cls_gen_random_human.register()
 
 
