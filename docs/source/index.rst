@@ -33,6 +33,7 @@ The Catharsys interface to generating human models in Blender using the add-on H
 
    humgen
    license
+   back-to-main
 
 .. Indices and tables
 .. ==================
