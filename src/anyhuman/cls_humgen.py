@@ -133,6 +133,7 @@ class HumGenWrapper:
     # enddef
             
         addon_path = bpy.context.preferences.addons[HumGenWrapper.addon_name].preferences["filepath_"]
+        content_packs_path = os.path.join(addon_path, "content_packs")
         base_human_path = os.path.join(addon_path, "models")
         hair_path = os.path.join(addon_path, "hair")
         outfit_path = os.path.join(addon_path, "outfits")
@@ -152,6 +153,8 @@ class HumGenWrapper:
         # endclass
 
         self.generator_config = HumGenConfigValues()
+        
+
 
         for dir_, _, files in os.walk(base_human_path):
             for file_name in files:
@@ -264,7 +267,114 @@ class HumGenWrapper:
     # enddef
 
     ############################################################################################
+    def CreateFullRandomHuman(self, _sName:str):
+        """ 
+            Create fully random human using the HumGen3D V4 API
+            sName: Give the human a name
+        """
+        # Random Gender
+        sGender =  random.choice(["male", "female"])
+        # Get preset for selected gender
+        self.chosen_option = self.Human.get_preset_options(sGender) 
 
+        # Choose a random base human
+        self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
+
+        # Choose a random integer between 20 and 81 for age
+        iHuman_age = random.randrange(20, 81)
+        self.human_obj.age.set(iHuman_age)
+
+        # Create dict with random body key values
+        random_body_dict = {}
+        for i, v in enumerate(self.human_obj.body.keys):
+            v.value = random.random()
+            random_body_dict.update({v.name : v.value})
+    
+        # Randomize clothing
+        # Footwear
+        footwear = self.human_obj.clothing.footwear
+        lFootwear = footwear.get_options()
+        sFootwear = random.choice(lFootwear)
+        footwear.set(sFootwear)
+        # Add a random pattern to footwear
+        # TODO check also if pattern parameter are showing via as_dict() function
+        if random.random() < 0.5:
+            lRandomPattern = footwear.pattern.get_options()
+            sFootwearRandomPattern = random.choice(lRandomPattern)
+            footwear.pattern.set(sFootwearRandomPattern, footwear.objects[0])
+            # Apply random base color to the footwear
+            # TODO: Dive into blender shaders and do it without Humgens randomize color function
+            footwear.randomize_colors(footwear.objects[0])
+        else:
+            pass
+
+        # Outfit    
+        outfit = self.human_obj.clothing.outfit
+        lOutfits = outfit.get_options()
+        sOutfits = random.choice(lOutfits)
+        outfit.set(sOutfits)
+        # Get list of  pattern for outfit
+        lOutfits = outfit.pattern.get_options()
+        # TODO check also if pattern parameter are showing via as_dict() function
+        # As the outfits have different number of parts (jacket, trousers, tie,...) we need to loop over them
+        for i, k in enumerate(outfit.objects):
+            # Add a random pattern to each of the different outfit parts
+            if random.random() < 0.5:
+                outfit.pattern.set(random.choice(lOutfits), outfit.objects[i])
+            # Apply random base color to the different parts of the outfits
+            # TODO: Dive into blender shaders and do it without Humgens randomize color function
+            elif random.random() < 0.5:
+                outfit.randomize_colors(outfit.objects[i])
+            else:    
+                pass
+
+        # Eyes
+        eyes = self.human_obj.eyes
+        # Change iris color with Humgens randomize color function
+        # TODO: Dive into blender shaders and do it without Humgens randomize color function
+        eyes.randomize()
+        # TODO: Change sclera color within a reasonable range
+
+        # Face
+        face = self.human_obj.face
+        # Randomize the face using HumGen Function
+        face.randomize()
+        # Randomize face with own functions
+        # face_dict = dict()
+        # for i, v in enumerate(face.keys):
+        #     v.value = random.random()
+        #     face_dict.update({v.name : v.value})
+
+
+
+
+
+  
+        # Load and create base_human_dict
+        filename = os.path.join(content_packs_path, "Base_Humans.json")
+        with open(filename, "r") as file:
+            base_human_dict = json.load(file)
+
+        # Load and create base_hair_dict
+        filename = os.path.join(content_packs_path, "Base_Hair.json")
+        with open(filename, "r") as file:
+            base_hair_dict = json.load(file)
+
+        # Json files for hair are used by HumGenV4
+        base_hair_json_files = [file for file in base_hair_dict["files"] if file.endswith('.json')]
+
+        # Load and create base_clothes_dict
+        filename = os.path.join(content_packs_path, "Base_Clothes.json")
+        with open(filename, "r") as file:
+            base_clothes_dict = json.load(file)
+        # blend files for hair are used by HumGenV4
+        base_clothes_blend_files = [file for file in base_clothes_dict["files"] if file.endswith('.blend')]
+
+        # Load and create base_poses_dict
+        filename = os.path.join(content_packs_path, "Base_Poses.json")
+        with open(filename, "r") as file:
+            base_poses_dict = json.load(file)
+        base_pose_blend_files = [file for file in base_poses_dict["files"] if file.endswith('.blend')]
          
     def CreateHuman(self, _sName, _mParams):
         """
