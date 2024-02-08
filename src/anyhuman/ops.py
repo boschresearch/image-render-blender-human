@@ -54,6 +54,7 @@ except Exception as xEx:
 # # endtry
 
 
+
 ##############################################################################################################
 def GenerateHuman(_dicParams, **kwargs):
     """
@@ -63,15 +64,15 @@ def GenerateHuman(_dicParams, **kwargs):
     then will be used to create the human.
 
     The computation of parameters can be based on different approaches as full randomization,
-    randomization by a Zwicky-Box specifcation, or directly by given parameters. For a detailed description,
+    randomization by a Zwicky-Box specification, or directly by given parameters. For a detailed description,
     see the HumGenWrapper class.
 
-    The _dicParams dictionaly can contain the keys:
+    The _dicParams dictionary can contain the keys:
     - sId: name that should be used for the generated blender object
     - xSeed: object for seeding the randomization
     - sMode: mode for computation of the parameters of the human
     - mParamConfig: dict with parameters for the parameter computation, see HumGenWrapper
-    - mOverwrite: dict with parameters that should be used to overwrite the computed paramter values
+    - mOverwrite: dict with parameters that should be used to overwrite the computed parameter values
     - bDeleteBackup: set to False to prevent the deletion of the humgen backup human
         that is necessary for certain operations
 
@@ -125,8 +126,7 @@ def GenerateHuman(_dicParams, **kwargs):
 
     objX = lHumanGenerator.CreateHuman(
         _sName=_dicParams["sId"],
-        _mParams=generator_params,
-        _bDeleteBackup=_dicParams.get("bDeleteBackup", True),
+        _mParams=generator_params
     )
 
     objX["generator_param_dict"] = json.dumps(generator_params)

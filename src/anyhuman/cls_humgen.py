@@ -266,7 +266,7 @@ class HumGenWrapper:
     ############################################################################################
 
          
-    def CreateHuman(self, _sName, _mParams, _bDeleteBackup=True):
+    def CreateHuman(self, _sName, _mParams):
         """
         is a random human given gender and name
 
@@ -326,7 +326,7 @@ class HumGenWrapper:
             print("Error setting mode to 'OBJECT':\n{}".format(str(xEx)))
         # endtry
 
-        # sGender = _mParams["gender"]  # Humgen V3
+        # sGender = _mParams["sGender"]  # Humgen V3
         if _mParams["keys"]["Male"] == 1.0:
             sGender = "male"
         elif _mParams["keys"]["Male"] == 0.0:
@@ -340,7 +340,7 @@ class HumGenWrapper:
         # this needs to be run to populate internal values of the plugin
         # self.human_obj.get_starting_human_options(gender=sGender) # Humgen V3
         self.chosen_option = self.Human.get_preset_options(sGender) 
-        self.human_obj = self.Human.from_preset(self.chosen_option[0])
+        self.human_obj = self.Human.from_preset(_mParams)
         # self.human_obj.create(chosen_starting_human=body_rel_file) # Humgen V3
 
         # name_human = self.human_obj.body_object.material_slots[0].name # Humgen V3
@@ -393,9 +393,10 @@ class HumGenWrapper:
         #     # endif # HumGen V3
         # except Exception as xEx: # HumGen V3
         #     print("Error setting context area type back to '{}':\n{}".format(original_type, str(xEx))) # HumGen V3
-        # # endtry # HumGen V3
+        # endtry # HumGen V3
 
-        # return self.human_obj.rig_object
+        # return self.human_obj.rig_object # HumGen V3
+        return self.human_obj.objects.rig
 
     # enddef
 

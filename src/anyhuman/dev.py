@@ -27,7 +27,7 @@
 ###
 
 import bpy
-from . import ops
+from anyhuman import ops
 
 
 ###############################################################################################################################
@@ -42,9 +42,9 @@ def _testHumanGeneration():
         # "RANDOM_FULL",
         # "RANDOM_REALISTIC",
         # "RANDOM_REALISTIC_GRID",
-        "PERSONA",
+        # "PERSONA",
         # "LEGACY",
-        "OTHER",
+        "FILE",
     ]
     try:
         dx = 1.2
@@ -58,15 +58,28 @@ def _testHumanGeneration():
 
             # PlaceHumanOnSeat(obj, {'sEmptyBaseName': 'seat_1'})
         # endif
+        if "FILE" in active_tests:
+            bpy.context.scene.cursor.location[0] = 0
+            obj = ops.GenerateHuman(
+                {
+                    "sId": "Anna",
+                    "sMode": "FILE",
+                    "mParamConfig": {
+                        "sFilename": "C:\\Users\\mnt1lr\\Documents\\work\\Cathy_HumGenV4_Development\\image-render-setup\\repos\image-render-blender-human\\src\\anyhuman\\personas\\Anna.json"
+                    },
+                }
+            )    
 
         if "PERSONA" in active_tests:
             bpy.context.scene.cursor.location[0] = 0
             obj = ops.GenerateHuman(
                 {
                     "xSeed": 1,
-                    "sId": "Anna",
+                    "sId": "Alice",
                     "sMode": "PERSONA",
-                    "mParamConfig": {"sPersonaId": "Anna"},
+                    "mParamConfig": {
+                        "sPersonaId": "alice"
+                        },
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
@@ -75,7 +88,9 @@ def _testHumanGeneration():
                     "xSeed": 1,
                     "sId": "Bob",
                     "sMode": "PERSONA",
-                    "mParamConfig": {"sPersonaId": "bob"},
+                    "mParamConfig": {
+                        "sPersonaId": "bob"
+                        },
                 }
             )
             bpy.context.scene.cursor.location[1] += dy
@@ -217,4 +232,4 @@ def _testHumanGeneration():
 
 
 # uncomment the following line when testing the script in Blender:
-# _testHumanGeneration()
+_testHumanGeneration()
