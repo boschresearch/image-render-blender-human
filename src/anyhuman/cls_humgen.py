@@ -315,7 +315,7 @@ class HumGenWrapper:
 
         self.human_obj = self.Human.from_preset(_sJsonFile)
 
-        return self.human_obj.rig_object
+        return self.human_obj.objects.rig
 
     def CreateHuman(self, _sName, _mParams):
         """
