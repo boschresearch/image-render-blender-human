@@ -327,6 +327,9 @@ class HumGenWrapper:
                 outfit.randomize_colors(outfit.objects[i])
             else:    
                 pass
+        
+            # endif
+        # endfor
 
         # Eyes
         eyes = self.human_obj.eyes
@@ -344,6 +347,98 @@ class HumGenWrapper:
         # for i, v in enumerate(face.keys):
         #     v.value = random.random()
         #     face_dict.update({v.name : v.value})
+
+        # Hair
+        # Eye brows
+        eyebrows = self.human_obj.hair.eyebrows
+        # Fast (0) or accurate shaders (1)
+        eyebrows.fast_or_accurate = 1 # Accurate
+        eyebrows.hue.value = random.random()
+        eyebrows.lightness.value = random.random()
+        eyebrows.redness.value = random.random()
+        eyebrows.root_lightness.value = random.random()
+        eyebrows.root_redness.value = random.random()
+        eyebrows.root_redness.value = random.random()
+        eyebrows.root.value = random.random()
+        eyebrows.root_hue.value = random.random()
+        eyebrows.roughness.value = random.random()
+        eyebrows.salt_and_pepper.value = random.random()
+        # Eye lashes
+        eyelashes =  self.human_obj.hair.eyelashes        
+        # Fast (0) or accurate shaders (1)
+        eyelashes.fast_or_accurate = 1 # Accurate
+        eyelashes.hue.value = random.random()
+        eyelashes.lightness.value = random.random()
+        eyelashes.redness.value = random.random()
+        eyelashes.root_lightness.value = random.random()
+        eyelashes.root_redness.value = random.random()
+        eyelashes.roots.value = random.random()
+        eyelashes.root_hue.value = random.random()        
+        eyelashes.roughness.value = random.random()   
+        eyelashes.salt_and_pepper.value = random.random()  
+        # Face hair
+        face_hair =  self.human_obj.hair.face_hair      
+        if random.random() < 0.5:
+            # Set a random face hair
+            face_hair.set_random()
+            # Fast (0) or accurate shaders (1)
+            face_hair.fast_or_accurate = 1 # Accurate
+            # Set random face hair using a humgen function
+            face_hair.hue.value = random.random()
+            face_hair.lightness.value = random.random()
+            face_hair.lightness.value = random.random()
+            face_hair.redness.value = random.random()
+            face_hair.root_lightness.value = random.random()
+            face_hair.root_redness.value = random.random()
+            face_hair.roots.value = random.random()
+            face_hair.root_hue.value = random.random()        
+            face_hair.roughness.value = random.random()   
+            face_hair.salt_and_pepper.value = random.random() 
+
+        # endif
+            
+        # Regular hair
+        hair =  self.human_obj.hair.regular_hair  
+        if random.random() < 0.5:
+            # Set a random face hair
+            hair.set_random()
+            # Fast (0) or accurate shaders (1)
+            hair.fast_or_accurate = 1 # Accurate
+            # Set random face hair using a humgen function
+            hair.hue.value = random.random()
+            hair.lightness.value = random.random()
+            hair.lightness.value = random.random()
+            hair.redness.value = random.random()
+            hair.root_lightness.value = random.random()
+            hair.root_redness.value = random.random()
+            hair.roots.value = random.random()
+            hair.root_hue.value = random.random()        
+            hair.roughness.value = random.random()   
+            hair.salt_and_pepper.value = random.random() 
+        
+        # endif
+
+        # Height
+
+        # Skin
+        skin =  self.human_obj.hair.skin 
+        # General settings
+        skin.set_subsurface_scattering(True) # Turn on SSS
+        # Parameters
+        skin.cavity_strength.value = random.random()
+        skin.freckles.value = random.uniform(0, 0.5)
+        if sGender == "male":
+            skin.gender_specific.beard_shadow.value = random.random()
+            skin.gender_specific.mustache_shadow.value = random.random()
+        else: 
+            pass
+        skin.normal_strength.value = random.uniform(0, 10)
+        skin.redness.value = random.random()
+        skin.roughness_multiplier.value = random.uniform(-10000, 10000)
+        skin.saturation.value = random.uniform(0, 2)
+        skin.splotches.value = random.uniform(0, 0.5)
+        skin.tone.value = random.uniform(0, 3)
+        # endif
 
 
 
