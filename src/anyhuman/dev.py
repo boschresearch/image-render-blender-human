@@ -224,4 +224,4 @@ def _testHumanGeneration():
 
 
 # uncomment the following line when testing the script in Blender:
-_testHumanGeneration()
+# _testHumanGeneration()
