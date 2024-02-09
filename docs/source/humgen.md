@@ -23,7 +23,6 @@
 
 To run anyhumans you need HumGen V4 from [HumGenV4 testing fork](https://github.com/mnt1lr/HumGen3D/tree/testing)
 
-
 ## How to generate a human <a name="generate-anyhumans"></a>
 
 Generation of anyhumans is based on a configuration dictionary (see [configuration](#anyhuman-configuration)).
@@ -82,7 +81,9 @@ Example generator snippit for catharsys:
 }
 ```
 
-### 2. Fully Random:
+### 2. Full Random Human:
+
+To randomize a HumGen you can use dependent parameters such as **age** or independent parameters such as e.g **Forearm Thickness**. In other words setting the age, sets preset values to parameters like **Aged male**
 
 For domain randomization, it is reasonable to create completely random anyhumans. The parameters of the human will be varied over the whole range of valid values, resulting sometimes in funny and questionable configurations. However, even if these anyhumans probably will not have a correspondace in reality, it is expected that this is benefitial for AI training.
 
