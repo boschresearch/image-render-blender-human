@@ -62,13 +62,13 @@ def _testHumanGeneration():
             bpy.context.scene.cursor.location[0] = 0
             obj = ops.GenerateHuman(
                 {
-                    "sId": "Anna",
+                    "sId": "Seth",
                     "sMode": "FILE",
                     "mParamConfig": {
-                        "sFilename": "C:\\Users\\mnt1lr\\Documents\\work\\Cathy_HumGenV4_Development\\image-render-setup\\repos\image-render-blender-human\\src\\anyhuman\\personas\\Anna.json"
+                        "sFilename": "C:\\Users\\mnt1lr\\Documents\\work\\Cathy_HumGenV4_Development\\image-render-setup\\repos\image-render-blender-human\\src\\anyhuman\\personas\\HG_Seth.json"
                     },
                 }
-            )    
+            )
 
         if "PERSONA" in active_tests:
             bpy.context.scene.cursor.location[0] = 0
@@ -77,9 +77,7 @@ def _testHumanGeneration():
                     "xSeed": 1,
                     "sId": "Alice",
                     "sMode": "PERSONA",
-                    "mParamConfig": {
-                        "sPersonaId": "alice"
-                        },
+                    "mParamConfig": {"sPersonaId": "alice"},
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
@@ -88,9 +86,7 @@ def _testHumanGeneration():
                     "xSeed": 1,
                     "sId": "Bob",
                     "sMode": "PERSONA",
-                    "mParamConfig": {
-                        "sPersonaId": "bob"
-                        },
+                    "mParamConfig": {"sPersonaId": "bob"},
                 }
             )
             bpy.context.scene.cursor.location[1] += dy
@@ -121,9 +117,7 @@ def _testHumanGeneration():
                 bpy.context.scene.cursor.location[0] = 0
                 for x in range(0, 4):
                     bpy.context.scene.cursor.location[0] += dx
-                    obj = ops.GenerateHuman(
-                        {"sId": "Armature.0{}{}".format(y, x), "sMode": "RANDOM_FULL"}
-                    )
+                    obj = ops.GenerateHuman({"sId": "Armature.0{}{}".format(y, x), "sMode": "RANDOM_FULL"})
                 bpy.context.scene.cursor.location[1] += dy
         # endif
 
@@ -216,9 +210,7 @@ def _testHumanGeneration():
                 bpy.context.scene.cursor.location[0] = 0
                 for x in range(0, 4):
                     bpy.context.scene.cursor.location[0] += dx
-                    obj = ops.GenerateHuman(
-                        {"sId": "Armature.0{}{}".format(y, x), "sMode": "ZWICKY"}
-                    )
+                    obj = ops.GenerateHuman({"sId": "Armature.0{}{}".format(y, x), "sMode": "ZWICKY"})
                 bpy.context.scene.cursor.location[1] += dy
         # endif
 
