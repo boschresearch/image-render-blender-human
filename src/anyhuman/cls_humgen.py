@@ -43,7 +43,7 @@ from pathlib import Path
 from anyblend import node
 from anyblend.util.node import GetByLabelOrId
 from anyblend.collection import RemoveCollection
-import addon_utils 
+import addon_utils
 
 
 from . import tools
@@ -105,8 +105,9 @@ class HumGenWrapper:
                 humgen_version = mod.bl_info.get("version")
                 print(f'HumGen3D Version is: {".".join(map(str, humgen_version))}')
                 break  # Stop searching once addon is found
-        return humgen_version 
-    #enddef
+        return humgen_version
+
+    # enddef
     # Import Human class based on the version
     version_info = None
     try:
@@ -118,9 +119,11 @@ class HumGenWrapper:
     if version_info and version_info[0] == 4:
         # Check only MAJOR version number
         from HumGen3D import Human
+
         addon_name = "HumGen3D"
     elif version_info and version_info[0] == 3:
         from humgen3d import Human  # Adjust the import based on your actual module structure
+
         addon_name = "humgen3d"
     else:
         from HumGen3D import Human
@@ -130,8 +133,8 @@ class HumGenWrapper:
         Sets lists for base humans/hair/beard styles from humgen content folder
         """
 
-    # enddef
-            
+        # enddef
+
         addon_path = bpy.context.preferences.addons[HumGenWrapper.addon_name].preferences["filepath_"]
         content_packs_path = os.path.join(addon_path, "content_packs")
         base_human_path = os.path.join(addon_path, "models")
@@ -267,6 +270,56 @@ class HumGenWrapper:
     # enddef
 
     ############################################################################################
+
+    def CreateHumanFromJSON(self, _sJsonFile: str):
+        """_summary_
+
+        Parameters
+        ----------
+        _sJsonFile : str
+            abs or relative file path with filename of human descritpion
+
+        Returns
+        -------
+        blender object
+            human armature, to be selected in blender by the given name
+        Raises
+        ------
+        RuntimeError
+            raises ...
+        """
+        bpy.ops.outliner.orphans_purge(do_recursive=True)
+        # HumanArmature = None
+
+        original_type = None
+        try:
+            original_type = bpy.context.area.type
+        except Exception as xEx:
+            print("Error storing original context area type:\n{}".format(str(xEx)))
+        # endtry get area type
+
+        try:
+            bpy.context.area.type = "VIEW_3D"
+        except Exception as xEx:
+            print("Error setting context area type to 'VIEW_3D':\n{}".format(str(xEx)))
+        # endtry set area type
+
+        try:
+            bpy.ops.object.select_all(action="DESELECT")
+        except Exception as xEx:
+            print("Error deselecting all objects:\n{}".format(str(xEx)))
+        # end try deselect all
+
+        try:
+            bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
+        except Exception as xEx:
+            print("Error setting mode to 'OBJECT':\n{}".format(str(xEx)))
+        # endtry
+
+        self.human_obj = self.Human.from_preset(_sJsonFile)
+
+        return self.human_obj.objects.rig
+
     def CreateFullRandomHuman(self, _sName:str):
         """ 
             Create fully random human using the HumGen3D V4 API
@@ -539,12 +592,12 @@ class HumGenWrapper:
 
         # body_rel_file = "/models/{}/{}.json".format(sGender, _mParams["body"]) # Humgen V3
         # body_rel_file = self._make_rel_path(body_rel_file) # Humgen V3
-       
+
         # self.human_obj = HG_Human() # Humgen V3
 
         # this needs to be run to populate internal values of the plugin
         # self.human_obj.get_starting_human_options(gender=sGender) # Humgen V3
-        self.chosen_option = self.Human.get_preset_options(sGender) 
+        self.chosen_option = self.Human.get_preset_options(sGender)
         self.human_obj = self.Human.from_preset(_mParams)
         # self.human_obj.create(chosen_starting_human=body_rel_file) # Humgen V3
 
@@ -559,7 +612,7 @@ class HumGenWrapper:
         # self.human_obj.finish_creation_phase() # Humgen V3
 
         # calculate the bodies weight and volume
-        body_surface = self.human_obj.props['body_obj']
+        body_surface = self.human_obj.props["body_obj"]
 
         bm = bmesh.new()
 
@@ -738,7 +791,7 @@ class HumGenWrapper:
 
     ############################################################################################
     def _prepare_eyes(self, gender, _mParams):
-        """Prepare eyes """
+        """Prepare eyes"""
         # eye_nodes = bpy.data.materials[".HG_Eyes_Inner"].node_tree.nodes # HumGen3D V3
         # eye_nodes["HG_Eye_Color"].inputs[2].default_value = params["eyes"]["iris_color"] # HumGen3D V3
         self.human_obj.eyes.iris_color.value = _mParams["eyes"]["pupil_color"]
@@ -763,7 +816,7 @@ class HumGenWrapper:
 
         #     for i in range(0, eyebrowsindex):
         #         bpy.ops.hg3d.eyebrowswitch(forward=True)
-            # endfor
+        # endfor
         # endif # HumGen3D V3
 
     # enddef
@@ -1091,9 +1144,9 @@ class HumGenWrapper:
             if posefilename == "random":
                 posefilename = random.choice(AvailablePoses)
             elif posefilename is None:
-                posefilename = AvailablePoses[0] # set A-Pose
+                posefilename = AvailablePoses[0]  # set A-Pose
         except:
-            posefilename = AvailablePoses[0] # set A-Pose
+            posefilename = AvailablePoses[0]  # set A-Pose
 
         # if posefilename is None: # HumGen V3
         #     posefilename = self._make_rel_path("/poses/Base Poses/HG_A_Pose.blend") # HumGen V3
@@ -1114,25 +1167,23 @@ class HumGenWrapper:
         # print("done.") # HumGen V3
 
         AvailableExpressions = self.human_obj.expression.get_options()
-        if "expression" in _mParams: 
-                self.human_obj.expression.keys[0].value = _mParams["expression"]["Angry"]
-                self.human_obj.expression.keys[1].value = _mParams["expression"]["Blink Left"]
-                self.human_obj.expression.keys[2].value = _mParams["expression"]["Blink Right"]
-                self.human_obj.expression.keys[3].value = _mParams["expression"]["Brow Raise Left"]
-                self.human_obj.expression.keys[4].value = _mParams["expression"]["Brow Raise Right"]
-                self.human_obj.expression.keys[5].value = _mParams["expression"]["Cheeck Suck"]
-                self.human_obj.expression.keys[6].value = _mParams["expression"]["Frown"]
-                self.human_obj.expression.keys[7].value = _mParams["expression"]["Frown.001"]
-                self.human_obj.expression.keys[8].value = _mParams["expression"]["Brow Raise Left.001"]
+        if "expression" in _mParams:
+            self.human_obj.expression.keys[0].value = _mParams["expression"]["Angry"]
+            self.human_obj.expression.keys[1].value = _mParams["expression"]["Blink Left"]
+            self.human_obj.expression.keys[2].value = _mParams["expression"]["Blink Right"]
+            self.human_obj.expression.keys[3].value = _mParams["expression"]["Brow Raise Left"]
+            self.human_obj.expression.keys[4].value = _mParams["expression"]["Brow Raise Right"]
+            self.human_obj.expression.keys[5].value = _mParams["expression"]["Cheeck Suck"]
+            self.human_obj.expression.keys[6].value = _mParams["expression"]["Frown"]
+            self.human_obj.expression.keys[7].value = _mParams["expression"]["Frown.001"]
+            self.human_obj.expression.keys[8].value = _mParams["expression"]["Brow Raise Left.001"]
         else:
             # set random expression
             self.human_obj.expression.set_random()
             # save the set expression
-            _mParams["expression"] = {
-                "mode" : "HumGen3D Random"
-            }
+            _mParams["expression"] = {"mode": "HumGen3D Random"}
             for i, k in enumerate(self.human_obj.expression.keys):
-                _mParams["expression"].update({k.name : k.value}) 
+                _mParams["expression"].update({k.name: k.value})
             # endfor
         # endif
         print(_mParams["expression"])

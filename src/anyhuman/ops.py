@@ -54,7 +54,6 @@ except Exception as xEx:
 # # endtry
 
 
-
 ##############################################################################################################
 def GenerateHuman(_dicParams, **kwargs):
     """
@@ -124,10 +123,10 @@ def GenerateHuman(_dicParams, **kwargs):
     # apply
     # params['posefilename'] =_dicParams.get('sPosefile')
 
-    objX = lHumanGenerator.CreateHuman(
-        _sName=_dicParams["sId"],
-        _mParams=generator_params
-    )
+    if _dicParams.get("sMode") == "FILE":
+        objX = lHumanGenerator.CreateHumanFromJSON(params["sFilename"])
+    else:
+        objX = lHumanGenerator.CreateHuman(_sName=_dicParams["sId"], _mParams=generator_params)
 
     objX["generator_param_dict"] = json.dumps(generator_params)
 
