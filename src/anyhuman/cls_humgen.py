@@ -353,7 +353,11 @@ class HumGenWrapper:
         if random.random() < 0.5:
             lRandomPattern = footwear.pattern.get_options()
             sFootwearRandomPattern = random.choice(lRandomPattern)
-            footwear.pattern.set(sFootwearRandomPattern, footwear.objects[0])
+            # to some footwear patterns can not be applied, e.g. garden boots
+            try:
+                footwear.pattern.set(sFootwearRandomPattern, footwear.objects[0])
+            except IndexError:
+                pass
             # Apply random base color to the footwear
             # TODO: Dive into blender shaders and do it without Humgens randomize color function
             footwear.randomize_colors(footwear.objects[0])
@@ -412,7 +416,7 @@ class HumGenWrapper:
         eyebrows.root_redness.value = random.random()
         eyebrows.root_redness.value = random.random()
         eyebrows.roots.value = random.random()
-        eyebrows.root_hue.value = random.random()
+        eyebrows.roots_hue.value = random.random()
         eyebrows.roughness.value = random.random()
         eyebrows.salt_and_pepper.value = random.random()
         # Eye lashes
@@ -425,28 +429,29 @@ class HumGenWrapper:
         eyelashes.root_lightness.value = random.random()
         eyelashes.root_redness.value = random.random()
         eyelashes.roots.value = random.random()
-        eyelashes.root_hue.value = random.random()        
+        eyelashes.roots_hue.value = random.random()        
         eyelashes.roughness.value = random.random()   
         eyelashes.salt_and_pepper.value = random.random()  
         # Face hair
-        face_hair =  self.human_obj.hair.face_hair      
-        if random.random() < 0.5:
-            # Set a random face hair
-            face_hair.set_random()
-            # Fast (0) or accurate shaders (1)
-            face_hair.fast_or_accurate = 1 # Accurate
-            # Set random face hair using a humgen function
-            face_hair.hue.value = random.random()
-            face_hair.lightness.value = random.random()
-            face_hair.lightness.value = random.random()
-            face_hair.redness.value = random.random()
-            face_hair.root_lightness.value = random.random()
-            face_hair.root_redness.value = random.random()
-            face_hair.roots.value = random.random()
-            face_hair.root_hue.value = random.random()        
-            face_hair.roughness.value = random.random()   
-            face_hair.salt_and_pepper.value = random.random() 
-
+        if sGender == "male":
+            face_hair =  self.human_obj.hair.face_hair 
+            if random.random() < 0.5:
+                # Set a random face hair
+                face_hair.set_random()
+                # Fast (0) or accurate shaders (1)
+                face_hair.fast_or_accurate = 1 # Accurate
+                # Set random face hair using a humgen function
+                face_hair.hue.value = random.random()
+                face_hair.lightness.value = random.random()
+                face_hair.lightness.value = random.random()
+                face_hair.redness.value = random.random()
+                face_hair.root_lightness.value = random.random()
+                face_hair.root_redness.value = random.random()
+                face_hair.roots.value = random.random()
+                face_hair.roots_hue.value = random.random()        
+                face_hair.roughness.value = random.random()   
+                face_hair.salt_and_pepper.value = random.random() 
+            # endif
         # endif
             
         # Regular hair
@@ -464,7 +469,7 @@ class HumGenWrapper:
             hair.root_lightness.value = random.random()
             hair.root_redness.value = random.random()
             hair.roots.value = random.random()
-            hair.root_hue.value = random.random()        
+            hair.roots_hue.value = random.random()        
             hair.roughness.value = random.random()   
             hair.salt_and_pepper.value = random.random() 
         
@@ -473,7 +478,7 @@ class HumGenWrapper:
         # Height
 
         # Skin
-        skin =  self.human_obj.hair.skin 
+        skin =  self.human_obj.skin 
         # General settings
         skin.set_subsurface_scattering(True) # Turn on SSS
         # Parameters
