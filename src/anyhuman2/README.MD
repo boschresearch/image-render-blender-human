@@ -1,4 +1,11 @@
-# Inofficial HumGen V4 Documentation
+# Anyhuman2
+
+Anyhuman2 is an addon for Catharsys. It is using a [fork of HumGen V4](https://github.com/mnt1lr/HumGen3D/tree/testing), maintaining the same interfaces as Anyhuman (based on HumGen V3).
+
+- JSON files
+- Full-random parameters
+
+[InofficialHumGenV4Documentation](#Inofficial-HumGen-V4-Documentation)
 
 # Beginning
 
@@ -6,7 +13,7 @@
 - `o = Human.get_preset_options('male')`
 - `h = Human.from_preset(o[0])`
 
-# General parameters in exported JSON
+[GeneralParametersInExportedJSON](#General-parameters-in-exported-JSON)
 
 ## Age
 

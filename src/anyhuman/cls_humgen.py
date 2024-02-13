@@ -320,13 +320,12 @@ class HumGenWrapper:
 
         return self.human_obj.objects.rig
 
-    def CreateFullRandomHuman(self, _sName:str):
+    def CreateFullRandomHuman(self, sGender:str):
         """ 
             Create fully random human using the HumGen3D V4 API
             sName: Give the human a name
         """
-        # Random Gender
-        sGender =  random.choice(["male", "female"])
+
         # Get preset for selected gender
         self.chosen_option = self.Human.get_preset_options(sGender) 
 
@@ -492,7 +491,7 @@ class HumGenWrapper:
         skin.splotches.value = random.uniform(0, 0.5)
         skin.tone.value = random.uniform(0, 3)
         # endif
-
+    # enddef
 
 
 

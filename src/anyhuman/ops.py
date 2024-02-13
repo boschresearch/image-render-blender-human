@@ -118,13 +118,15 @@ def GenerateHuman(_dicParams, **kwargs):
     # gender = _dicParams["sGender"]
 
     # first compute the parameters that should be used for the creation of the human
-    generator_params = ComputeParams(mode, params, overwrite, lHumanGenerator.generator_config)
+    # generator_params = ComputeParams(mode, params, overwrite, lHumanGenerator.generator_config)
 
     # apply
     # params['posefilename'] =_dicParams.get('sPosefile')
 
     if _dicParams.get("sMode") == "FILE":
         objX = lHumanGenerator.CreateHumanFromJSON(params["sFilename"])
+    elif _dicParams.get("sMode") == "FULL_RANDOM":
+        objX = lHumanGenerator.CreateFullRandomHuman(params["sGender"])
     else:
         objX = lHumanGenerator.CreateHuman(_sName=_dicParams["sId"], _mParams=generator_params)
 
