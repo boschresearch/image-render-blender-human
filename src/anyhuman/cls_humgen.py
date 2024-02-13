@@ -411,7 +411,7 @@ class HumGenWrapper:
         eyebrows.root_lightness.value = random.random()
         eyebrows.root_redness.value = random.random()
         eyebrows.root_redness.value = random.random()
-        eyebrows.root.value = random.random()
+        eyebrows.roots.value = random.random()
         eyebrows.root_hue.value = random.random()
         eyebrows.roughness.value = random.random()
         eyebrows.salt_and_pepper.value = random.random()
