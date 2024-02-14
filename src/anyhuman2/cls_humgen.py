@@ -46,7 +46,6 @@ from anyblend.collection import RemoveCollection
 import addon_utils
 
 
-from . import tools
 
 color_dict = {
     # color set from HG3D (see HG_COLORS.py)
