@@ -49,3 +49,10 @@ Anyhuman2 is an addon for Catharsys. It is using a [fork of HumGen V4](https://g
 - `h.hair.eyebrows.set` --> Range Eyebrows_001...Eyebrows_009
 
 ### Expression
+
+## Good to know
+- `ear_livekeys = human.keys.filtered("face_proportions", "ears”)`
+
+Each of them gives back a LiveKeyItem https://github.com/OliverJPost/HumGen3D/blob/main/human/keys/keys.py#L212
+With methods like “value” getter and setter and “set_without_update” for changing large amount of livekeys
+
