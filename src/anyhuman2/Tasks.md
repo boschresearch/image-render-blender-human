@@ -17,7 +17,7 @@
   - Label bones must exist (vinayak handpose stuff, tobias face label bones) --> lets write functions for handpose labels and face labels --> should be default argument in any function (e.g. `CreateFullRandomHuman`), user has to explicitly turn it off.
 
 - Use as_dict() of HumGenV3 to export a human
-
+- Modify `CreateHumanFromJSON` function so that it can read the output JSON from `CreateFullRandomHuman`
 
 - Write a function which covers the random_realistic.py functionality
 
