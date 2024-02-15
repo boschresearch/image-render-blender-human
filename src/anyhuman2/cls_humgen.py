@@ -46,7 +46,6 @@ from anyblend.collection import RemoveCollection
 import addon_utils
 
 
-
 color_dict = {
     # color set from HG3D (see HG_COLORS.py)
     "C0": {
@@ -155,8 +154,6 @@ class HumGenWrapper:
         # endclass
 
         self.generator_config = HumGenConfigValues()
-        
-
 
         for dir_, _, files in os.walk(base_human_path):
             for file_name in files:
@@ -319,14 +316,14 @@ class HumGenWrapper:
 
         return self.human_obj.objects.rig
 
-    def CreateFullRandomHuman(self, sGender:str):
-        """ 
-            Create fully random human using the HumGen3D V4 API
-            sName: Give the human a name
+    def CreateFullRandomHuman(self, sGender: str):
+        """
+        Create fully random human using the HumGen3D V4 API
+        sName: Give the human a name
         """
 
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(sGender) 
+        self.chosen_option = self.Human.get_preset_options(sGender)
 
         # Choose a random base human
         self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
@@ -339,8 +336,8 @@ class HumGenWrapper:
         random_body_dict = {}
         for i, v in enumerate(self.human_obj.body.keys):
             v.value = random.random()
-            random_body_dict.update({v.name : v.value})
-    
+            random_body_dict.update({v.name: v.value})
+
         # Randomize clothing
         # Footwear
         footwear = self.human_obj.clothing.footwear
@@ -363,7 +360,7 @@ class HumGenWrapper:
         else:
             pass
 
-        # Outfit    
+        # Outfit
         outfit = self.human_obj.clothing.outfit
         lOutfits = outfit.get_options()
         sOutfits = random.choice(lOutfits)
@@ -380,9 +377,9 @@ class HumGenWrapper:
             # TODO: Dive into blender shaders and do it without Humgens randomize color function
             elif random.random() < 0.5:
                 outfit.randomize_colors(outfit.objects[i])
-            else:    
+            else:
                 pass
-        
+
             # endif
         # endfor
 
@@ -407,7 +404,7 @@ class HumGenWrapper:
         # Eye brows
         eyebrows = self.human_obj.hair.eyebrows
         # Fast (0) or accurate shaders (1)
-        eyebrows.fast_or_accurate = 1 # Accurate
+        eyebrows.fast_or_accurate = 1  # Accurate
         eyebrows.hue.value = random.random()
         eyebrows.lightness.value = random.random()
         eyebrows.redness.value = random.random()
@@ -419,26 +416,26 @@ class HumGenWrapper:
         eyebrows.roughness.value = random.random()
         eyebrows.salt_and_pepper.value = random.random()
         # Eye lashes
-        eyelashes =  self.human_obj.hair.eyelashes        
+        eyelashes = self.human_obj.hair.eyelashes
         # Fast (0) or accurate shaders (1)
-        eyelashes.fast_or_accurate = 1 # Accurate
+        eyelashes.fast_or_accurate = 1  # Accurate
         eyelashes.hue.value = random.random()
         eyelashes.lightness.value = random.random()
         eyelashes.redness.value = random.random()
         eyelashes.root_lightness.value = random.random()
         eyelashes.root_redness.value = random.random()
         eyelashes.roots.value = random.random()
-        eyelashes.roots_hue.value = random.random()        
-        eyelashes.roughness.value = random.random()   
-        eyelashes.salt_and_pepper.value = random.random()  
+        eyelashes.roots_hue.value = random.random()
+        eyelashes.roughness.value = random.random()
+        eyelashes.salt_and_pepper.value = random.random()
         # Face hair
         if sGender == "male":
-            face_hair =  self.human_obj.hair.face_hair 
+            face_hair = self.human_obj.hair.face_hair
             if random.random() < 0.5:
                 # Set a random face hair
                 face_hair.set_random()
                 # Fast (0) or accurate shaders (1)
-                face_hair.fast_or_accurate = 1 # Accurate
+                face_hair.fast_or_accurate = 1  # Accurate
                 # Set random face hair using a humgen function
                 face_hair.hue.value = random.random()
                 face_hair.lightness.value = random.random()
@@ -447,19 +444,19 @@ class HumGenWrapper:
                 face_hair.root_lightness.value = random.random()
                 face_hair.root_redness.value = random.random()
                 face_hair.roots.value = random.random()
-                face_hair.roots_hue.value = random.random()        
-                face_hair.roughness.value = random.random()   
-                face_hair.salt_and_pepper.value = random.random() 
+                face_hair.roots_hue.value = random.random()
+                face_hair.roughness.value = random.random()
+                face_hair.salt_and_pepper.value = random.random()
             # endif
         # endif
-            
+
         # Regular hair
-        hair =  self.human_obj.hair.regular_hair  
+        hair = self.human_obj.hair.regular_hair
         if random.random() < 0.5:
             # Set a random face hair
             hair.set_random()
             # Fast (0) or accurate shaders (1)
-            hair.fast_or_accurate = 1 # Accurate
+            hair.fast_or_accurate = 1  # Accurate
             # Set random face hair using a humgen function
             hair.hue.value = random.random()
             hair.lightness.value = random.random()
@@ -468,25 +465,25 @@ class HumGenWrapper:
             hair.root_lightness.value = random.random()
             hair.root_redness.value = random.random()
             hair.roots.value = random.random()
-            hair.roots_hue.value = random.random()        
-            hair.roughness.value = random.random()   
-            hair.salt_and_pepper.value = random.random() 
-        
+            hair.roots_hue.value = random.random()
+            hair.roughness.value = random.random()
+            hair.salt_and_pepper.value = random.random()
+
         # endif
 
         # Height
 
         # Skin
-        skin =  self.human_obj.skin 
+        skin = self.human_obj.skin
         # General settings
-        skin.set_subsurface_scattering(True) # Turn on SSS
+        skin.set_subsurface_scattering(True)  # Turn on SSS
         # Parameters
         skin.cavity_strength.value = random.random()
         skin.freckles.value = random.uniform(0, 0.5)
         if sGender == "male":
             skin.gender_specific.beard_shadow.value = random.random()
             skin.gender_specific.mustache_shadow.value = random.random()
-        else: 
+        else:
             pass
         skin.normal_strength.value = random.uniform(0, 10)
         skin.redness.value = random.random()
@@ -498,16 +495,10 @@ class HumGenWrapper:
 
         # Enable FACS
         self.human_obj.expression.load_facial_rig()
-    
+
         # Save all values to JSON
-        
+
     # enddef
-
-
-
-
-  
-      
 
 
 ###########################################################################################################
