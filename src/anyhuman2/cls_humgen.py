@@ -315,8 +315,21 @@ class HumGenWrapper:
             print("Error setting mode to 'OBJECT':\n{}".format(str(xEx)))
         # endtry
 
-        self.human_obj = self.Human.from_preset(_sJsonFile)
+        with open(_sJsonFile) as json_file:
+            dictAnyhuman = json.load(json_file)
 
+        if dictAnyhuman["bHandLabels"]:
+            print("Hand label present")
+            # TODO: Add handlabels
+        # endif
+
+        if dictAnyhuman["bFacialRig"]:
+            print("facial rig present")
+            # TODO: edit facs
+        # endif
+
+        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHuman_V4"])
+        self.human_obj.name = (_sJsonFile.rsplit("\\", 1)[1]).rsplit(".", 1)[0]
         return self.human_obj.objects.rig
 
     # enddef
