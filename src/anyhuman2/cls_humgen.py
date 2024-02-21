@@ -134,141 +134,7 @@ class HumGenWrapper:
 
         # enddef
 
-        addon_path = bpy.context.preferences.addons[HumGenWrapper.addon_name].preferences["filepath_"]
-        content_packs_path = os.path.join(addon_path, "content_packs")
-        base_human_path = os.path.join(addon_path, "models")
-        hair_path = os.path.join(addon_path, "hair")
-        outfit_path = os.path.join(addon_path, "outfits")
-
-        class HumGenConfigValues:
-            def __init__(self):
-                self.list_females = []
-                self.list_males = []
-                self.dict_female_head_hair = {}
-                self.dict_male_head_hair = {}
-                self.dict_male_face_hair = {}
-                self.dict_female_outfits = collections.defaultdict(list)
-                self.dict_male_outfits = collections.defaultdict(list)
-
-            # enddef
-
-        # endclass
-
-        self.generator_config = HumGenConfigValues()
-
-
-
-        for dir_, _, files in os.walk(base_human_path):
-            for file_name in files:
-                rel_dir = os.path.relpath(dir_, base_human_path)
-                rel_file = os.path.join("models", rel_dir, file_name)
-                rel_file = os.path.sep + rel_file
-                if ".json" in rel_file:
-                    file_name = os.path.splitext(os.path.basename(rel_file))[0]
-                    if "female" in rel_file:
-                        self.generator_config.list_females.append(file_name)
-                    elif "male" in rel_file:
-                        self.generator_config.list_males.append(file_name)
-                    # endif gender
-                # endif model
-            # endfor
-        # endfor
-
-        for dir_, _, files in os.walk(hair_path):
-            for file_name in files:
-                rel_dir = os.path.relpath(dir_, hair_path)
-                rel_file = os.path.join("hair", rel_dir, file_name)
-                rel_file = os.path.sep + rel_file
-                if "head" in rel_file and ".json" in rel_file:
-                    file_name = os.path.splitext(os.path.basename(rel_file))[0]
-                    if "female" in rel_file:
-                        self.generator_config.dict_female_head_hair[file_name] = rel_file
-                    elif "male" in rel_file:
-                        self.generator_config.dict_male_head_hair[file_name] = rel_file
-                    # endif gender
-                if "face_hair" in rel_file and ".json" in rel_file:
-                    file_name = os.path.splitext(os.path.basename(file_name))[0]
-                    self.generator_config.dict_male_face_hair[file_name] = rel_file
-                # endif face/head hair
-            # endif hair
-        # endfor
-
-        for dir_, _, files in os.walk(outfit_path):
-            for file_name in files:
-                rel_dir = os.path.relpath(dir_, hair_path)
-                rel_file = os.path.join("outputs", rel_dir, file_name)
-                rel_file = os.path.sep + rel_file
-                components = Path(rel_file).parts
-                if ".blend" in rel_file and len(components) > 5:
-                    set_name = components[5]
-                    file_name = os.path.splitext(os.path.basename(rel_file))[0]
-
-                    # skip faulty outfits
-                    if file_name in ["BBQ_Barbara", "New_Intern"]:
-                        continue
-
-                    if "female" in rel_file:
-                        self.generator_config.dict_female_outfits[set_name].append(file_name)
-                    elif "male" in rel_file:
-                        self.generator_config.dict_male_outfits[set_name].append(file_name)
-                    # endif gender
-                # endif face/head hair
-            # endif hair
-        # endfor
-
-        if len(self.generator_config.list_males) == 0:
-            raise RuntimeError("list of male model files empty")
-
-        if len(self.generator_config.dict_male_head_hair) == 0:
-            raise RuntimeError("list of male hair model files empty")
-
-        if len(self.generator_config.dict_male_face_hair) == 0:
-            raise RuntimeError("list of male face hair model files empty")
-
-        if len(self.generator_config.list_females) == 0:
-            raise RuntimeError("list of female model files empty")
-
-        if len(self.generator_config.dict_female_head_hair) == 0:
-            raise RuntimeError("list of female hair model files empty")
-
-        if len(self.generator_config.dict_female_outfits) == 0:
-            raise RuntimeError("list of female outfit files empty")
-
-        if len(self.generator_config.dict_male_outfits) == 0:
-            raise RuntimeError("list of male outfit files empty")
-
-        self.generator_config.dict_bodies = {
-            "male": self.generator_config.list_males,
-            "female": self.generator_config.list_females,
-        }
-        self.generator_config.dict_hair = {
-            "male": self.generator_config.dict_male_head_hair,
-            "female": self.generator_config.dict_female_head_hair,
-        }
-
-        self.generator_config.dict_outfits = {
-            "male": self.generator_config.dict_male_outfits,
-            "female": self.generator_config.dict_female_outfits,
-        }
-
-        try:
-            self.generator_config.persona_path = Path(bpy.context.space_data.text.filepath).parent.resolve()
-        except AttributeError:
-            self.generator_config.persona_path = Path(__file__).parent.resolve()
-        # endtry
-        self.generator_config.persona_path = Path.joinpath(self.generator_config.persona_path, "personas")
-
     # enddef
-
-    ############################################################################################
-    def _make_rel_path(self, s):
-        if os.name == "nt":
-            s = s.replace("/", "\\")
-        return s
-
-    # enddef
-
-    ############################################################################################
 
     def CreateHumanFromJSON(self, _sJsonFile: str):
         """_summary_
@@ -350,18 +216,18 @@ class HumGenWrapper:
             json.dump(dictAnyhuman, xFp, indent=4)
     # enddef
 
-    def CreateFullRandomHuman(self, sGender:str):
+    def CreateFullRandomHuman(self, params:dict):
         """
             Create fully random human using the HumGen3D V4 API
             sName: Give the human a name
         """
         # Reading values from dict and defining variables
         # Gender
-        gender = params["sGender"]
+        gender = params["mParamConfig"]["sGender"]
         # Name
         ArmatureName = params["sId"]
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(sGender) 
+        self.chosen_option = self.Human.get_preset_options(gender) 
 
         # Choose a random base human
         self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
@@ -467,7 +333,7 @@ class HumGenWrapper:
         eyelashes.roughness.value = random.random()
         eyelashes.salt_and_pepper.value = random.random()
         # Face hair
-        if sGender == "male":
+        if gender == "male":
             face_hair =  self.human_obj.hair.face_hair 
             if random.random() < 0.5:
                 # Set a random face hair
@@ -533,8 +399,9 @@ class HumGenWrapper:
 
         # Enable FACS
         self.human_obj.expression.load_facial_rig()
-    
-        # Save all values to JSON
+
+        # Set the name of the armature
+        bpy.data.objects["HG_" + self.human_obj.name].name = ArmatureName       
         
     # enddef
 
