@@ -46,12 +46,7 @@ if bInBlenderContext is True:
         }
 
         from . import cls_gen_random_human
-        # ## DEBUG ##
-        import anybase.module
 
-        # anybase.module.ReloadModule(_sName="anyblend", _bChildren=True, _bDoPrint=True) # Reload module anyblend
-        anybase.module.ReloadCurrentChildModules(_bDoPrint=True) # Reload all child modules of the calling function's module
-        # ###########
     except Exception as xEx:
         # pass
         print(">>>> Exception importing libs:\n{}".format(str(xEx)))
@@ -60,7 +55,6 @@ if bInBlenderContext is True:
 
 
 def register():
-    from . import cls_gen_random_human
     cls_gen_random_human.register()
 
 
