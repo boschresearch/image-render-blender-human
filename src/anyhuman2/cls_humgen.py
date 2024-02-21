@@ -29,7 +29,6 @@
 
 import bpy
 import bmesh
-import re
 
 import random
 import os
@@ -140,13 +139,8 @@ class HumGenWrapper:
         base_human_path = os.path.join(addon_path, "models")
         hair_path = os.path.join(addon_path, "hair")
         outfit_path = os.path.join(addon_path, "outfits")
-        footwear_path = os.path.join(addon_path, "footwear")
-        textures_path = os.path.join(addon_path, "textures")
 
         class HumGenConfigValues:
-            """
-            Kind of a generator class. It parses all relevant files from the HumGen folder and ouputs a dictionary that can be modified.
-            """
             def __init__(self):
                 self.list_females = []
                 self.list_males = []
@@ -155,10 +149,7 @@ class HumGenWrapper:
                 self.dict_male_face_hair = {}
                 self.dict_female_outfits = collections.defaultdict(list)
                 self.dict_male_outfits = collections.defaultdict(list)
-                self.dict_female_footwear = {}
-                self.dict_male_footwear = {}
-                self.dict_female_textures = collections.defaultdict(list)
-                self.dict_male_textures = collections.defaultdict(list)
+
             # enddef
 
         # endclass
@@ -175,9 +166,9 @@ class HumGenWrapper:
                 if ".json" in rel_file:
                     file_name = os.path.splitext(os.path.basename(rel_file))[0]
                     if "female" in rel_file:
-                        self.generator_config.list_females.append(rel_file)
+                        self.generator_config.list_females.append(file_name)
                     elif "male" in rel_file:
-                        self.generator_config.list_males.append(rel_file)
+                        self.generator_config.list_males.append(file_name)
                     # endif gender
                 # endif model
             # endfor
@@ -187,6 +178,7 @@ class HumGenWrapper:
             for file_name in files:
                 rel_dir = os.path.relpath(dir_, hair_path)
                 rel_file = os.path.join("hair", rel_dir, file_name)
+                rel_file = os.path.sep + rel_file
                 if "head" in rel_file and ".json" in rel_file:
                     file_name = os.path.splitext(os.path.basename(rel_file))[0]
                     if "female" in rel_file:
@@ -201,75 +193,28 @@ class HumGenWrapper:
             # endif hair
         # endfor
 
-        for dirpath, _, files in os.walk(outfit_path):
-            for filename in files:
-                full_path = os.path.join(dirpath, filename)
-                rel_path= os.path.join(*full_path.split(os.path.sep)[-4:])
-                rel_file = os.path.join("outfits", rel_dir, filename)
-                components = Path(full_path).parts
-                if ".blend" in rel_path and len(components) > 5:
+        for dir_, _, files in os.walk(outfit_path):
+            for file_name in files:
+                rel_dir = os.path.relpath(dir_, hair_path)
+                rel_file = os.path.join("outputs", rel_dir, file_name)
+                rel_file = os.path.sep + rel_file
+                components = Path(rel_file).parts
+                if ".blend" in rel_file and len(components) > 5:
                     set_name = components[5]
-                    file_name = os.path.splitext(os.path.basename(rel_path))[0]
+                    file_name = os.path.splitext(os.path.basename(rel_file))[0]
+
                     # skip faulty outfits
                     if file_name in ["BBQ_Barbara", "New_Intern"]:
                         continue
 
-                    if "female" in rel_path:
-                        self.generator_config.dict_female_outfits[set_name].append(rel_path)
-                    elif "male" in rel_path:
-                        self.generator_config.dict_male_outfits[set_name].append(rel_path)
+                    if "female" in rel_file:
+                        self.generator_config.dict_female_outfits[set_name].append(file_name)
+                    elif "male" in rel_file:
+                        self.generator_config.dict_male_outfits[set_name].append(file_name)
                     # endif gender
                 # endif face/head hair
             # endif hair
         # endfor
-
-        for dirpath, dirnames, filenames in os.walk(footwear_path):
-            for filename in filenames:
-                full_path = os.path.join(dirpath, filename)
-                rel_path = os.path.join(*full_path.split(os.path.sep)[-4:])
-                components = Path(rel_path).parts
-                if ".blend" in rel_path and len(components) > 3:
-                    set_name = components[1]
-                    file_name = os.path.splitext(os.path.basename(rel_path))[0]
-                    if "female" in rel_path:
-                        self.generator_config.dict_female_footwear[file_name] = rel_path
-                    elif "male" in rel_path:
-                        self.generator_config.dict_male_footwear[file_name] = rel_path
-                    # endif gender
-                # endif footwear
-            # endif 
-        # endfor
-        
-        # Fill female textures directory
-        for dirpath, dirnames, filenames in os.walk(textures_path):
-            FileRegExPattern = r"Female \d{2}\.png"
-            pattern_regex = re.compile(FileRegExPattern)
-            for filename in filenames:
-                full_path = os.path.join(dirpath, filename)
-                if pattern_regex.match(filename):
-                    full_path = os.path.join(dirpath, filename)
-                    keyword = full_path.split(os.path.sep)[-2]
-                    rel_path= os.path.join(*full_path.split(os.path.sep)[-4:])
-                    self.generator_config.dict_female_textures[keyword].append(rel_path)
-                # endif
-            # endfor
-        # endfor
-
-        # Fill male textures directory
-        for dirpath, dirnames, filenames in os.walk(textures_path):
-            FileRegExPattern = r"Male \d{2}\.png"
-            pattern_regex = re.compile(FileRegExPattern)
-            for filename in filenames:
-                full_path = os.path.join(dirpath, filename)
-                if pattern_regex.match(filename):
-                    full_path = os.path.join(dirpath, filename)
-                    keyword = full_path.split(os.path.sep)[-2]
-                    rel_path= os.path.join(*full_path.split(os.path.sep)[-4:])
-                    self.generator_config.dict_male_textures[keyword].append(rel_path)
-                # endif
-            # endfor
-        # endfor
-
 
         if len(self.generator_config.list_males) == 0:
             raise RuntimeError("list of male model files empty")
@@ -292,20 +237,6 @@ class HumGenWrapper:
         if len(self.generator_config.dict_male_outfits) == 0:
             raise RuntimeError("list of male outfit files empty")
 
-        if len(self.generator_config.dict_female_footwear) == 0:
-            raise RuntimeError("list of female footwear files empty")
-
-        if len(self.generator_config.dict_male_footwear) == 0:
-            raise RuntimeError("list of male footwear files empty")
-
-        if len(self.generator_config.dict_female_textures) == 0:
-            raise RuntimeError("list of female footwear files empty")
-
-        if len(self.generator_config.dict_male_textures) == 0:
-            raise RuntimeError("list of male footwear files empty")
-
-
-
         self.generator_config.dict_bodies = {
             "male": self.generator_config.list_males,
             "female": self.generator_config.list_females,
@@ -320,12 +251,6 @@ class HumGenWrapper:
             "female": self.generator_config.dict_female_outfits,
         }
 
-
-        self.generator_config.dict_textures = {
-            "male": self.generator_config.dict_male_textures,
-            "female": self.generator_config.dict_female_textures,
-        }
-        # Guess: Trying to get the parent path relative to a txt file opened in blender editor
         try:
             self.generator_config.persona_path = Path(bpy.context.space_data.text.filepath).parent.resolve()
         except AttributeError:
@@ -335,7 +260,13 @@ class HumGenWrapper:
 
     # enddef
 
+    ############################################################################################
+    def _make_rel_path(self, s):
+        if os.name == "nt":
+            s = s.replace("/", "\\")
+        return s
 
+    # enddef
 
     ############################################################################################
 
@@ -388,19 +319,14 @@ class HumGenWrapper:
 
         return self.human_obj.objects.rig
 
-    def CreateFullRandomHuman(self, _sName, _mParams):
+    def CreateFullRandomHuman(self, sGender:str):
         """ 
             Create fully random human using the HumGen3D V4 API
-            sName (optional): Give the human a name
+            sName: Give the human a name
         """
-        # Dictionary collecting all relevant values
-        dicArmature = dict()
-
-        # Add armature name to dict
-        dicArmature.update({"name": _sName}) 
 
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(_mParams.get("sGender")) 
+        self.chosen_option = self.Human.get_preset_options(sGender) 
 
         # Choose a random base human
         self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
@@ -506,7 +432,7 @@ class HumGenWrapper:
         eyelashes.roughness.value = random.random()   
         eyelashes.salt_and_pepper.value = random.random()  
         # Face hair
-        if _mParams.get("sGender") == "male":
+        if sGender == "male":
             face_hair =  self.human_obj.hair.face_hair 
             if random.random() < 0.5:
                 # Set a random face hair
@@ -557,7 +483,7 @@ class HumGenWrapper:
         # Parameters
         skin.cavity_strength.value = random.random()
         skin.freckles.value = random.uniform(0, 0.5)
-        if _mParams.get("sGender") == "male":
+        if sGender == "male":
             skin.gender_specific.beard_shadow.value = random.random()
             skin.gender_specific.mustache_shadow.value = random.random()
         else: 
@@ -572,136 +498,12 @@ class HumGenWrapper:
 
         # Enable FACS
         self.human_obj.expression.load_facial_rig()
-        # Add information about face rig
-        if self.human_obj.expression.has_facial_rig == True:
-            dicArmature.update({"face_rig": "true"})
-        else:
-            dicArmature.update({"face_rig": "false"})
-        # Set A-Pose
-        # HG_APose = self.human_obj.pose.get_options()[0]
-        # self.human_obj.pose.set(HG_APose)
-        # Add pose info to dict
-        dicArmature.update({
-            "posefilename": self.human_obj.pose.as_dict()
-        })
-        # Rename collection HumGen to Persona
-        HumGenCollection = bpy.data.collections['HumGen']
-        HumGenCollection.name = "Persona"
-        # Rename the armature to sName
-        self.human_obj.name = _sName
-        # Add dict from HumGen to existing dict
-        dicArmature.update({"HumGenV4": self.human_obj.as_dict()})
-        # Returning the rig; assumption: this is equivalent to Human.rig_object() method in HumGenV3
-        return(self.human_obj.objects.rig)
-
-
-
+    
+        # Save all values to JSON
         
     # enddef
-    ############################################################################################
-    def _make_rel_path(self, s):
-        if os.name == "nt":
-            s = s.replace("/", "\\")
-        return s    
-    # enddef    
-
-############################################################################################
-    def CreateHuman(self, _sName, _mParams, _bDeleteBackup=True):
-        """
-        generates a random human given gender and name
-
-        Parameters
-        ----------
-        _sName : string
-            name human armature should get. The name, the huamn generator creates automatically
-            is overwritten by this name
-        _mParams: dict
-            dictionary of all values that should be used for generation of the human
-
-        Returns
-        -------
-        blender object
-            human armature, to be selected in blender by the given name
-        Raises
-        ------
-        RuntimeError
-            raises "Unknown gender" if gender is not either "male" or "female"
-        """
-        # bpy.ops.outliner.orphans_purge(do_recursive=True)
-        # # HumanArmature = None
-
-        # original_type = None
-        # try:
-        #     original_type = bpy.context.area.type
-        # except Exception as xEx:
-        #     print("Error storing original context area type:\n{}".format(str(xEx)))
-        # # endtry get area type
-
-        # try:
-        #     bpy.context.area.type = "VIEW_3D"
-        # except Exception as xEx:
-        #     print("Error setting context area type to 'VIEW_3D':\n{}".format(str(xEx)))
-        # endtry set area type
-
-        # Possibilities to make sure, no object is selected, if selected objects bring trouble
-        # try:
-        #     bpy.context.view_layer.objects.active = None
-        # except Exception as e:
-        #     print(e)
-
-        # for obj in bpy.context.selected_objects:
-        #    obj.select_set(False)
-        # for obj in bpy.data.objects:
-        #     obj.select_set(False)
-
-        try:
-            bpy.ops.object.select_all(action="DESELECT")
-        except Exception as xEx:
-            print("Error deselcting all objects:\n{}".format(str(xEx)))
-        # end try deselect all
-
-        try:
-            bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
-        except Exception as xEx:
-            print("Error setting mode to 'OBJECT':\n{}".format(str(xEx)))
-        # endtry
-
-        sGender = _mParams["own_parameters"]["gender"]
-
-        # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(sGender) 
-
-        # Choose a base human and remove trailing "\\""
-        self.human_obj = self.Human.from_preset(_mParams["own_parameters"]["preset_human"].lstrip("\\"))
-        # Armature name
-        name_human = self.human_obj.name
-
-        # Set age dict
-        self.human_obj.age.set_from_dict(_mParams["HumGenV4"]["age"])
-        # Set keys dict
-        self.human_obj.keys.set_from_dict(_mParams["HumGenV4"]["keys"])
-        # Set skin dict
-        self.human_obj.skin.set_from_dict(_mParams["HumGenV4"]["skin"])
 
 
-
-        # # calculate the bodies weight and volume
-        # skin = self.human_obj.body_object
-
-        # bm = bmesh.new()
-
-        # bm.from_object(skin, depsgraph=bpy.context.evaluated_depsgraph_get())
-
-        # volume = bm.calc_volume()
-        # self.human_obj.rig_object["volume"] = volume
-
-        # density = 1.0
-        # self.human_obj.rig_object["weight"] = volume * density * 1000.0
-
-
-    # enddef
-
-    ############################################################################################
 
 
   

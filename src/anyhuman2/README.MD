@@ -2,10 +2,6 @@
 
 Anyhuman2 is an addon for Catharsys. It is using a [fork of HumGen V4](https://github.com/mnt1lr/HumGen3D/tree/testing), maintaining the same interfaces as Anyhuman (based on HumGen V3).
 
-personas/Anna.json --> as_dict() HumGenV4 export
-personas/David.json --> as_dict() HumGenV4 export
-personas/HG_Seth.json --> as_dict() HumGenV4 export
-
 - JSON files
 - Full-random parameters
 
@@ -55,24 +51,8 @@ personas/HG_Seth.json --> as_dict() HumGenV4 export
 ### Expression
 
 ## Good to know
-
 - `ear_livekeys = human.keys.filtered("face_proportions", "ears”)`
 
 Each of them gives back a LiveKeyItem https://github.com/OliverJPost/HumGen3D/blob/main/human/keys/keys.py#L212
 With methods like “value” getter and setter and “set_without_update” for changing large amount of livekeys
 
-## Description of saved parameters.json
-
-This dictionary describes the human by appending the HumGenV4 as_dict() method out put to the following own defined key-value pairs:
-`{
-  'name': 'Armature.001',
-  'face_rig': 'true',
-  'posefilename': {'set': None},
-  'HumGenV4':{...}
-  }`
-
-| key          | Value Range | Description                                                                  |
-| ------------ | ----------- | ---------------------------------------------------------------------------- |
-| name         | your input  | Armature name                                                                |
-| face_rig     | true/false  | is facerig available                                                         |
-| posefilename | None        | HumGenV4 dict `human.pose.as_dict()`; If {"set":None}, Armature is in A-pose |
