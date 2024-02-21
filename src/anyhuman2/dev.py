@@ -39,13 +39,13 @@ def _testHumanGeneration():
         # "ZWICKY",
         # "ZWICKY_GRID",
         # "RANDOM_FULL_GRID",
-        # "RANDOM_FULL",
+          "RANDOM_FULL",
         # "RANDOM_REALISTIC",
         # "RANDOM_REALISTIC_GRID",
         # "PERSONA",
         # "LEGACY",
         # "FILE", # HumGenV4 Test
-        "FULL_RANDOM", # HumgGenV4 Test
+        # "FULL_RANDOM", # HumgGenV4 Test
     ]
     try:
         dx = 1.2
