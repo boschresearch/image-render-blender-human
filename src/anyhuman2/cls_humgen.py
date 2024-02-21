@@ -205,8 +205,8 @@ class HumGenWrapper:
         dictAnyhuman = {
             "bHandLabels": False,
             "bFacialRig": self.human_obj.expression.has_facial_rig,
-            "sPoseFilename": "path/to/pose/file",
-            "dictHuman_V4": self.human_obj.as_dict()
+            "sPoseFilename": self.human_obj.pose.as_dict(),
+            "dictHumGen_V4": self.human_obj.as_dict()
         }
 
         sCurrentDirectory = os.path.dirname(os.path.abspath(__file__))
@@ -222,6 +222,9 @@ class HumGenWrapper:
             sName: Give the human a name
         """
         # Reading values from dict and defining variables
+        # CONSTANTS
+        HUMGEN_COLLECTION_NAME = "HumGen"
+        HUMGEN_COLLECTION_NAME_NEW = "Persona"
         # Gender
         gender = params["mParamConfig"]["sGender"]
         # Name
@@ -400,8 +403,17 @@ class HumGenWrapper:
         # Enable FACS
         self.human_obj.expression.load_facial_rig()
 
+        # Poses
+        pose = self.human_obj.pose
+        # A-Pose path
+        APose = 'poses\\Base Poses\\HG_A_Pose.blend'
+        # Set pose explicitly to A-Pose
+        pose.set(APose)
+
         # Set the name of the armature
-        bpy.data.objects["HG_" + self.human_obj.name].name = ArmatureName       
+        bpy.data.objects["HG_" + self.human_obj.name].name = ArmatureName  
+        # Rename HumGen collection 
+        bpy.data.collections[HUMGEN_COLLECTION_NAME].name = HUMGEN_COLLECTION_NAME_NEW
         
     # enddef
 
