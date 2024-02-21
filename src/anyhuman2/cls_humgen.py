@@ -350,14 +350,18 @@ class HumGenWrapper:
             json.dump(dictAnyhuman, xFp, indent=4)
     # enddef
 
-    def CreateFullRandomHuman(self, sGender:str):
-        """
+    def CreateFullRandomHuman(self, params:dict):
+        """ 
             Create fully random human using the HumGen3D V4 API
             sName: Give the human a name
         """
-
+        # Reading values from dict and defining variables
+        # Gender
+        gender = params["sGender"]
+        # Name
+        ArmatureName = params["sId"]
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(sGender)
+        self.chosen_option = self.Human.get_preset_options(gender) 
 
         # Choose a random base human
         self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
@@ -463,8 +467,8 @@ class HumGenWrapper:
         eyelashes.roughness.value = random.random()
         eyelashes.salt_and_pepper.value = random.random()
         # Face hair
-        if sGender == "male":
-            face_hair =  self.human_obj.hair.face_hair
+        if gender == "male":
+            face_hair =  self.human_obj.hair.face_hair 
             if random.random() < 0.5:
                 # Set a random face hair
                 face_hair.set_random()
@@ -514,7 +518,7 @@ class HumGenWrapper:
         # Parameters
         skin.cavity_strength.value = random.random()
         skin.freckles.value = random.uniform(0, 0.5)
-        if sGender == "male":
+        if gender == "male":
             skin.gender_specific.beard_shadow.value = random.random()
             skin.gender_specific.mustache_shadow.value = random.random()
         else:
@@ -530,10 +534,14 @@ class HumGenWrapper:
         # Enable FACS
         self.human_obj.expression.load_facial_rig()
 
-        # Save all values to JSON v4 style
+        # Save all values to JSON
         sJsonFile = self.human_obj.name + "_v4.json"
         self.ExportJSON(sJsonFile)
-
+        
+        # Rename from HG_... to name
+        bpy.data.objects["HG_" + str(self.human_obj.name)].name = ArmatureName
+        # Change the name of the collection from Humgen to Persons
+        
         return self.human_obj.objects.rig
 
     # enddef
