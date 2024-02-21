@@ -40,7 +40,6 @@ from anybase import convert
 
 from .cls_humgen import SingletonHumGenWrapper
 
-from .paramgenerators import ComputeParams, ResolveRandomParams
 
 try:
     from HumGen3D import Human as HG_Human
@@ -130,7 +129,6 @@ def GenerateHuman(_dicParams, **kwargs):
     else:
         objX = lHumanGenerator.CreateHuman(_sName=_dicParams["sId"], _mParams=generator_params)
 
-    objX["generator_param_dict"] = json.dumps(generator_params)
 
     return objX
 
