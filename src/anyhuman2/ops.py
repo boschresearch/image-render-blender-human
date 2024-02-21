@@ -125,7 +125,7 @@ def GenerateHuman(_dicParams, **kwargs):
     if _dicParams.get("sMode") == "FILE":
         objX = lHumanGenerator.CreateHumanFromJSON(params["sFilename"])
     elif _dicParams.get("sMode") == "FULL_RANDOM":
-        objX = lHumanGenerator.CreateFullRandomHuman(params["sGender"])
+        objX = lHumanGenerator.CreateFullRandomHuman(params)
     else:
         objX = lHumanGenerator.CreateHuman(_sName=_dicParams["sId"], _mParams=generator_params)
 

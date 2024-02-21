@@ -319,14 +319,15 @@ class HumGenWrapper:
 
         return self.human_obj.objects.rig
 
-    def CreateFullRandomHuman(self, sGender:str):
+    def CreateFullRandomHuman(self, params:dict):
         """ 
             Create fully random human using the HumGen3D V4 API
             sName: Give the human a name
         """
-
+        # Reading values from dict and defining variables
+        gender = params["sGender"]
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(sGender) 
+        self.chosen_option = self.Human.get_preset_options(gender) 
 
         # Choose a random base human
         self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
@@ -432,7 +433,7 @@ class HumGenWrapper:
         eyelashes.roughness.value = random.random()   
         eyelashes.salt_and_pepper.value = random.random()  
         # Face hair
-        if sGender == "male":
+        if gender == "male":
             face_hair =  self.human_obj.hair.face_hair 
             if random.random() < 0.5:
                 # Set a random face hair
@@ -483,7 +484,7 @@ class HumGenWrapper:
         # Parameters
         skin.cavity_strength.value = random.random()
         skin.freckles.value = random.uniform(0, 0.5)
-        if sGender == "male":
+        if gender == "male":
             skin.gender_specific.beard_shadow.value = random.random()
             skin.gender_specific.mustache_shadow.value = random.random()
         else: 
