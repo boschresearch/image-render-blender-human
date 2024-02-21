@@ -155,7 +155,7 @@ class HumGenWrapper:
         # endclass
 
         self.generator_config = HumGenConfigValues()
-        
+
 
 
         for dir_, _, files in os.walk(base_human_path):
@@ -315,9 +315,40 @@ class HumGenWrapper:
             print("Error setting mode to 'OBJECT':\n{}".format(str(xEx)))
         # endtry
 
-        self.human_obj = self.Human.from_preset(_sJsonFile)
+        with open(_sJsonFile) as json_file:
+            dictAnyhuman = json.load(json_file)
 
+        if dictAnyhuman["bHandLabels"]:
+            print("Hand label present")
+            # TODO: Add handlabels
+        # endif
+
+        if dictAnyhuman["bFacialRig"]:
+            print("facial rig present")
+            # TODO: edit facs
+        # endif
+
+        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHuman_V4"])
+        self.human_obj.name = (_sJsonFile.rsplit("\\", 1)[1]).rsplit(".", 1)[0]
         return self.human_obj.objects.rig
+
+    # enddef
+
+    def ExportJSON(self, _sFilename: str):
+
+        dictAnyhuman = {
+            "bHandLabels": False,
+            "bFacialRig": self.human_obj.expression.has_facial_rig,
+            "sPoseFilename": "path/to/pose/file",
+            "dictHuman_V4": self.human_obj.as_dict()
+        }
+
+        sCurrentDirectory = os.path.dirname(os.path.abspath(__file__))
+        sJsonFile = os.path.join(sCurrentDirectory, "personas/" + _sFilename)
+
+        with open(sJsonFile, 'w') as xFp:
+            json.dump(dictAnyhuman, xFp, indent=4)
+    # enddef
 
     def CreateFullRandomHuman(self, params:dict):
         """ 
@@ -344,7 +375,7 @@ class HumGenWrapper:
         for i, v in enumerate(self.human_obj.body.keys):
             v.value = random.random()
             random_body_dict.update({v.name : v.value})
-    
+
         # Randomize clothing
         # Footwear
         footwear = self.human_obj.clothing.footwear
@@ -367,7 +398,7 @@ class HumGenWrapper:
         else:
             pass
 
-        # Outfit    
+        # Outfit
         outfit = self.human_obj.clothing.outfit
         lOutfits = outfit.get_options()
         sOutfits = random.choice(lOutfits)
@@ -384,9 +415,9 @@ class HumGenWrapper:
             # TODO: Dive into blender shaders and do it without Humgens randomize color function
             elif random.random() < 0.5:
                 outfit.randomize_colors(outfit.objects[i])
-            else:    
+            else:
                 pass
-        
+
             # endif
         # endfor
 
@@ -423,7 +454,7 @@ class HumGenWrapper:
         eyebrows.roughness.value = random.random()
         eyebrows.salt_and_pepper.value = random.random()
         # Eye lashes
-        eyelashes =  self.human_obj.hair.eyelashes        
+        eyelashes =  self.human_obj.hair.eyelashes
         # Fast (0) or accurate shaders (1)
         eyelashes.fast_or_accurate = 1 # Accurate
         eyelashes.hue.value = random.random()
@@ -432,9 +463,9 @@ class HumGenWrapper:
         eyelashes.root_lightness.value = random.random()
         eyelashes.root_redness.value = random.random()
         eyelashes.roots.value = random.random()
-        eyelashes.roots_hue.value = random.random()        
-        eyelashes.roughness.value = random.random()   
-        eyelashes.salt_and_pepper.value = random.random()  
+        eyelashes.roots_hue.value = random.random()
+        eyelashes.roughness.value = random.random()
+        eyelashes.salt_and_pepper.value = random.random()
         # Face hair
         if gender == "male":
             face_hair =  self.human_obj.hair.face_hair 
@@ -451,14 +482,14 @@ class HumGenWrapper:
                 face_hair.root_lightness.value = random.random()
                 face_hair.root_redness.value = random.random()
                 face_hair.roots.value = random.random()
-                face_hair.roots_hue.value = random.random()        
-                face_hair.roughness.value = random.random()   
-                face_hair.salt_and_pepper.value = random.random() 
+                face_hair.roots_hue.value = random.random()
+                face_hair.roughness.value = random.random()
+                face_hair.salt_and_pepper.value = random.random()
             # endif
         # endif
-            
+
         # Regular hair
-        hair =  self.human_obj.hair.regular_hair  
+        hair =  self.human_obj.hair.regular_hair
         if random.random() < 0.5:
             # Set a random face hair
             hair.set_random()
@@ -472,16 +503,16 @@ class HumGenWrapper:
             hair.root_lightness.value = random.random()
             hair.root_redness.value = random.random()
             hair.roots.value = random.random()
-            hair.roots_hue.value = random.random()        
-            hair.roughness.value = random.random()   
-            hair.salt_and_pepper.value = random.random() 
-        
+            hair.roots_hue.value = random.random()
+            hair.roughness.value = random.random()
+            hair.salt_and_pepper.value = random.random()
+
         # endif
 
         # Height
 
         # Skin
-        skin =  self.human_obj.skin 
+        skin =  self.human_obj.skin
         # General settings
         skin.set_subsurface_scattering(True) # Turn on SSS
         # Parameters
@@ -490,7 +521,7 @@ class HumGenWrapper:
         if gender == "male":
             skin.gender_specific.beard_shadow.value = random.random()
             skin.gender_specific.mustache_shadow.value = random.random()
-        else: 
+        else:
             pass
         skin.normal_strength.value = random.uniform(0, 10)
         skin.redness.value = random.random()
@@ -502,19 +533,24 @@ class HumGenWrapper:
 
         # Enable FACS
         self.human_obj.expression.load_facial_rig()
-    
+
         # Save all values to JSON
+        sJsonFile = self.human_obj.name + "_v4.json"
+        self.ExportJSON(sJsonFile)
+        
         # Rename from HG_... to name
         bpy.data.objects["HG_" + str(self.human_obj.name)].name = ArmatureName
         # Change the name of the collection from Humgen to Persons
+        
+        return self.human_obj.objects.rig
 
     # enddef
 
 
 
 
-  
-      
+
+
 
 
 ###########################################################################################################
