@@ -325,7 +325,10 @@ class HumGenWrapper:
             sName: Give the human a name
         """
         # Reading values from dict and defining variables
+        # Gender
         gender = params["sGender"]
+        # Name
+        ArmatureName = params["sId"]
         # Get preset for selected gender
         self.chosen_option = self.Human.get_preset_options(gender) 
 
@@ -501,7 +504,10 @@ class HumGenWrapper:
         self.human_obj.expression.load_facial_rig()
     
         # Save all values to JSON
-        
+        # Rename from HG_... to name
+        bpy.data.objects["HG_" + str(self.human_obj.name)].name = ArmatureName
+        # Change the name of the collection from Humgen to Persons
+
     # enddef
 
 
