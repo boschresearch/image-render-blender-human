@@ -219,7 +219,7 @@ class HumGenWrapper:
     def CreateFullRandomHuman(self, params:dict):
         """
             Create fully random human using the HumGen3D V4 API
-            sName: Give the human a name
+            params: dictionary, containing information about the human that will be generated.
         """
         # Reading values from dict and defining variables
         # CONSTANTS
