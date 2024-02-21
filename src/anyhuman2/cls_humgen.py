@@ -335,7 +335,6 @@ class HumGenWrapper:
     # enddef
 
     def ExportJSON(self, _sFilename: str):
-    def exportJSONv3Style(self, _sFilename: str):
 
         dictAnyhuman = {
             "bHandLabels": False,
