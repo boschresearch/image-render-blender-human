@@ -335,6 +335,7 @@ class HumGenWrapper:
     # enddef
 
     def ExportJSON(self, _sFilename: str):
+    def exportJSONv3Style(self, _sFilename: str):
 
         dictAnyhuman = {
             "bHandLabels": False,
@@ -350,8 +351,8 @@ class HumGenWrapper:
             json.dump(dictAnyhuman, xFp, indent=4)
     # enddef
 
-    def CreateFullRandomHuman(self, params:dict):
-        """ 
+    def CreateFullRandomHuman(self, sGender:str):
+        """
             Create fully random human using the HumGen3D V4 API
             sName: Give the human a name
         """
@@ -361,7 +362,7 @@ class HumGenWrapper:
         # Name
         ArmatureName = params["sId"]
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(gender) 
+        self.chosen_option = self.Human.get_preset_options(sGender) 
 
         # Choose a random base human
         self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
@@ -467,7 +468,7 @@ class HumGenWrapper:
         eyelashes.roughness.value = random.random()
         eyelashes.salt_and_pepper.value = random.random()
         # Face hair
-        if gender == "male":
+        if sGender == "male":
             face_hair =  self.human_obj.hair.face_hair 
             if random.random() < 0.5:
                 # Set a random face hair
@@ -533,17 +534,9 @@ class HumGenWrapper:
 
         # Enable FACS
         self.human_obj.expression.load_facial_rig()
-
+    
         # Save all values to JSON
-        sJsonFile = self.human_obj.name + "_v4.json"
-        self.ExportJSON(sJsonFile)
         
-        # Rename from HG_... to name
-        bpy.data.objects["HG_" + str(self.human_obj.name)].name = ArmatureName
-        # Change the name of the collection from Humgen to Persons
-        
-        return self.human_obj.objects.rig
-
     # enddef
 
 
