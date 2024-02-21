@@ -155,7 +155,7 @@ class HumGenWrapper:
         # endclass
 
         self.generator_config = HumGenConfigValues()
-        
+
 
 
         for dir_, _, files in os.walk(base_human_path):
@@ -319,8 +319,119 @@ class HumGenWrapper:
 
         return self.human_obj.objects.rig
 
-    def CreateFullRandomHuman(self, params:dict):
-        """ 
+    def exportJSONv3Style(self, _sFilename: str):
+
+        body = self.human_obj.body
+        skin = self.human_obj.skin
+        eyes = self.human_obj.eyes
+        hair = self.human_obj.hair.regular_hair
+        #eyebrows = self.human.hair.eyebrows
+        outfit = self.human_obj.clothing.outfit
+        footwear = self.human_obj.clothing.footwear
+        sGender = self.human_obj.gender
+
+        # Save all values to JSON
+        new_params = {
+            "gender": sGender,
+            "body": body,  # random.choice(generator_params.dict_bodies[sGender]),
+            "muscular": body.keys[14].value,  # RandomUniformDiscrete(0, 1, 11),
+            "overweight": body.keys[15].value,  # RandomUniformDiscrete(0, 1, 11),
+            # set skinny value to 0-0.2 as  persons too skinny look odd
+            "skinny": body.keys[16].value,  # RandomUniformDiscrete(0, 0.5, 11),
+            "height": self.human_obj.height.meters,  # random.randint(150, 190),
+            # v3 only "face": self.human_obj.face,  # "random",
+            "skin": {
+                "texture.set_v4": skin.as_dict()['texture.set'],
+                "tone": skin.tone.value,  # RandomUniformDiscrete(0.1, 1.9, 51),
+                "redness": skin.redness.value,  # RandomUniformDiscrete(-0.2, 0.8, 51),
+                "saturation": skin.saturation.value,  # RandomUniformDiscrete(0.1, 0.9, 51),
+                "normal_strength": skin.normal_strength.value,  # random.randint(1, 2),
+                "roughness_multiplier": skin.roughness_multiplier,  # RandomUniformDiscrete(1.5, 2.0, 51),
+                # v3 "dark_areas": skin.dark_areas,  # RandomUniformDiscrete(0.0, 2.0, 101),
+                # v3 "light_areas": skin.light_areas,  # RandomUniformDiscrete(0.0, 2.0, 101),
+                "freckles": skin.freckles.value,  # RandomUniformDiscrete(0.0, 0.5, 101),
+                "splotches": skin.splotches.value,  # RandomUniformDiscrete(0.0, 0.5, 101),
+                # v3 only "beauty_spots_amount_": skin.beauty_spots_amount_,  # random.randint(0, 100),  # TODO clarify what this is
+                # v3 only "beauty_spots_amount": skin.beauty_spots_amount,  # RandomUniformDiscrete(0.0, 1.0, 101),
+                # v3 only "beauty_spots_opacity": skin.beauty_spots_opacity,  # RandomUniformDiscrete(0.0, 0.5, 101),
+                # v3 only "sagging": skin.sagging,  # RandomUniformDiscrete(0.3, 1.0, 15),
+                "wrinkles": self.human_obj.age.age_wrinkles  # RandomUniformDiscrete(5.0, 20.0, 51)
+            },
+            "eyes": {
+                "iris_color": eyes.iris_color,  # [random.random(), random.random(), random.random(), 1.00],
+                # v3 only "eyebrows_style": eyes.eyebrows_style,  # "random",
+                # v3 only "eyebrows_length": eyes.eyebrows_length,  # None,  # TODO implement
+                # v3 only "eyelashes_lenght": eyes.eyelashes_lenght,  # None,  # TODO implement
+                # "hair_lightness": hair.eyelashes.lightness,  # 0.3,
+                # "hair_redness": hair.eyelashes.redness,  # 0.9,
+                # "hair_roughness": hair.eyelashes.roughness,  # 0.3,
+                "eyebrows_v4": hair.eyebrows.as_dict(),
+                "eyelashes_v4": hair.eyelashes.as_dict()
+            },
+            "hair_v4": hair.regular_hair.as_dict(),
+            # {
+            #     # v3 only"hair_style": hair.hair_style,  # random.choice(list(generator_params.dict_hair[gender].keys())),
+            #     # v3 only "length": hair.length,  # hairstyle seems not to be evaluated
+            #     "lightness": hair.lightness,
+            #     "redness": hair.redness,
+            #     "roughness": hair.roughness,
+            #     "salt_and_pepper": hair.salt_and_pepper,
+            #     "roots": hair.roots,
+            #     "hue": hair.hue
+            # },
+            "beard": {
+                "mustache_shadow": skin.gender_specific.mustache_shadow if sGender == "male" else 0,
+                "beard_shadow": skin.gender_specific.beard_shadow if sGender == "male" else 0
+            },
+            "gender_specific_v4": skin.as_dict()["gender_specific"],
+            "makeup": {
+                "foundation_amount": skin.gender_specific.foundation_amount,  # 0,
+                "foundation_color": skin.gender_specific.foundation_color,  # [0.655761, 0.332872, 0.191478, 1.000000],
+                "blush_opacity": skin.gender_specific.blush_opacity,  # RandomUniformDiscrete(0.0, 1.0, 101),
+                "blush_color": skin.gender_specific.blush_color,  # 0.553053, 0.138596, 0.109141, 1.000000],
+                # v3 only"eyeshadow_opacity": makeup.eyeshadow_opacity,  # RandomUniformDiscrete(0.0, 1.0, 101),
+                # v3 obly "eyeshadow_color": makeup.eyeshadow_color,  # [0.239424, 0.041744, 0.013199, 1.000000],
+                "eyebrows_opacity_v4": skin.gender_specific.eyebrows_opacity,
+                "eyebrows_color_v4": skin.gender_specific.eyebrows_color,
+                "lipstick_opacity": skin.gender_specific.lipstick_opacity,  # RandomUniformDiscrete(0.0, 1.0, 101),
+                "lipstick_color": skin.gender_specific.lipstick_color,  # [0.309741, 0.091615, 0.073231, 1.000000],
+                "eyeliner_opacity": skin.gender_specific.eyeliner_opacity,  # RandomUniformDiscrete(0.0, 1.0, 101),
+                "eyeliner_color": skin.gender_specific.eyeliner_color,  # [0.001578, 0.010979, 0.060677, 1.000000],
+            } if sGender == "female" else {},
+            "outfit": {
+                "set_v4": outfit.as_dict()['set'],
+                "outfit_style": outfit.as_dict()['set'],
+                # following v3 only
+                # "outfit_pattern": outfit.outfit_pattern,
+                # "outfit_palette": outfit.outfit_palette,  # "RANDOM_FULL",
+                # "outfit_color": outfit.outfit_color,  # "random",
+                # "outfit_brightness": outfit.outfit_brightness,  # random.triangular(0.6, 1.4),
+                # "outfit_saturation": outfit.outfit_saturation,  # random.triangular(0.8, 1.7),
+                # "outfit_contrast": outfit.outfit_contrast,  # random.triangular(1.8, 2.4),
+            },
+            "footwear": {
+                "footwear_style": footwear.as_dict()['set'],  # "random",
+                # v3 only "footwear_color": footwear.footwear_color,  # "random",
+            },
+            "posefilename": self.human_obj.pose.as_dict()['set'],
+        }
+
+        if sGender == "male":
+            if random.choice([True, False]):
+                new_params["beard"]["beard_style"] = None
+
+        with open(_sFilename, 'w') as fp:
+            json.dump(new_params, fp)
+    # enddef
+
+    def exportJSONv4Style(self, _sFilename: str):
+        dictParamsV4 = self.human_obj.as_dict()
+        with open(_sFilename, 'w') as fp:
+            json.dump(dictParamsV4, fp)
+    # enddef
+
+    def CreateFullRandomHuman(self, sGender:str):
+        """
             Create fully random human using the HumGen3D V4 API
             sName: Give the human a name
         """
@@ -330,7 +441,7 @@ class HumGenWrapper:
         # Name
         ArmatureName = params["sId"]
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(gender) 
+        self.chosen_option = self.Human.get_preset_options(sGender) 
 
         # Choose a random base human
         self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
@@ -344,7 +455,7 @@ class HumGenWrapper:
         for i, v in enumerate(self.human_obj.body.keys):
             v.value = random.random()
             random_body_dict.update({v.name : v.value})
-    
+
         # Randomize clothing
         # Footwear
         footwear = self.human_obj.clothing.footwear
@@ -367,7 +478,7 @@ class HumGenWrapper:
         else:
             pass
 
-        # Outfit    
+        # Outfit
         outfit = self.human_obj.clothing.outfit
         lOutfits = outfit.get_options()
         sOutfits = random.choice(lOutfits)
@@ -384,9 +495,9 @@ class HumGenWrapper:
             # TODO: Dive into blender shaders and do it without Humgens randomize color function
             elif random.random() < 0.5:
                 outfit.randomize_colors(outfit.objects[i])
-            else:    
+            else:
                 pass
-        
+
             # endif
         # endfor
 
@@ -423,7 +534,7 @@ class HumGenWrapper:
         eyebrows.roughness.value = random.random()
         eyebrows.salt_and_pepper.value = random.random()
         # Eye lashes
-        eyelashes =  self.human_obj.hair.eyelashes        
+        eyelashes =  self.human_obj.hair.eyelashes
         # Fast (0) or accurate shaders (1)
         eyelashes.fast_or_accurate = 1 # Accurate
         eyelashes.hue.value = random.random()
@@ -432,11 +543,11 @@ class HumGenWrapper:
         eyelashes.root_lightness.value = random.random()
         eyelashes.root_redness.value = random.random()
         eyelashes.roots.value = random.random()
-        eyelashes.roots_hue.value = random.random()        
-        eyelashes.roughness.value = random.random()   
-        eyelashes.salt_and_pepper.value = random.random()  
+        eyelashes.roots_hue.value = random.random()
+        eyelashes.roughness.value = random.random()
+        eyelashes.salt_and_pepper.value = random.random()
         # Face hair
-        if gender == "male":
+        if sGender == "male":
             face_hair =  self.human_obj.hair.face_hair 
             if random.random() < 0.5:
                 # Set a random face hair
@@ -451,14 +562,14 @@ class HumGenWrapper:
                 face_hair.root_lightness.value = random.random()
                 face_hair.root_redness.value = random.random()
                 face_hair.roots.value = random.random()
-                face_hair.roots_hue.value = random.random()        
-                face_hair.roughness.value = random.random()   
-                face_hair.salt_and_pepper.value = random.random() 
+                face_hair.roots_hue.value = random.random()
+                face_hair.roughness.value = random.random()
+                face_hair.salt_and_pepper.value = random.random()
             # endif
         # endif
-            
+
         # Regular hair
-        hair =  self.human_obj.hair.regular_hair  
+        hair =  self.human_obj.hair.regular_hair
         if random.random() < 0.5:
             # Set a random face hair
             hair.set_random()
@@ -472,16 +583,16 @@ class HumGenWrapper:
             hair.root_lightness.value = random.random()
             hair.root_redness.value = random.random()
             hair.roots.value = random.random()
-            hair.roots_hue.value = random.random()        
-            hair.roughness.value = random.random()   
-            hair.salt_and_pepper.value = random.random() 
-        
+            hair.roots_hue.value = random.random()
+            hair.roughness.value = random.random()
+            hair.salt_and_pepper.value = random.random()
+
         # endif
 
         # Height
 
         # Skin
-        skin =  self.human_obj.skin 
+        skin =  self.human_obj.skin
         # General settings
         skin.set_subsurface_scattering(True) # Turn on SSS
         # Parameters
@@ -490,7 +601,7 @@ class HumGenWrapper:
         if gender == "male":
             skin.gender_specific.beard_shadow.value = random.random()
             skin.gender_specific.mustache_shadow.value = random.random()
-        else: 
+        else:
             pass
         skin.normal_strength.value = random.uniform(0, 10)
         skin.redness.value = random.random()
@@ -504,17 +615,14 @@ class HumGenWrapper:
         self.human_obj.expression.load_facial_rig()
     
         # Save all values to JSON
-        # Rename from HG_... to name
-        bpy.data.objects["HG_" + str(self.human_obj.name)].name = ArmatureName
-        # Change the name of the collection from Humgen to Persons
-
+        
     # enddef
 
 
 
 
-  
-      
+
+
 
 
 ###########################################################################################################
