@@ -95,6 +95,8 @@ color_dict = {
 
 
 #########################################################################################################
+
+
 class HumGenWrapper:
     @staticmethod
     def get_installed_humgen_version():
@@ -127,11 +129,31 @@ class HumGenWrapper:
     else:
         from HumGen3D import Human
 
+    
+
+
     def __init__(self):
         """
         Sets lists for base humans/hair/beard styles from humgen content folder
         """
+        addon_path = bpy.context.preferences.addons[self.addon_name].preferences["filepath_"]
+        contentpacks = os.path.join(addon_path, "content_packs")
+        textures = "8K_Textures"
+        baseclothes = "Base_Clothes"
+        basehair = "Base_Hair"
+        basehumans = "Base_Humans"
+        baseposes = "Base_Poses"
 
+
+        class HumGenConfigValues:
+            def __init__(self):
+                self.list_females = []
+                self.list_males = []
+                self.dict_female_head_hair = {}
+                self.dict_male_head_hair = {}
+                self.dict_male_face_hair = {}
+                self.dict_female_outfits = collections.defaultdict(list)
+                self.dict_male_outfits = collections.defaultdict(list)
         # enddef
 
     # enddef
