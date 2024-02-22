@@ -137,11 +137,80 @@ class HumGenWrapper:
         """
         addon_path = bpy.context.preferences.addons[self.addon_name].preferences["filepath_"]
         contentpacks = os.path.join(addon_path, "content_packs")
-        textures = "8K_Textures"
-        baseclothes = "Base_Clothes"
-        basehair = "Base_Hair"
-        basehumans = "Base_Humans"
-        baseposes = "Base_Poses"
+        self.textures = os.path.join(contentpacks, "8K_Textures.json")
+        self.basehumans = os.path.join(contentpacks, "Base_Humans.json")
+        self.basehair = os.path.join(contentpacks, "Base_Hair.json")
+        self.baseclothes = os.path.join(contentpacks, "Base_Clothes.json")
+        self.baseposes = os.path.join(contentpacks, "Base_Poses.json")
+
+        # Create textures dictionary
+        with open(self.textures) as json_file:
+            dict = json.load(json_file)
+            filtered_elements = [file for file in dict["files"] 
+                                 if ('Default 8K' in file) 
+                                 and (('female' in file) or ('male' in file))
+                                 and file.endswith('.png') 
+                                 and '__MACOSX' not in file
+                                 and 'PBR' not in file]
+        self.dict_textures = {}
+        for file_path in filtered_elements:
+            components = file_path.split('/')
+            gender = components[1]  # Extracting the gender (second component)
+            filename = components[-1].split('.')[0]  # Extracting the filename without extension
+            if gender == 'male':
+                if gender not in self.dict_textures:
+                    self.dict_textures[gender] = {}
+                self.dict_textures[gender][filename] = file_path
+            if gender == 'female':
+                if gender not in self.dict_textures:
+                    self.dict_textures[gender] = {}
+                self.dict_textures[gender][filename] = file_path
+
+
+        # Create models dictionary
+        with open(self.basehumans) as json_file:
+            dict = json.load(json_file)
+            filtered_elements = [file for file in dict["files"] 
+                                 if ('models' in file) 
+                                 and (('female' in file) or ('male' in file))
+                                 and file.endswith('.json') 
+                                 and '__MACOSX' not in file]
+        self.dict_models = {}
+        for file_path in filtered_elements:
+            components = file_path.split('/')
+            gender = components[1]  # Extracting the gender (second component)
+            filename = components[-1].split('.')[0]  # Extracting the filename without extension
+            if gender == 'male':
+                if gender not in self.dict_models:
+                    self.dict_models[gender] = {}
+                self.dict_models[gender][filename] = file_path
+            if gender == 'female':
+                if gender not in self.dict_models:
+                    self.dict_models[gender] = {}
+                self.dict_models[gender][filename] = file_path
+
+# Create regular head hair dictionary
+        with open(self.basehair) as json_file:
+            dict = json.load(json_file)
+            filtered_elements = [file for file in dict["files"] 
+                                 if 'head' in file
+                                 and (('female' in file) or ('male' in file))
+                                 and file.endswith('.json') 
+                                 ]
+        self.dict_hair = {}
+        for file_path in filtered_elements:
+            components = file_path.split('/')
+            gender = components[2]  # Extracting the gender (third component)
+            filename = components[-1].split('.')[0]  # Extracting the filename without extension
+            if gender == 'male':
+                if gender not in self.dict_hair:
+                    self.dict_hair[gender] = {}
+                self.dict_hair[gender][filename] = file_path
+            if gender == 'female':
+                if gender not in self.dict_hair:
+                    self.dict_hair[gender] = {}
+                self.dict_hair[gender][filename] = file_path                
+
 
 
         class HumGenConfigValues:
