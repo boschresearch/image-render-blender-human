@@ -46,7 +46,6 @@ from anyblend.collection import RemoveCollection
 import addon_utils
 
 
-
 color_dict = {
     # color set from HG3D (see HG_COLORS.py)
     "C0": {
@@ -175,10 +174,12 @@ class HumGenWrapper:
         RuntimeError
             raises ...
         """
- 
 
         with open(_sJsonFile) as json_file:
             dictAnyhuman = json.load(json_file)
+
+        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHuman_V4"])
+        self.human_obj.name = (_sJsonFile.rsplit("\\", 1)[1]).rsplit(".", 1)[0]
 
         if dictAnyhuman["bHandLabels"]:
             print("Hand label present")
@@ -186,36 +187,33 @@ class HumGenWrapper:
         # endif
 
         if dictAnyhuman["bFacialRig"]:
-            print("facial rig present")
-            # TODO: edit facs
+            self.human_obj.expression.load_facial_rig()
         # endif
 
-        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHuman_V4"])
-        self.human_obj.name = (_sJsonFile.rsplit("\\", 1)[1]).rsplit(".", 1)[0]
         return self.human_obj.objects.rig
 
     # enddef
 
     def ExportJSON(self, _sFilename: str):
-
         dictAnyhuman = {
             "bHandLabels": False,
             "bFacialRig": self.human_obj.expression.has_facial_rig,
             "sPoseFilename": self.human_obj.pose.as_dict(),
-            "dictHumGen_V4": self.human_obj.as_dict()
+            "dictHumGen_V4": self.human_obj.as_dict(),
         }
 
         sCurrentDirectory = os.path.dirname(os.path.abspath(__file__))
         sJsonFile = os.path.join(sCurrentDirectory, "personas/" + _sFilename)
 
-        with open(sJsonFile, 'w') as xFp:
+        with open(sJsonFile, "w") as xFp:
             json.dump(dictAnyhuman, xFp, indent=4)
+
     # enddef
 
-    def CreateFullRandomHuman(self, params:dict):
+    def CreateFullRandomHuman(self, params: dict):
         """
-            Create fully random human using the HumGen3D V4 API
-            params: dictionary, containing information about the human that will be generated.
+        Create fully random human using the HumGen3D V4 API
+        params: dictionary, containing information about the human that will be generated.
         """
         # Reading values from dict and defining variables
         # CONSTANTS
@@ -226,7 +224,7 @@ class HumGenWrapper:
         # Name
         ArmatureName = params["sId"]
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(gender) 
+        self.chosen_option = self.Human.get_preset_options(gender)
 
         # Choose a random base human
         self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
@@ -239,7 +237,7 @@ class HumGenWrapper:
         random_body_dict = {}
         for i, v in enumerate(self.human_obj.body.keys):
             v.value = random.random()
-            random_body_dict.update({v.name : v.value})
+            random_body_dict.update({v.name: v.value})
 
         # Randomize clothing
         # Footwear
@@ -307,7 +305,7 @@ class HumGenWrapper:
         # Eye brows
         eyebrows = self.human_obj.hair.eyebrows
         # Fast (0) or accurate shaders (1)
-        eyebrows.fast_or_accurate = 1 # Accurate
+        eyebrows.fast_or_accurate = 1  # Accurate
         eyebrows.hue.value = random.random()
         eyebrows.lightness.value = random.random()
         eyebrows.redness.value = random.random()
@@ -319,9 +317,9 @@ class HumGenWrapper:
         eyebrows.roughness.value = random.random()
         eyebrows.salt_and_pepper.value = random.random()
         # Eye lashes
-        eyelashes =  self.human_obj.hair.eyelashes
+        eyelashes = self.human_obj.hair.eyelashes
         # Fast (0) or accurate shaders (1)
-        eyelashes.fast_or_accurate = 1 # Accurate
+        eyelashes.fast_or_accurate = 1  # Accurate
         eyelashes.hue.value = random.random()
         eyelashes.lightness.value = random.random()
         eyelashes.redness.value = random.random()
@@ -333,12 +331,12 @@ class HumGenWrapper:
         eyelashes.salt_and_pepper.value = random.random()
         # Face hair
         if gender == "male":
-            face_hair =  self.human_obj.hair.face_hair 
+            face_hair = self.human_obj.hair.face_hair
             if random.random() < 0.5:
                 # Set a random face hair
                 face_hair.set_random()
                 # Fast (0) or accurate shaders (1)
-                face_hair.fast_or_accurate = 1 # Accurate
+                face_hair.fast_or_accurate = 1  # Accurate
                 # Set random face hair using a humgen function
                 face_hair.hue.value = random.random()
                 face_hair.lightness.value = random.random()
@@ -354,12 +352,12 @@ class HumGenWrapper:
         # endif
 
         # Regular hair
-        hair =  self.human_obj.hair.regular_hair
+        hair = self.human_obj.hair.regular_hair
         if random.random() < 0.5:
             # Set a random face hair
             hair.set_random()
             # Fast (0) or accurate shaders (1)
-            hair.fast_or_accurate = 1 # Accurate
+            hair.fast_or_accurate = 1  # Accurate
             # Set random face hair using a humgen function
             hair.hue.value = random.random()
             hair.lightness.value = random.random()
@@ -377,9 +375,9 @@ class HumGenWrapper:
         # Height
 
         # Skin
-        skin =  self.human_obj.skin
+        skin = self.human_obj.skin
         # General settings
-        skin.set_subsurface_scattering(True) # Turn on SSS
+        skin.set_subsurface_scattering(True)  # Turn on SSS
         # Parameters
         skin.cavity_strength.value = random.random()
         skin.freckles.value = random.uniform(0, 0.5)
@@ -402,30 +400,26 @@ class HumGenWrapper:
         # Poses
         pose = self.human_obj.pose
         # A-Pose path
-        APose = 'poses\\Base Poses\\HG_A_Pose.blend'
+        APose = "poses\\Base Poses\\HG_A_Pose.blend"
         # Set pose explicitly to A-Pose
         pose.set(APose)
 
         # Set the name of the armature
-        bpy.data.objects["HG_" + self.human_obj.name].name = ArmatureName  
-        # Rename HumGen collection 
+        bpy.data.objects["HG_" + self.human_obj.name].name = ArmatureName
+        # Rename HumGen collection
         bpy.data.collections[HUMGEN_COLLECTION_NAME].name = HUMGEN_COLLECTION_NAME_NEW
-        
+
     # enddef
 
-    def CreateHuman(self, params:dict):
+    def CreateHuman(self, params: dict):
         """
-            Create human from dictionary params using the HumGen3D V4 API
-            params: dictionary, containing information about the human that will be generated.
+        Create human from dictionary params using the HumGen3D V4 API
+        params: dictionary, containing information about the human that will be generated.
         """
         # Reading values from dict and defining variables
         # CONSTANTS
         HUMGEN_COLLECTION_NAME = "HumGen"
         HUMGEN_COLLECTION_NAME_NEW = "Persona"
-
-
-
-
 
 
 ###########################################################################################################
