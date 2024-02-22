@@ -153,33 +153,7 @@ class HumGenWrapper:
         RuntimeError
             raises ...
         """
-        bpy.ops.outliner.orphans_purge(do_recursive=True)
-        # HumanArmature = None
-
-        original_type = None
-        try:
-            original_type = bpy.context.area.type
-        except Exception as xEx:
-            print("Error storing original context area type:\n{}".format(str(xEx)))
-        # endtry get area type
-
-        try:
-            bpy.context.area.type = "VIEW_3D"
-        except Exception as xEx:
-            print("Error setting context area type to 'VIEW_3D':\n{}".format(str(xEx)))
-        # endtry set area type
-
-        try:
-            bpy.ops.object.select_all(action="DESELECT")
-        except Exception as xEx:
-            print("Error deselecting all objects:\n{}".format(str(xEx)))
-        # end try deselect all
-
-        try:
-            bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
-        except Exception as xEx:
-            print("Error setting mode to 'OBJECT':\n{}".format(str(xEx)))
-        # endtry
+ 
 
         with open(_sJsonFile) as json_file:
             dictAnyhuman = json.load(json_file)
@@ -417,7 +391,15 @@ class HumGenWrapper:
         
     # enddef
 
-
+    def CreateHuman(self, params:dict):
+        """
+            Create human from dictionary params using the HumGen3D V4 API
+            params: dictionary, containing information about the human that will be generated.
+        """
+        # Reading values from dict and defining variables
+        # CONSTANTS
+        HUMGEN_COLLECTION_NAME = "HumGen"
+        HUMGEN_COLLECTION_NAME_NEW = "Persona"
 
 
 
