@@ -467,16 +467,20 @@ class HumGenWrapper:
         self.human_obj.expression.load_facial_rig()
 
         # Poses
-        pose = self.human_obj.pose
-        # A-Pose path
-        APose = "poses\\Base Poses\\HG_A_Pose.blend"
-        # Set pose explicitly to A-Pose
-        pose.set(APose)
+        # pose = self.human_obj.pose
+        # # A-Pose path
+        # APose = "poses\\Base Poses\\HG_A_Pose.blend"
+        # # Set pose explicitly to A-Pose
+        # pose.set(APose)
 
         # Set the name of the armature
         bpy.data.objects["HG_" + self.human_obj.name].name = ArmatureName
         # Rename HumGen collection
-        bpy.data.collections[HUMGEN_COLLECTION_NAME].name = HUMGEN_COLLECTION_NAME_NEW
+        # if bpy.data.collections.find(HUMGEN_COLLECTION_NAME) != -1:
+        #     bpy.data.collections[HUMGEN_COLLECTION_NAME].name = HUMGEN_COLLECTION_NAME_NEW
+        # # new collection already exists
+        # if bpy.data.collections.find(HUMGEN_COLLECTION_NAME_NEW) == 1:
+        #     pass
 
     # enddef
 
