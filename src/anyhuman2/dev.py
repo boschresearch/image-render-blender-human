@@ -66,7 +66,7 @@ def _testHumanGeneration():
                     "sId": "Seth",
                     "sMode": "FILE",
                     "mParamConfig": {
-                        "sFilename": "C:\\Users\\mnt1lr\\Documents\\work\\Cathy_HumGenV4_Development\\image-render-setup\\repos\image-render-blender-human\\src\\anyhuman\\personas\\HG_Seth.json"
+                        "sFilename": "C:\\Catharsys\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\personas\\xyz.json"
                     },
                 }
             )
@@ -112,7 +112,7 @@ def _testHumanGeneration():
             )
             bpy.context.scene.cursor.location[1] += dy
         # endif
-            
+
         # HumGen V4 test
         if "FULL_RANDOM" in active_tests:
             bpy.context.scene.cursor.location[0] = 0
@@ -120,7 +120,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.001",
                     "sMode": "FULL_RANDOM",
-                    "mParamConfig": {"sGender": "female"},
+                    "mParamConfig": {"sGender": "male", "bHandLabels": True},
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
@@ -128,7 +128,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.002",
                     "sMode": "FULL_RANDOM",
-                    "mParamConfig": {"sGender": "male"},
+                    "mParamConfig": {"sGender": "female", "bHandLabels": False},
                 }
             )
             bpy.context.scene.cursor.location[1] += dy
