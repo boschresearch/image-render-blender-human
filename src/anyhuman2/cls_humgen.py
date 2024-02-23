@@ -301,6 +301,8 @@ class HumGenWrapper:
         gender = params["mParamConfig"]["sGender"]
         # Name
         ArmatureName = params["sId"]
+        # HandLabels
+        bHandLabels = params["mParamConfig"]["bHandLabels"]
         # Get preset for selected gender
         self.chosen_option = self.Human.get_preset_options(gender)
 
@@ -484,6 +486,14 @@ class HumGenWrapper:
 
         # Set the name of the armature
         bpy.data.objects["HG_" + self.human_obj.name].name = ArmatureName
+
+
+        if bHandLabels:
+            # TODO: clean code, pass _sHandLabelFile dynamically
+            sHandLabelFile = "C:\\Catharsys\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
+            self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
+        # endif
+
         # Rename HumGen collection
         # if bpy.data.collections.find(HUMGEN_COLLECTION_NAME) != -1:
         #     bpy.data.collections[HUMGEN_COLLECTION_NAME].name = HUMGEN_COLLECTION_NAME_NEW
