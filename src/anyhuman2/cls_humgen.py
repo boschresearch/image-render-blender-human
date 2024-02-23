@@ -45,6 +45,7 @@ from anyblend.util.node import GetByLabelOrId
 from anyblend.collection import RemoveCollection
 import addon_utils
 
+from .labelling.cls_label_skeleton import BoneLabel
 
 color_dict = {
     # color set from HG3D (see HG_COLORS.py)
@@ -129,8 +130,6 @@ class HumGenWrapper:
         from HumGen3D import Human
 
 
-
-
     def __init__(self):
         """
         Sets lists for base humans/hair/beard styles from humgen content folder
@@ -189,7 +188,7 @@ class HumGenWrapper:
                     self.dict_models[gender] = {}
                 self.dict_models[gender][filename] = file_path
 
-# Create regular head hair dictionary
+        # Create regular head hair dictionary
         with open(self.basehair) as json_file:
             dict = json.load(json_file)
             filtered_elements = [file for file in dict["files"]
@@ -226,18 +225,27 @@ class HumGenWrapper:
 
     # enddef
 
+    def AddLabelsFromJSON(self, _sHandLabelFile: str):
+
+        xBoneLabel = BoneLabel(self.human_obj)
+        objRig = self.human_obj.objects.rig
+        objArmature = objRig.data
+        xBoneLabel.AddLabelBones(_sLabelFile=_sHandLabelFile, _objArmature=objArmature, _objRig=objRig)
+        return
+
     def CreateHumanFromJSON(self, _sJsonFile: str):
         """_summary_
 
         Parameters
         ----------
         _sJsonFile : str
-            abs or relative file path with filename of human descritpion
+            abs file path with filename of human description in JSON format
 
         Returns
         -------
         blender object
             human armature, to be selected in blender by the given name
+
         Raises
         ------
         RuntimeError
@@ -247,12 +255,13 @@ class HumGenWrapper:
         with open(_sJsonFile) as json_file:
             dictAnyhuman = json.load(json_file)
 
-        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHuman_V4"])
+        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHumGen_V4"])
         self.human_obj.name = (_sJsonFile.rsplit("\\", 1)[1]).rsplit(".", 1)[0]
 
         if dictAnyhuman["bHandLabels"]:
-            print("Hand label present")
-            # TODO: Add handlabels
+            # TODO: clean code, pass _sHandLabelFile dynamically
+            sHandLabelFile = "C:\\Catharsys\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
+            self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
         # endif
 
         if dictAnyhuman["bFacialRig"]:
