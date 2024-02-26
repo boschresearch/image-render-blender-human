@@ -541,15 +541,33 @@ class HumGenWrapper:
 
     # enddef
 
-    def CreateHuman(self, params: dict):
+    def CreateHuman(self, dictAnyhuman: dict):
         """
-        Create human from dictionary params using the HumGen3D V4 API
-        params: dictionary, containing information about the human that will be generated.
+        Create human from a dictAnyhuman dictionary which is a composition of the standard
+        HumGenV4 as_dict() + some additional parameters such as gender, pose, labels,...
+        dictAnyhuman: dictionary, containing information about the human that will be generated.
         """
-        # Reading values from dict and defining variables
+        # Reading values from dictAnyhuman and splitting it to custom and HumGenV4 dicts
+        dictCustom = dictAnyhuman["dictCustom"]
+        dictHumGenV4 = dictAnyhuman["dictHumGen_V4"]
         # CONSTANTS
         HUMGEN_COLLECTION_NAME = "HumGen"
         HUMGEN_COLLECTION_NAME_NEW = "Persona"
+        # Get preset for selected gender
+        self.chosen_option = self.Human.get_preset_options(dictCustom["sGender"])
+
+        # Use previously generated HumGenV4 compatible directory
+        self.human_obj = self.Human.from_preset(dictHumGenV4)
+
+        # Set facial rig
+        if dictCustom["bFacialRig"] == True:
+            self.human_obj.expression.load_facial_rig()
+        else:
+            pass
+
+        # Set pose
+        
+
 
 
 ###########################################################################################################
