@@ -44,8 +44,8 @@ def _testHumanGeneration():
         # "RANDOM_REALISTIC_GRID",
         # "PERSONA",
         # "LEGACY",
-        # "FILE", # HumGenV4 Test
-        "FULL_RANDOM", # HumgGenV4 Test
+         "FILE", # HumGenV4 Test
+        #"FULL_RANDOM",  # HumgGenV4 Test
     ]
     try:
         dx = 1.2
@@ -66,7 +66,7 @@ def _testHumanGeneration():
                     "sId": "Seth",
                     "sMode": "FILE",
                     "mParamConfig": {
-                        "sFilename": "C:\\Catharsys\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\personas\\xyz.json"
+                        "sFilename": "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\personas\\FILE_male.json"
                     },
                 }
             )
@@ -120,7 +120,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.001",
                     "sMode": "FULL_RANDOM",
-                    "mParamConfig": {"sGender": "male", "bHandLabels": True},
+                    "mParamConfig": {"sGender": "male", "bOpenPoseHandLabels": True},
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
@@ -128,7 +128,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.002",
                     "sMode": "FULL_RANDOM",
-                    "mParamConfig": {"sGender": "female", "bHandLabels": False},
+                    "mParamConfig": {"sGender": "female", "bOpenPoseHandLabels": False},
                 }
             )
             bpy.context.scene.cursor.location[1] += dy
