@@ -27,7 +27,7 @@
 ###
 
 import bpy
-from . import ops
+from anyhuman import ops
 
 
 ###############################################################################################################################
@@ -42,9 +42,10 @@ def _testHumanGeneration():
         # "RANDOM_FULL",
         # "RANDOM_REALISTIC",
         # "RANDOM_REALISTIC_GRID",
-        "PERSONA",
+        # "PERSONA",
         # "LEGACY",
-        "OTHER",
+        # "FILE", # HumGenV4 Test
+        "FULL_RANDOM", # HumgGenV4 Test
     ]
     try:
         dx = 1.2
@@ -58,6 +59,17 @@ def _testHumanGeneration():
 
             # PlaceHumanOnSeat(obj, {'sEmptyBaseName': 'seat_1'})
         # endif
+        if "FILE" in active_tests:
+            bpy.context.scene.cursor.location[0] = 0
+            obj = ops.GenerateHuman(
+                {
+                    "sId": "Seth",
+                    "sMode": "FILE",
+                    "mParamConfig": {
+                        "sFilename": "C:\\Users\\mnt1lr\\Documents\\work\\Cathy_HumGenV4_Development\\image-render-setup\\repos\image-render-blender-human\\src\\anyhuman\\personas\\HG_Seth.json"
+                    },
+                }
+            )
 
         if "PERSONA" in active_tests:
             bpy.context.scene.cursor.location[0] = 0
@@ -87,7 +99,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.001",
                     "sMode": "RANDOM_FULL",
-                    "mParamConfig": {"gender": "female"},
+                    "mParamConfig": {"sGender": "female"},
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
@@ -95,7 +107,28 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.002",
                     "sMode": "RANDOM_FULL",
-                    "mParamConfig": {"gender": "male"},
+                    "mParamConfig": {"sGender": "male"},
+                }
+            )
+            bpy.context.scene.cursor.location[1] += dy
+        # endif
+            
+        # HumGen V4 test
+        if "FULL_RANDOM" in active_tests:
+            bpy.context.scene.cursor.location[0] = 0
+            obj = ops.GenerateHuman(
+                {
+                    "sId": "Armature.001",
+                    "sMode": "FULL_RANDOM",
+                    "mParamConfig": {"sGender": "female"},
+                }
+            )
+            bpy.context.scene.cursor.location[0] += dx
+            obj = ops.GenerateHuman(
+                {
+                    "sId": "Armature.002",
+                    "sMode": "FULL_RANDOM",
+                    "mParamConfig": {"sGender": "male"},
                 }
             )
             bpy.context.scene.cursor.location[1] += dy
@@ -106,9 +139,7 @@ def _testHumanGeneration():
                 bpy.context.scene.cursor.location[0] = 0
                 for x in range(0, 4):
                     bpy.context.scene.cursor.location[0] += dx
-                    obj = ops.GenerateHuman(
-                        {"sId": "Armature.0{}{}".format(y, x), "sMode": "RANDOM_FULL"}
-                    )
+                    obj = ops.GenerateHuman({"sId": "Armature.0{}{}".format(y, x), "sMode": "RANDOM_FULL"})
                 bpy.context.scene.cursor.location[1] += dy
         # endif
 
@@ -201,9 +232,7 @@ def _testHumanGeneration():
                 bpy.context.scene.cursor.location[0] = 0
                 for x in range(0, 4):
                     bpy.context.scene.cursor.location[0] += dx
-                    obj = ops.GenerateHuman(
-                        {"sId": "Armature.0{}{}".format(y, x), "sMode": "ZWICKY"}
-                    )
+                    obj = ops.GenerateHuman({"sId": "Armature.0{}{}".format(y, x), "sMode": "ZWICKY"})
                 bpy.context.scene.cursor.location[1] += dy
         # endif
 
@@ -217,4 +246,6 @@ def _testHumanGeneration():
 
 
 # uncomment the following line when testing the script in Blender:
-# _testHumanGeneration()
+
+if __name__ == "__main__":
+    _testHumanGeneration()

@@ -10,21 +10,7 @@
               `
 - For each function e.g. `CreateFullRandomHuman` there must be:
 
-  - export JSON files, describing the generated human fully must be available. --> as_dict function from Humgen + custom dictionaries (posefilename) resulting generator_params.json
-  Example:
-  "posefilename:  "//pathtoownposefile",
-  "has_facial_rig: True,
-
-  "HUMGENV4_JSON_EXPORT":
-  {
-    "age": {
-        "set": 30,
-        "age_color": 0.0,
-        "age_wrinkles": 0.0
-        ...
-    },
-  }
-  - Modify import function to read the above dictionary and create a human from it.
+  - export JSON files, describing the generated human fully must be available. --> as_dict function from Humgen + custom dictionaries (posefilename) resulting generator_params.json; keys in dictionary which are ONLY available in HumgenV4 should have a suffix "V4", e.g. "FaceRigV4": "random"
   - a blend file with the created human --> probably catharsys functionaility; dont work on it
   - An image of the created human --> probably catharsys functionaility; dont work on it
   - Face rig must be available

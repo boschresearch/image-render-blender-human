@@ -43,12 +43,8 @@ from pathlib import Path
 from anyblend import node
 from anyblend.util.node import GetByLabelOrId
 from anyblend.collection import RemoveCollection
+import addon_utils
 
-try:
-    from humgen3d.API import HG_Human, HG_Batch_Generator
-except Exception as xEx:
-    print("Error initializing anyhuman module:\n{}".format(str(xEx)))
-# endtry
 
 from . import tools
 
@@ -101,12 +97,46 @@ color_dict = {
 
 #########################################################################################################
 class HumGenWrapper:
+    @staticmethod
+    def get_installed_humgen_version():
+        humgen_version = None  # Default value if addon not found
+        for mod in addon_utils.modules():
+            if mod.bl_info.get("name") == "Human Generator 3D":
+                humgen_version = mod.bl_info.get("version")
+                print(f'HumGen3D Version is: {".".join(map(str, humgen_version))}')
+                break  # Stop searching once addon is found
+        return humgen_version
+
+    # enddef
+    # Import Human class based on the version
+    version_info = None
+    try:
+        version_info = get_installed_humgen_version()
+    except ImportError:
+        # Handle ImportError if get_installed_humgen_version is not available
+        pass
+
+    if version_info and version_info[0] == 4:
+        # Check only MAJOR version number
+        from HumGen3D import Human
+
+        addon_name = "HumGen3D"
+    elif version_info and version_info[0] == 3:
+        from humgen3d import Human  # Adjust the import based on your actual module structure
+
+        addon_name = "humgen3d"
+    else:
+        from HumGen3D import Human
+
     def __init__(self):
         """
         Sets lists for base humans/hair/beard styles from humgen content folder
         """
-        addon_name = "humgen3d"
-        addon_path = bpy.context.preferences.addons[addon_name].preferences["filepath"]
+
+        # enddef
+
+        addon_path = bpy.context.preferences.addons[HumGenWrapper.addon_name].preferences["filepath_"]
+        content_packs_path = os.path.join(addon_path, "content_packs")
         base_human_path = os.path.join(addon_path, "models")
         hair_path = os.path.join(addon_path, "hair")
         outfit_path = os.path.join(addon_path, "outfits")
@@ -126,6 +156,8 @@ class HumGenWrapper:
         # endclass
 
         self.generator_config = HumGenConfigValues()
+        
+
 
         for dir_, _, files in os.walk(base_human_path):
             for file_name in files:
@@ -238,14 +270,272 @@ class HumGenWrapper:
     # enddef
 
     ############################################################################################
-    def CreateHuman(self, _sName, _mParams, _bDeleteBackup=True):
+
+    def CreateHumanFromJSON(self, _sJsonFile: str):
+        """_summary_
+
+        Parameters
+        ----------
+        _sJsonFile : str
+            abs or relative file path with filename of human descritpion
+
+        Returns
+        -------
+        blender object
+            human armature, to be selected in blender by the given name
+        Raises
+        ------
+        RuntimeError
+            raises ...
         """
-        generates a random human given gender and name
+        bpy.ops.outliner.orphans_purge(do_recursive=True)
+        # HumanArmature = None
+
+        original_type = None
+        try:
+            original_type = bpy.context.area.type
+        except Exception as xEx:
+            print("Error storing original context area type:\n{}".format(str(xEx)))
+        # endtry get area type
+
+        try:
+            bpy.context.area.type = "VIEW_3D"
+        except Exception as xEx:
+            print("Error setting context area type to 'VIEW_3D':\n{}".format(str(xEx)))
+        # endtry set area type
+
+        try:
+            bpy.ops.object.select_all(action="DESELECT")
+        except Exception as xEx:
+            print("Error deselecting all objects:\n{}".format(str(xEx)))
+        # end try deselect all
+
+        try:
+            bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
+        except Exception as xEx:
+            print("Error setting mode to 'OBJECT':\n{}".format(str(xEx)))
+        # endtry
+
+        self.human_obj = self.Human.from_preset(_sJsonFile)
+
+        return self.human_obj.objects.rig
+
+    def CreateFullRandomHuman(self, sGender:str):
+        """ 
+            Create fully random human using the HumGen3D V4 API
+            sName: Give the human a name
+        """
+
+        # Get preset for selected gender
+        self.chosen_option = self.Human.get_preset_options(sGender) 
+
+        # Choose a random base human
+        self.human_obj = self.Human.from_preset(random.choice(self.chosen_option))
+
+        # Choose a random integer between 20 and 81 for age
+        iHuman_age = random.randrange(20, 81)
+        self.human_obj.age.set(iHuman_age)
+
+        # Create dict with random body key values
+        random_body_dict = {}
+        for i, v in enumerate(self.human_obj.body.keys):
+            v.value = random.random()
+            random_body_dict.update({v.name : v.value})
+    
+        # Randomize clothing
+        # Footwear
+        footwear = self.human_obj.clothing.footwear
+        lFootwear = footwear.get_options()
+        sFootwear = random.choice(lFootwear)
+        footwear.set(sFootwear)
+        # Add a random pattern to footwear
+        # TODO check also if pattern parameter are showing via as_dict() function
+        if random.random() < 0.5:
+            lRandomPattern = footwear.pattern.get_options()
+            sFootwearRandomPattern = random.choice(lRandomPattern)
+            # to some footwear patterns can not be applied, e.g. garden boots
+            try:
+                footwear.pattern.set(sFootwearRandomPattern, footwear.objects[0])
+            except IndexError:
+                pass
+            # Apply random base color to the footwear
+            # TODO: Dive into blender shaders and do it without Humgens randomize color function
+            footwear.randomize_colors(footwear.objects[0])
+        else:
+            pass
+
+        # Outfit    
+        outfit = self.human_obj.clothing.outfit
+        lOutfits = outfit.get_options()
+        sOutfits = random.choice(lOutfits)
+        outfit.set(sOutfits)
+        # Get list of  pattern for outfit
+        lOutfits = outfit.pattern.get_options()
+        # TODO check also if pattern parameter are showing via as_dict() function
+        # As the outfits have different number of parts (jacket, trousers, tie,...) we need to loop over them
+        for i, k in enumerate(outfit.objects):
+            # Add a random pattern to each of the different outfit parts
+            if random.random() < 0.5:
+                outfit.pattern.set(random.choice(lOutfits), outfit.objects[i])
+            # Apply random base color to the different parts of the outfits
+            # TODO: Dive into blender shaders and do it without Humgens randomize color function
+            elif random.random() < 0.5:
+                outfit.randomize_colors(outfit.objects[i])
+            else:    
+                pass
+        
+            # endif
+        # endfor
+
+        # Eyes
+        eyes = self.human_obj.eyes
+        # Change iris color with Humgens randomize color function
+        # TODO: Dive into blender shaders and do it without Humgens randomize color function
+        eyes.randomize()
+        # TODO: Change sclera color within a reasonable range
+
+        # Face
+        face = self.human_obj.face
+        # Randomize the face using HumGen Function
+        face.randomize()
+        # Randomize face with own functions
+        # face_dict = dict()
+        # for i, v in enumerate(face.keys):
+        #     v.value = random.random()
+        #     face_dict.update({v.name : v.value})
+
+        # Hair
+        # Eye brows
+        eyebrows = self.human_obj.hair.eyebrows
+        # Fast (0) or accurate shaders (1)
+        eyebrows.fast_or_accurate = 1 # Accurate
+        eyebrows.hue.value = random.random()
+        eyebrows.lightness.value = random.random()
+        eyebrows.redness.value = random.random()
+        eyebrows.root_lightness.value = random.random()
+        eyebrows.root_redness.value = random.random()
+        eyebrows.root_redness.value = random.random()
+        eyebrows.roots.value = random.random()
+        eyebrows.roots_hue.value = random.random()
+        eyebrows.roughness.value = random.random()
+        eyebrows.salt_and_pepper.value = random.random()
+        # Eye lashes
+        eyelashes =  self.human_obj.hair.eyelashes        
+        # Fast (0) or accurate shaders (1)
+        eyelashes.fast_or_accurate = 1 # Accurate
+        eyelashes.hue.value = random.random()
+        eyelashes.lightness.value = random.random()
+        eyelashes.redness.value = random.random()
+        eyelashes.root_lightness.value = random.random()
+        eyelashes.root_redness.value = random.random()
+        eyelashes.roots.value = random.random()
+        eyelashes.roots_hue.value = random.random()        
+        eyelashes.roughness.value = random.random()   
+        eyelashes.salt_and_pepper.value = random.random()  
+        # Face hair
+        if sGender == "male":
+            face_hair =  self.human_obj.hair.face_hair 
+            if random.random() < 0.5:
+                # Set a random face hair
+                face_hair.set_random()
+                # Fast (0) or accurate shaders (1)
+                face_hair.fast_or_accurate = 1 # Accurate
+                # Set random face hair using a humgen function
+                face_hair.hue.value = random.random()
+                face_hair.lightness.value = random.random()
+                face_hair.lightness.value = random.random()
+                face_hair.redness.value = random.random()
+                face_hair.root_lightness.value = random.random()
+                face_hair.root_redness.value = random.random()
+                face_hair.roots.value = random.random()
+                face_hair.roots_hue.value = random.random()        
+                face_hair.roughness.value = random.random()   
+                face_hair.salt_and_pepper.value = random.random() 
+            # endif
+        # endif
+            
+        # Regular hair
+        hair =  self.human_obj.hair.regular_hair  
+        if random.random() < 0.5:
+            # Set a random face hair
+            hair.set_random()
+            # Fast (0) or accurate shaders (1)
+            hair.fast_or_accurate = 1 # Accurate
+            # Set random face hair using a humgen function
+            hair.hue.value = random.random()
+            hair.lightness.value = random.random()
+            hair.lightness.value = random.random()
+            hair.redness.value = random.random()
+            hair.root_lightness.value = random.random()
+            hair.root_redness.value = random.random()
+            hair.roots.value = random.random()
+            hair.roots_hue.value = random.random()        
+            hair.roughness.value = random.random()   
+            hair.salt_and_pepper.value = random.random() 
+        
+        # endif
+
+        # Height
+
+        # Skin
+        skin =  self.human_obj.skin 
+        # General settings
+        skin.set_subsurface_scattering(True) # Turn on SSS
+        # Parameters
+        skin.cavity_strength.value = random.random()
+        skin.freckles.value = random.uniform(0, 0.5)
+        if sGender == "male":
+            skin.gender_specific.beard_shadow.value = random.random()
+            skin.gender_specific.mustache_shadow.value = random.random()
+        else: 
+            pass
+        skin.normal_strength.value = random.uniform(0, 10)
+        skin.redness.value = random.random()
+        skin.roughness_multiplier.value = random.uniform(-10000, 10000)
+        skin.saturation.value = random.uniform(0, 2)
+        skin.splotches.value = random.uniform(0, 0.5)
+        skin.tone.value = random.uniform(0, 3)
+        # endif
+    # enddef
+
+
+
+
+  
+        # Load and create base_human_dict
+        filename = os.path.join(content_packs_path, "Base_Humans.json")
+        with open(filename, "r") as file:
+            base_human_dict = json.load(file)
+
+        # Load and create base_hair_dict
+        filename = os.path.join(content_packs_path, "Base_Hair.json")
+        with open(filename, "r") as file:
+            base_hair_dict = json.load(file)
+
+        # Json files for hair are used by HumGenV4
+        base_hair_json_files = [file for file in base_hair_dict["files"] if file.endswith('.json')]
+
+        # Load and create base_clothes_dict
+        filename = os.path.join(content_packs_path, "Base_Clothes.json")
+        with open(filename, "r") as file:
+            base_clothes_dict = json.load(file)
+        # blend files for hair are used by HumGenV4
+        base_clothes_blend_files = [file for file in base_clothes_dict["files"] if file.endswith('.blend')]
+
+        # Load and create base_poses_dict
+        filename = os.path.join(content_packs_path, "Base_Poses.json")
+        with open(filename, "r") as file:
+            base_poses_dict = json.load(file)
+        base_pose_blend_files = [file for file in base_poses_dict["files"] if file.endswith('.blend')]
+         
+    def CreateHuman(self, _sName, _mParams):
+        """
+        is a random human given gender and name
 
         Parameters
         ----------
         _sName : string
-            name human armature should get. The name, the huamn generator creates automatically
+            name human armature should get. The name, the human generator creates automatically
             is overwritten by this name
         _mParams: dict
             dictionary of all values that should be used for generation of the human
@@ -289,7 +579,7 @@ class HumGenWrapper:
         try:
             bpy.ops.object.select_all(action="DESELECT")
         except Exception as xEx:
-            print("Error deselcting all objects:\n{}".format(str(xEx)))
+            print("Error deselecting all objects:\n{}".format(str(xEx)))
         # end try deselect all
 
         try:
@@ -298,46 +588,53 @@ class HumGenWrapper:
             print("Error setting mode to 'OBJECT':\n{}".format(str(xEx)))
         # endtry
 
-        sGender = _mParams["gender"]
+        # sGender = _mParams["sGender"]  # Humgen V3
+        if _mParams["keys"]["Male"] == 1.0:
+            sGender = "male"
+        elif _mParams["keys"]["Male"] == 0.0:
+            sGender = "female"
 
-        body_rel_file = "/models/{}/{}.json".format(sGender, _mParams["body"])
-        body_rel_file = self._make_rel_path(body_rel_file)
+        # body_rel_file = "/models/{}/{}.json".format(sGender, _mParams["body"]) # Humgen V3
+        # body_rel_file = self._make_rel_path(body_rel_file) # Humgen V3
 
-        self.human_obj = HG_Human()
+        # self.human_obj = HG_Human() # Humgen V3
 
         # this needs to be run to populate internal values of the plugin
-        self.human_obj.get_starting_human_options(gender=sGender)
+        # self.human_obj.get_starting_human_options(gender=sGender) # Humgen V3
+        self.chosen_option = self.Human.get_preset_options(sGender)
+        self.human_obj = self.Human.from_preset(_mParams)
+        # self.human_obj.create(chosen_starting_human=body_rel_file) # Humgen V3
 
-        self.human_obj.create(chosen_starting_human=body_rel_file)
-
-        name_human = self.human_obj.body_object.material_slots[0].name
-
+        # name_human = self.human_obj.body_object.material_slots[0].name # Humgen V3
+        name_human = self.human_obj.name
+        _sName = ".Human"
         self._prepare_body(sGender, _mParams)
-        self._prepare_skin(sGender, name_human, _mParams)
+        self._prepare_skin(sGender, _sName, _mParams)
         self._prepare_eyes(sGender, _mParams)
-        self._prepare_hair(sGender, name_human, _mParams)
+        self._prepare_hair(sGender, _sName, _mParams)
 
-        self.human_obj.finish_creation_phase()
+        # self.human_obj.finish_creation_phase() # Humgen V3
 
         # calculate the bodies weight and volume
-        skin = self.human_obj.body_object
+        body_surface = self.human_obj.props["body_obj"]
 
         bm = bmesh.new()
 
-        bm.from_object(skin, depsgraph=bpy.context.evaluated_depsgraph_get())
+        bm.from_object(body_surface, depsgraph=bpy.context.evaluated_depsgraph_get())
 
         volume = bm.calc_volume()
-        self.human_obj.rig_object["volume"] = volume
+        # self.human_obj.rig_object["volume"] = volume # Humgen V3
 
         density = 1.0
-        self.human_obj.rig_object["weight"] = volume * density * 1000.0
+        # self.human_obj.rig_object["weight"] = volume * density * 1000.0 # HumGen V3
 
         self._prepare_outfit(sGender, _mParams)
 
-        tools.FixClothBoneWeights(
-            skinMesh=self.human_obj.body_object,
-            clothMeshes=self.human_obj.clothing_objects,
-        )
+        # HumGen V3
+        # tools.FixClothBoneWeights(
+        #     skinMesh=self.human_obj.body_object,
+        #     clothMeshes=self.human_obj.clothing_objects,
+        # )
 
         self._prepare_pose(sGender, _mParams)
 
@@ -348,19 +645,20 @@ class HumGenWrapper:
         # since this is not needed here, the backup collection is deleted
 
         # print("Removing backup collection...")
-        if _bDeleteBackup:
-            RemoveCollection("HumGen_Backup [Don't Delete]")
+        # if _bDeleteBackup: # HumGen V3
+        #     RemoveCollection("HumGen_Backup [Don't Delete]") # HumGen V3
         # print("done.")
 
-        try:
-            if original_type is not None:
-                bpy.context.area.type = original_type
-            # endif
-        except Exception as xEx:
-            print("Error setting context area type back to '{}':\n{}".format(original_type, str(xEx)))
-        # endtry
+        # try: # HumGen V3
+        #     if original_type is not None: # HumGen V3
+        #         bpy.context.area.type = original_type # HumGen V3
+        #     # endif # HumGen V3
+        # except Exception as xEx: # HumGen V3
+        #     print("Error setting context area type back to '{}':\n{}".format(original_type, str(xEx))) # HumGen V3
+        # endtry # HumGen V3
 
-        return self.human_obj.rig_object
+        # return self.human_obj.rig_object # HumGen V3
+        return self.human_obj.objects.rig
 
     # enddef
 
@@ -374,41 +672,44 @@ class HumGenWrapper:
     ############################################################################################
     def _prepare_body(self, gender, params):
         # set skinny value to 0-0.2 as  persons too skinny look odd
-        for number, key in enumerate(bpy.data.shape_keys):
-            try:
-                bpy.data.shape_keys[number].key_blocks["bp_Muscular"].value = params["muscular"]
-                bpy.data.shape_keys[number].key_blocks["bp_Overweight"].value = params["overweight"]
-                bpy.data.shape_keys[number].key_blocks["bp_Skinny"].value = params["skinny"]
-            except Exception as e:
-                print(e)
+        for number, key in enumerate(self.human_obj.body.keys):
+            if self.human_obj.body.keys[number].name in params["keys"]:
+                self.human_obj.body.keys[number].value = params["keys"][self.human_obj.body.keys[number].name]
+            # try:
+            #     bpy.data.shape_keys[number].key_blocks["bp_Muscular"].value = params["keys"]["muscular"]
+            #     bpy.data.shape_keys[number].key_blocks["bp_Overweight"].value = params["keys"]["overweight"]
+            #     bpy.data.shape_keys[number].key_blocks["bp_Skinny"].value = params["keys"]["skinny"]
+            # except Exception as e:
+            #     print(e)
             # endtry
         # endfor
 
         bpy.data.scenes["Scene"].HG3D.human_length = params["height"]
 
-        if params["face"] == "random":
-            bpy.ops.hg3d.random(random_type="face_all")
+        # if params["face"] == "random": # HumGen V3
+        #     bpy.ops.hg3d.random(random_type="face_all")
 
-        elif "variation" in params["face"]:
-            for number, key in enumerate(bpy.data.shape_keys):
-                try:
-                    bpy.data.shape_keys[number].key_blocks["pr_asian"].value = 0.0
-                    bpy.data.shape_keys[number].key_blocks["pr_black"].value = 0.0
-                    bpy.data.shape_keys[number].key_blocks["pr_caucasian"].value = 0.0
-                    bpy.data.shape_keys[number].key_blocks["pr_{}".format(params["face"])].value = 1.0
-                except Exception as e:
-                    print(e)
-                # endtry
-            # endfor
-        else:
-            raise NotImplementedError
-        # endif
+        # elif "variation" in params["face"]:
+        #     for number, key in enumerate(bpy.data.shape_keys):
+        #         try:
+        #             bpy.data.shape_keys[number].key_blocks["pr_asian"].value = 0.0
+        #             bpy.data.shape_keys[number].key_blocks["pr_black"].value = 0.0
+        #             bpy.data.shape_keys[number].key_blocks["pr_caucasian"].value = 0.0
+        #             bpy.data.shape_keys[number].key_blocks["pr_{}".format(params["face"])].value = 1.0
+        #         except Exception as e:
+        #             print(e)
+        #         # endtry
+        #     # endfor
+        # else:
+        #     raise NotImplementedError
+        # # endif
 
     # enddef
 
     ############################################################################################
-    def _prepare_skin(self, _sGender, _sNameHuman, _mParams):
-        nodes = bpy.data.materials[_sNameHuman].node_tree.nodes
+    def _prepare_skin(self, _sGender, _sName, _mParams):
+        """Function to"""
+        nodes = bpy.data.materials[_sName].node_tree.nodes
         dicSkin = _mParams["skin"]
 
         # skin parameters
@@ -417,17 +718,17 @@ class HumGenWrapper:
         nodes["Skin_tone"].inputs[3].default_value = dicSkin["saturation"]
         nodes["Normal Map"].inputs[0].default_value = dicSkin["normal_strength"]
         nodes["R_Multiply"].inputs[1].default_value = dicSkin["roughness_multiplier"]
+        # HumGen3D V3
+        # bpy.data.scenes["Scene"].HG3D.skin_sss = "on" # HumGen3D V3
+        # bpy.data.scenes["Scene"].HG3D.underwar_switch = "on" # HumGen3D V3
 
-        bpy.data.scenes["Scene"].HG3D.skin_sss = "on"
-        bpy.data.scenes["Scene"].HG3D.underwar_switch = "on"
-
-        nodes["Darken_hsv"].inputs[2].default_value = dicSkin["dark_areas"]
-        nodes["Lighten_hsv"].inputs[2].default_value = dicSkin["light_areas"]
+        # nodes["Darken_hsv"].inputs[2].default_value = dicSkin["dark_areas"] # HumGen3D V3
+        # nodes["Lighten_hsv"].inputs[2].default_value = dicSkin["light_areas"] # HumGen3D V3
         nodes["Freckles_control"].inputs[3].default_value = dicSkin["freckles"]
         nodes["Splotches_control"].inputs[3].default_value = dicSkin["splotches"]
-        nodes["BS_Control"].inputs[1].default_value = dicSkin["beauty_spots_amount_"]
-        nodes["BS_Control"].inputs[2].default_value = dicSkin["beauty_spots_amount"]
-        nodes["BS_Opacity"].inputs[1].default_value = dicSkin["beauty_spots_opacity"]
+        # nodes["BS_Control"].inputs[1].default_value = dicSkin["beauty_spots_amount_"] # HumGen3D V3
+        # nodes["BS_Control"].inputs[2].default_value = dicSkin["beauty_spots_amount"] # HumGen3D V3
+        # nodes["BS_Opacity"].inputs[1].default_value = dicSkin["beauty_spots_opacity"] # HumGen3D V3
 
         xPriBsdfIns = nodes["Principled BSDF"].inputs
         if "Subsurface" in xPriBsdfIns:
@@ -448,7 +749,8 @@ class HumGenWrapper:
         # endfor
 
         # bpy.data.shape_keys["Key.001"].key_blocks["age_old.Transferred"].value = 0.2
-        nodes["HG_Age"].inputs[1].default_value = dicSkin["wrinkles"]
+        # nodes["HG_Age"].inputs[1].default_value = dicSkin["wrinkles"] # HumGen V3
+        self.human_obj.age.age_wrinkles = _mParams["age"]["age_wrinkles"]
 
         # setting beard shadow for male and make-up for female
         if _sGender == "male":
@@ -492,32 +794,34 @@ class HumGenWrapper:
     # enddef
 
     ############################################################################################
-    def _prepare_eyes(self, gender, params):
-        eye_nodes = bpy.data.materials[".HG_Eyes_Inner"].node_tree.nodes
-        eye_nodes["HG_Eye_Color"].inputs[2].default_value = params["eyes"]["iris_color"]
+    def _prepare_eyes(self, gender, _mParams):
+        """Prepare eyes"""
+        # eye_nodes = bpy.data.materials[".HG_Eyes_Inner"].node_tree.nodes # HumGen3D V3
+        # eye_nodes["HG_Eye_Color"].inputs[2].default_value = params["eyes"]["iris_color"] # HumGen3D V3
+        self.human_obj.eyes.iris_color.value = _mParams["eyes"]["pupil_color"]
 
-        if "eyebrows_style" in params["eyes"]:
-            eyebrowsindex = -1
-            try:
-                eyebrowsindex = int(params["eyes"]["eyebrows_style"])
-            except ValueError:
-                pass
+        # if "eyebrows_style" in _mParams["eyes"]: # HumGen3D V3
+        #     eyebrowsindex = -1
+        #     try:
+        #         eyebrowsindex = int(params["eyes"]["eyebrows_style"])
+        #     except ValueError:
+        #         pass
 
-            if params["eyes"]["eyebrows_style"] == "random":
-                raise RuntimeError(
-                    "random value not supported here, has to be resolved before with ResolveRandomParameters(...)"
-                )
-                eyebrowsindex = random.randint(0, 10)
-            elif eyebrowsindex != -1:
-                pass
-            else:
-                raise NotImplementedError
-            # endif
+        #     if params["eyes"]["eyebrows_style"] == "random":
+        #         raise RuntimeError(
+        #             "random value not supported here, has to be resolved before with ResolveRandomParameters(...)"
+        #         )
+        #         eyebrowsindex = random.randint(0, 10)
+        #     elif eyebrowsindex != -1:
+        #         pass
+        #     else:
+        #         raise NotImplementedError
+        #     # endif
 
-            for i in range(0, eyebrowsindex):
-                bpy.ops.hg3d.eyebrowswitch(forward=True)
-            # endfor
-        # endif
+        #     for i in range(0, eyebrowsindex):
+        #         bpy.ops.hg3d.eyebrowswitch(forward=True)
+        # endfor
+        # endif # HumGen3D V3
 
     # enddef
 
@@ -831,41 +1135,72 @@ class HumGenWrapper:
     # enddef
 
     ############################################################################################
-    def _prepare_pose(self, gender, params):
+    def _prepare_pose(self, gender, _mParams):
         # get options need to called first to populate internal list
-        lAvailablePoses = self.human_obj.get_pose_options()
+        # lAvailablePoses = self.human_obj.get_pose_options() # HumGen V3
+        AvailablePoses = self.human_obj.pose.get_options()
         # print("Available Poses: {}".format(lAvailablePoses))
 
         # choose at least the base pose so the armature has the same bone configuration as the predefined poses
         # (see _match_roll(...) in HG_POSE.py)
-        posefilename = params.get("posefilename")
-        if posefilename is None:
-            posefilename = self._make_rel_path("/poses/Base Poses/HG_A_Pose.blend")
-        elif posefilename == "random":
-            posefilename = random.choice(lAvailablePoses)
-        else:
-            posefilename = self._make_rel_path(posefilename)
+        try:
+            posefilename = _mParams.get("posefilename")
+            if posefilename == "random":
+                posefilename = random.choice(AvailablePoses)
+            elif posefilename is None:
+                posefilename = AvailablePoses[0]  # set A-Pose
+        except:
+            posefilename = AvailablePoses[0]  # set A-Pose
+
+        # if posefilename is None: # HumGen V3
+        #     posefilename = self._make_rel_path("/poses/Base Poses/HG_A_Pose.blend") # HumGen V3
+        # elif posefilename == "random": # HumGen V3
+        #     posefilename = random.choice(lAvailablePoses) # HumGen V3
+        # else: # HumGen V3
+        #     posefilename = self._make_rel_path(posefilename) # HumGen V3
 
         # print(f"Pose Filename: {posefilename}")
 
         # print("Setting pose...")
-        self.human_obj.set_pose(chosen_pose_option=posefilename)
+        # self.human_obj.set_pose(chosen_pose_option=posefilename) # HumGen V3
+        self.human_obj.pose.set(posefilename)
         print("done.")
 
-        print("Setting pose filename...")
-        bpy.data.scenes["Scene"].HG3D.pcoll_poses = posefilename
-        print("done.")
+        # print("Setting pose filename...") # HumGen V3
+        # bpy.data.scenes["Scene"].HG3D.pcoll_poses = posefilename # HumGen V3
+        # print("done.") # HumGen V3
 
-        if "expression" in params:
-            if params["expression"] == "random":
-                bpy.ops.hg3d.random(random_type="expressions")
-            elif "/expressions" in params["expression"]:
-                expression_file = self._make_rel_path(params["expression"])
-                bpy.data.scenes["Scene"].HG3D.pcoll_expressions = expression_file
-            else:
-                raise NotImplementedError
-            # endif
+        AvailableExpressions = self.human_obj.expression.get_options()
+        if "expression" in _mParams:
+            self.human_obj.expression.keys[0].value = _mParams["expression"]["Angry"]
+            self.human_obj.expression.keys[1].value = _mParams["expression"]["Blink Left"]
+            self.human_obj.expression.keys[2].value = _mParams["expression"]["Blink Right"]
+            self.human_obj.expression.keys[3].value = _mParams["expression"]["Brow Raise Left"]
+            self.human_obj.expression.keys[4].value = _mParams["expression"]["Brow Raise Right"]
+            self.human_obj.expression.keys[5].value = _mParams["expression"]["Cheeck Suck"]
+            self.human_obj.expression.keys[6].value = _mParams["expression"]["Frown"]
+            self.human_obj.expression.keys[7].value = _mParams["expression"]["Frown.001"]
+            self.human_obj.expression.keys[8].value = _mParams["expression"]["Brow Raise Left.001"]
+        else:
+            # set random expression
+            self.human_obj.expression.set_random()
+            # save the set expression
+            _mParams["expression"] = {"mode": "HumGen3D Random"}
+            for i, k in enumerate(self.human_obj.expression.keys):
+                _mParams["expression"].update({k.name: k.value})
+            # endfor
         # endif
+        print(_mParams["expression"])
+        # if "expression" in _mParams: # HumGen V3
+        #     if params["expression"] == "random": # HumGen V3
+        #         bpy.ops.hg3d.random(random_type="expressions") # HumGen V3
+        #     elif "/expressions" in params["expression"]: # HumGen V3
+        #         expression_file = self._make_rel_path(params["expression"]) # HumGen V3
+        #         bpy.data.scenes["Scene"].HG3D.pcoll_expressions = expression_file # HumGen V3
+        #     else: # HumGen V3
+        #         raise NotImplementedError # HumGen V3
+        #     # endif # HumGen V3
+        # # endif # HumGen V3
 
     # enddef
 

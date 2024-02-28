@@ -45,6 +45,7 @@ from anyblend.util.node import GetByLabelOrId
 from anyblend.collection import RemoveCollection
 import addon_utils
 
+from .labelling.cls_label_skeleton import BoneLabel
 
 color_dict = {
     # color set from HG3D (see HG_COLORS.py)
@@ -128,7 +129,7 @@ class HumGenWrapper:
     else:
         from HumGen3D import Human
 
-    
+
 
     def __init__(self):
         """
@@ -141,7 +142,7 @@ class HumGenWrapper:
         base_hair = os.path.join(content_packs, "Base_Hair.json")
         base_clothes = os.path.join(content_packs, "Base_Clothes.json")
         base_poses = os.path.join(content_packs, "Base_Poses.json")
-        
+
         class HumGenConfigValues:
             def __init__(self):
                 self.dict_textures = {} # Textures
@@ -155,11 +156,11 @@ class HumGenWrapper:
             def CreateDictionary(self, filelist: list, gender_position: int):
                 """
                 Creates dictionaries for regular hair, textures, models, regular head hair, and face hair based on the given file list.
-                
+
                 Parameters:
                 - filelist (list): A list of file paths.
                 - gender_position (int): The position of gender ("male" or "female") in the file path.
-                
+
                 Returns:
                 - dictName (dict)
                 """
@@ -190,22 +191,22 @@ class HumGenWrapper:
     # Create textures dictionary
         with open(textures) as json_file:
             dict = json.load(json_file)
-            filtered_elements = [file for file in dict["files"] 
-                                if ('Default 8K' in file) 
+            filtered_elements = [file for file in dict["files"]
+                                if ('Default 8K' in file)
                                 and (('female' in file) or ('male' in file))
-                                and file.endswith('.png') 
+                                and file.endswith('.png')
                                 and '__MACOSX' not in file
                                 and 'PBR' not in file]
-        
+
         self.generator_config.dict_textures = HumGenConfigValues.CreateDictionary(self, filtered_elements, 1)
 
         # Create models dictionary
         with open(base_humans) as json_file:
             dict = json.load(json_file)
-            filtered_elements = [file for file in dict["files"] 
-                                if ('models' in file) 
+            filtered_elements = [file for file in dict["files"]
+                                if ('models' in file)
                                 and (('female' in file) or ('male' in file))
-                                and file.endswith('.json') 
+                                and file.endswith('.json')
                                 and '__MACOSX' not in file]
 
         self.generator_config.dict_models = HumGenConfigValues.CreateDictionary(self, filtered_elements, 1)
@@ -213,20 +214,20 @@ class HumGenWrapper:
     # Create regular head hair dictionary
         with open(base_hair) as json_file:
             dict = json.load(json_file)
-            filtered_elements = [file for file in dict["files"] 
+            filtered_elements = [file for file in dict["files"]
                                 if 'head' in file
                                 and (('female' in file) or ('male' in file))
-                                and file.endswith('.json') 
+                                and file.endswith('.json')
                                 ]
- 
+
         self.generator_config.dict_regular_hair = HumGenConfigValues.CreateDictionary(self, filtered_elements, 2)
-    
+
     # Create face hair dictionary
         with open(base_hair) as json_file:
             dict = json.load(json_file)
-            filtered_elements = [file for file in dict["files"] 
+            filtered_elements = [file for file in dict["files"]
                                 if 'face_hair' in file
-                                and file.endswith('.json') 
+                                and file.endswith('.json')
                                 ]
         for file_path in filtered_elements:
             components = file_path.split('/')
@@ -240,48 +241,55 @@ class HumGenWrapper:
     # Create Clothes dictionary
         with open(base_clothes) as json_file:
             dict = json.load(json_file)
-            filtered_elements = [file for file in dict["files"] 
+            filtered_elements = [file for file in dict["files"]
                                 if 'outfits' in file
                                 and (('female' in file) or ('male' in file))
-                                and file.endswith('.blend') 
+                                and file.endswith('.blend')
                                 ]
- 
+
         self.generator_config.dict_clothes = HumGenConfigValues.CreateDictionary(self, filtered_elements, 1)
-    
+
     # Create Footwear dictionary
         with open(base_clothes) as json_file:
             dict = json.load(json_file)
-            filtered_elements = [file for file in dict["files"] 
+            filtered_elements = [file for file in dict["files"]
                                 if 'footwear' in file
                                 and (('female' in file) or ('male' in file))
-                                and file.endswith('.blend') 
+                                and file.endswith('.blend')
                                 ]
- 
+
         self.generator_config.dict_footwear = HumGenConfigValues.CreateDictionary(self, filtered_elements, 1)
-             
+
     # Create Footwear dictionary
         with open(base_clothes) as json_file:
             dict = json.load(json_file)
-            filtered_elements = [file for file in dict["files"] 
+            filtered_elements = [file for file in dict["files"]
                                 if 'footwear' in file
                                 and (('female' in file) or ('male' in file))
-                                and file.endswith('.blend') 
+                                and file.endswith('.blend')
                                 ]
- 
+
         self.generator_config.dict_footwear = HumGenConfigValues.CreateDictionary(self, filtered_elements, 1)
 
     # Create Poses dictionary
         with open(base_poses) as json_file:
             dict = json.load(json_file)
-            filtered_elements = [file for file in dict["files"] 
+            filtered_elements = [file for file in dict["files"]
                                 if 'poses' in file
-                                and file.endswith('.blend') 
+                                and file.endswith('.blend')
                                 ]
- 
+
         self.generator_config.dict_poses = HumGenConfigValues.CreateDictionary(self, filtered_elements, 1)
         # enddef
 
     # enddef
+
+    def AddLabelsFromJSON(self, _sHandLabelFile: str):
+        xBoneLabel = BoneLabel(self.human_obj)
+        objRig = self.human_obj.objects.rig
+        objArmature = objRig.data
+        xBoneLabel.AddLabelBones(_sLabelFile=_sHandLabelFile, _objArmature=objArmature, _objRig=objRig)
+        return
 
     def CreateHumanFromJSON(self, _sJsonFile: str):
         """_summary_
@@ -289,12 +297,13 @@ class HumGenWrapper:
         Parameters
         ----------
         _sJsonFile : str
-            abs or relative file path with filename of human descritpion
+            abs file path with filename of human description in JSON format
 
         Returns
         -------
         blender object
             human armature, to be selected in blender by the given name
+
         Raises
         ------
         RuntimeError
@@ -304,15 +313,16 @@ class HumGenWrapper:
         with open(_sJsonFile) as json_file:
             dictAnyhuman = json.load(json_file)
 
-        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHuman_V4"])
+        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHumGen_V4"])
         self.human_obj.name = (_sJsonFile.rsplit("\\", 1)[1]).rsplit(".", 1)[0]
 
-        if dictAnyhuman["bHandLabels"]:
-            print("Hand label present")
-            # TODO: Add handlabels
+        if dictAnyhuman["dictCustom"]["bOpenPoseHandLabels"]:
+            # TODO: clean code, pass _sHandLabelFile dynamically
+            sHandLabelFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
+            self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
         # endif
 
-        if dictAnyhuman["bFacialRig"]:
+        if dictAnyhuman["dictCustom"]["bFacialRig"]:
             self.human_obj.expression.load_facial_rig()
         # endif
 
@@ -321,10 +331,20 @@ class HumGenWrapper:
     # enddef
 
     def ExportJSON(self, _sFilename: str):
+        # INFO: stock bones 102, after adding 42 handlabels, 144
+        # TODO: Better validation required,
+        if len(self.human_obj.objects.rig.data.bones) == 144:
+            bOpenPoseHandLabelsPresent = True
+        else:
+            bOpenPoseHandLabelsPresent = False
+
         dictAnyhuman = {
-            "bHandLabels": False,
-            "bFacialRig": self.human_obj.expression.has_facial_rig,
-            "sPoseFilename": self.human_obj.pose.as_dict(),
+            "dictCustom": {
+                "sGender": self.human_obj.gender,
+                "bOpenPoseHandLabels": bOpenPoseHandLabelsPresent,
+                "bFacialRig": self.human_obj.expression.has_facial_rig,
+                "sPoseFilename": self.human_obj.pose.as_dict(),
+            },
             "dictHumGen_V4": self.human_obj.as_dict(),
         }
 
@@ -349,6 +369,8 @@ class HumGenWrapper:
         gender = params["mParamConfig"]["sGender"]
         # Name
         ArmatureName = params["sId"]
+        # HandLabels
+        bOpenPoseHandLabels = params["mParamConfig"]["bOpenPoseHandLabels"]
         # Get preset for selected gender
         self.chosen_option = self.Human.get_preset_options(gender)
 
@@ -532,6 +554,13 @@ class HumGenWrapper:
 
         # Set the name of the armature
         bpy.data.objects["HG_" + self.human_obj.name].name = ArmatureName
+
+        if bOpenPoseHandLabels:
+            # TODO: clean code, pass _sHandLabelFile dynamically
+            sHandLabelFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
+            self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
+        # endif
+
         # Rename HumGen collection
         # if bpy.data.collections.find(HUMGEN_COLLECTION_NAME) != -1:
         #     bpy.data.collections[HUMGEN_COLLECTION_NAME].name = HUMGEN_COLLECTION_NAME_NEW
