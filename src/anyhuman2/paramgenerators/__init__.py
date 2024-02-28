@@ -62,18 +62,7 @@ def ComputeParams(mode, params, overwrite, generator_params):
 
     """
     new_params = GetParams(mode, params, generator_params)
-    new_params = ResolveRandomParams(mode, new_params, generator_params)
 
-    # overwrite the configuration values if present in overwrite dict
-    # also, deal with nested values (only overwrite values given in overwrite dict)
-    for key, value in overwrite.items():
-        if isinstance(value, dict):
-            for inner_key, inner_value in value.items():
-                new_params[key][inner_key] = inner_value
-            # endfor
-        else:
-            new_params[key] = value
-        # endif
 
     return new_params
 

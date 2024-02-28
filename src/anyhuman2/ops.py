@@ -40,6 +40,7 @@ from anybase import convert
 
 from .cls_humgen import SingletonHumGenWrapper
 
+from .paramgenerators import ComputeParams, ResolveRandomParams
 
 try:
     from HumGen3D import Human as HG_Human
@@ -117,7 +118,7 @@ def GenerateHuman(_dicParams, **kwargs):
     # gender = _dicParams["sGender"]
 
     # first compute the parameters that should be used for the creation of the human
-    # generator_params = ComputeParams(mode, params, overwrite, lHumanGenerator.generator_config)
+    generated_params = ComputeParams(mode, params, overwrite, lHumanGenerator.generator_config)
 
     # apply
     # params['posefilename'] =_dicParams.get('sPosefile')
@@ -127,7 +128,7 @@ def GenerateHuman(_dicParams, **kwargs):
     elif _dicParams.get("sMode") == "FULL_RANDOM":
         objX = lHumanGenerator.CreateFullRandomHuman(_dicParams)
     else:
-        objX = lHumanGenerator.CreateHuman(_sName=_dicParams["sId"], _mParams=generator_params)
+        objX = lHumanGenerator.CreateHuman(params, generated_params)
 
 
     return objX
