@@ -118,7 +118,7 @@ def RealisticRandomizeParams(params, generator_config):
     # HumGenV4 Config
     NewHumGenV4Config = {
         "age": {
-            "set": 30,
+            "set": random.randrange(20, 81),
             "age_color": 0.0,
             "age_wrinkles": 0.0
             },
