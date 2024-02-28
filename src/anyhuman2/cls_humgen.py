@@ -541,20 +541,21 @@ class HumGenWrapper:
 
     # enddef
 
-    def CreateHuman(self, dictAnyhuman: dict):
+    def CreateHuman(self, params: dict, generatedParams: dict):
         """
         Create human from a dictAnyhuman dictionary which is a composition of the standard
         HumGenV4 as_dict() + some additional parameters such as gender, pose, labels,...
         dictAnyhuman: dictionary, containing information about the human that will be generated.
         """
         # Reading values from dictAnyhuman and splitting it to custom and HumGenV4 dicts
-        dictCustom = dictAnyhuman["dictCustom"]
-        dictHumGenV4 = dictAnyhuman["dictHumGen_V4"]
+        dictCustom = generatedParams["dictCustom"]
+        dictHumGenV4 = generatedParams["dictHumGen_V4"]
+        sGender = params["sGender"]
         # CONSTANTS
         HUMGEN_COLLECTION_NAME = "HumGen"
         HUMGEN_COLLECTION_NAME_NEW = "Persona"
         # Get preset for selected gender
-        self.chosen_option = self.Human.get_preset_options(dictCustom["sGender"])
+        self.chosen_option = self.Human.get_preset_options(sGender)
 
         # Use previously generated HumGenV4 compatible directory
         self.human_obj = self.Human.from_preset(dictHumGenV4)
@@ -566,7 +567,7 @@ class HumGenWrapper:
             pass
 
         # Set pose
-        
+
 
 
 
