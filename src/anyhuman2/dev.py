@@ -40,12 +40,12 @@ def _testHumanGeneration():
         # "ZWICKY_GRID",
         # "RANDOM_FULL_GRID",
         # "RANDOM_FULL",
-        # "RANDOM_REALISTIC",
+          "RANDOM_REALISTIC",
         # "RANDOM_REALISTIC_GRID",
         # "PERSONA",
         # "LEGACY",
-         "FILE", # HumGenV4 Test
-        #"FULL_RANDOM",  # HumgGenV4 Test
+        # "FILE", # HumGenV4 Test
+        # "FULL_RANDOM", # HumgGenV4 Test
     ]
     try:
         dx = 1.2
@@ -149,7 +149,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.001",
                     "sMode": "RANDOM_REALISTIC",
-                    "mParamConfig": {"gender": "male"},
+                    "mParamConfig": {"sGender": "male"},
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
@@ -157,7 +157,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.002",
                     "sMode": "RANDOM_REALISTIC",
-                    "mParamConfig": {"gender": "female"},
+                    "mParamConfig": {"sGender": "female"},
                 }
             )
             bpy.context.scene.cursor.location[1] += dy
