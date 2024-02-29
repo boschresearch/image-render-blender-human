@@ -79,16 +79,16 @@ def FullyRandomizeParams(params, generator_params):
         Male = 1.0
         dFaceHair = {
             "set": sFaceHair,
-            "lightness": 0.10000000149011612,
-            "redness": 0.8999999761581421,
-            "roughness": 0.44999998807907104,
-            "salt_and_pepper": 0.0,
-            "roots": 0.0,
-            "root_lightness": 0.0,
-            "root_redness": 0.8999999761581421,
-            "roots_hue": 0.5,
-            "fast_or_accurate": 0.0,
-            "hue": 0.5
+            "lightness": random.uniform(0, 1.0),
+            "redness": random.uniform(0, 1.0),
+            "roughness": random.uniform(0, 1.0),
+            "salt_and_pepper": random.uniform(0, 1.0),
+            "roots": random.uniform(0, 1.0),
+            "root_lightness": random.uniform(0, 5.0),
+            "root_redness": random.uniform(0, 1.0),
+            "roots_hue": random.uniform(0, 1.0),
+            "fast_or_accurate": 1.0,
+            "hue": random.uniform(0, 1.0),
         }
 
     # Eye brows are part of the hair particle and can not be accessed via a dictionary, there we provide them as list
@@ -105,6 +105,16 @@ def FullyRandomizeParams(params, generator_params):
                 ]
     # Regular hair
     sRegularHair = random.choice(list(generator_config.dict_regular_hair["male"].values()))
+    # Height generation, see HumGenV4 ...\height.py
+
+    height = random.uniform(140, 200) # in cm
+
+    if height > 184:
+        height_200 = (height - 184) / (200 - 184)
+        height_150 = 0.0
+    else:
+        height_150 = -((height - 150) / (184 - 150) - 1)
+        height_200 = 0.0
     # HumGenV4 Config
     NewHumGenV4Config = {
         "age": {
@@ -113,46 +123,46 @@ def FullyRandomizeParams(params, generator_params):
             "age_wrinkles": 0.0
             },
         "keys": {
-            "Forearm Length": random.random(),
-            "Forearm Thickness": random.random(),
-            "Hand Length": random.random(),
-            "Hand Thickness": random.random(),
-            "Hand Width": random.random(),
-            "Upper Arm Length": random.random(),
-            "Upper Arm Thickness": random.random(),
-            "Neck Length": random.random(),
-            "Neck Thickness": random.random(),
-            "Foot Length": random.random(),
-            "Shin Length": random.random(),
-            "Shin Thickness": random.random(),
-            "Thigh Length": random.random(),
-            "Thigh Thickness": random.random(),
-            "height_150": 0.02764713019132614,
-            "height_200": 0.25,
-            "muscular": random.random(),
-            "overweight": random.random(),
-            "skinny": random.random(),
-            "Back Muscles": random.random(),
-            "Biceps": random.random(),
-            "Calves Muscles": random.random(),
-            "Chest Muscles": random.random(),
-            "Forearm Muscles": random.random(),
-            "Hamstring Muscles": random.random(),
-            "Lower Butt Muscles": random.random(),
-            "Quad Muscles": random.random(),
-            "Shoulder Muscles": random.random(),
-            "Traps Muscles": random.random(),
-            "Triceps": random.random(),
-            "Upper Butt Muscles": random.random(),
-            "Stylized": random.random(),
-            "Belly Size": random.random(),
-            "Breast Size": random.random(),
-            "Chest Height": random.random(),
-            "Chest Width": random.random(),
-            "Hips Height": random.random(),
-            "Hips Size": random.random(),
-            "Shoulder Width": random.random(),
-            "Waist Thickness": random.random(),
+            "Forearm Length": random.uniform(0, 1.0),
+            "Forearm Thickness": random.uniform(0, 1.0),
+            "Hand Length": random.uniform(0, 1.0),
+            "Hand Thickness": random.uniform(0, 1.0),
+            "Hand Width": random.uniform(0, 1.0),
+            "Upper Arm Length": random.uniform(0, 1.0),
+            "Upper Arm Thickness": random.uniform(0, 1.0),
+            "Neck Length": random.uniform(0, 1.0),
+            "Neck Thickness": random.uniform(0, 1.0),
+            "Foot Length": random.uniform(0, 1.0),
+            "Shin Length": random.uniform(0, 1.0),
+            "Shin Thickness": random.uniform(0, 1.0),
+            "Thigh Length": random.uniform(0, 1.0),
+            "Thigh Thickness": random.uniform(0, 1.0),
+            "height_150": height_150,
+            "height_200": height_200,
+            "muscular": random.uniform(0, 1.0),
+            "overweight": random.uniform(0, 1.0),
+            "skinny": random.uniform(0, 1.0),
+            "Back Muscles": random.uniform(0, 1.0),
+            "Biceps": random.uniform(0, 1.0),
+            "Calves Muscles": random.uniform(0, 1.0),
+            "Chest Muscles": random.uniform(0, 1.0),
+            "Forearm Muscles": random.uniform(0, 1.0),
+            "Hamstring Muscles": random.uniform(0, 1.0),
+            "Lower Butt Muscles": random.uniform(0, 1.0),
+            "Quad Muscles": random.uniform(0, 1.0),
+            "Shoulder Muscles": random.uniform(0, 1.0),
+            "Traps Muscles": random.uniform(0, 1.0),
+            "Triceps": random.uniform(0, 1.0),
+            "Upper Butt Muscles": random.uniform(0, 1.0),
+            "Stylized": random.uniform(0, 1.0),
+            "Belly Size": random.uniform(0, 1.0),
+            "Breast Size": random.uniform(0, 1.0),
+            "Chest Height": random.uniform(0, 1.0),
+            "Chest Width": random.uniform(0, 1.0),
+            "Hips Height": random.uniform(0, 1.0),
+            "Hips Size": random.uniform(0, 1.0),
+            "Shoulder Width": random.uniform(0, 1.0),
+            "Waist Thickness": random.uniform(0, 1.0),
             "asian": 0.0,
             "black": 0.5,
             "caucasian": 0.0,
@@ -239,8 +249,8 @@ def FullyRandomizeParams(params, generator_params):
             }
             },
         "eyes": {
-            "pupil_color": [random.random(), random.random(), random.random(), 1.00],
-            "sclera_color": [random.random(), random.random(), random.random(), 1.00],
+            "pupil_color": [random.uniform(0, 1.0), random.uniform(0, 1.0), random.uniform(0, 1.0), 1.00],
+            "sclera_color": [random.uniform(0, 1.0), random.uniform(0, 1.0), random.uniform(0, 1.0), 1.00],
         },
         "height": {
             "set": RandomUniformDiscrete(160, 185, 26) # From Anyhuman1
@@ -286,6 +296,7 @@ def FullyRandomizeParams(params, generator_params):
 
     dictAnyHuman = {"dictCustom":
             {
+                "sGender": sGender,
                 "bOpenPoseHandLabels": False,
                 "bFacialRig": True ,
                 "sPoseFilename": None
