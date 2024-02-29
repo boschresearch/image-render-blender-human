@@ -32,7 +32,7 @@ from pathlib import Path
 
 ######################################################################
 def PersonaParams(params, generator_params):
-    """ Load parameters for human generation from JSON file. """
+    """ """
     persona_id = (params["sPersonaId"]).lower()
 
     filename = Path.joinpath(generator_params.persona_path, persona_id + ".json")

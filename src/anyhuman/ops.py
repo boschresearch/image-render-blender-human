@@ -43,15 +43,10 @@ from .cls_humgen import SingletonHumGenWrapper
 from .paramgenerators import ComputeParams, ResolveRandomParams
 
 try:
-    from HumGen3D import Human as HG_Human
+    from humgen3d.API import HG_Human, HG_Batch_Generator
 except Exception as xEx:
     print("Error initializing anyhuman module:\n{}".format(str(xEx)))
-# HumGen V3 Legacy
-# try:
-#     from humgen3d.API import HG_Human, HG_Batch_Generator
-# except Exception as xEx:
-#     print("Error initializing anyhuman module:\n{}".format(str(xEx)))
-# # endtry
+# endtry
 
 
 ##############################################################################################################
@@ -63,15 +58,15 @@ def GenerateHuman(_dicParams, **kwargs):
     then will be used to create the human.
 
     The computation of parameters can be based on different approaches as full randomization,
-    randomization by a Zwicky-Box specification, or directly by given parameters. For a detailed description,
+    randomization by a Zwicky-Box specifcation, or directly by given parameters. For a detailed description,
     see the HumGenWrapper class.
 
-    The _dicParams dictionary can contain the keys:
+    The _dicParams dictionaly can contain the keys:
     - sId: name that should be used for the generated blender object
     - xSeed: object for seeding the randomization
     - sMode: mode for computation of the parameters of the human
     - mParamConfig: dict with parameters for the parameter computation, see HumGenWrapper
-    - mOverwrite: dict with parameters that should be used to overwrite the computed parameter values
+    - mOverwrite: dict with parameters that should be used to overwrite the computed paramter values
     - bDeleteBackup: set to False to prevent the deletion of the humgen backup human
         that is necessary for certain operations
 
@@ -118,17 +113,16 @@ def GenerateHuman(_dicParams, **kwargs):
     # gender = _dicParams["sGender"]
 
     # first compute the parameters that should be used for the creation of the human
-    # generator_params = ComputeParams(mode, params, overwrite, lHumanGenerator.generator_config)
+    generator_params = ComputeParams(mode, params, overwrite, lHumanGenerator.generator_config)
 
     # apply
     # params['posefilename'] =_dicParams.get('sPosefile')
 
-    if _dicParams.get("sMode") == "FILE":
-        objX = lHumanGenerator.CreateHumanFromJSON(params["sFilename"])
-    elif _dicParams.get("sMode") == "FULL_RANDOM":
-        objX = lHumanGenerator.CreateFullRandomHuman(params["sGender"])
-    else:
-        objX = lHumanGenerator.CreateHuman(_sName=_dicParams["sId"], _mParams=generator_params)
+    objX = lHumanGenerator.CreateHuman(
+        _sName=_dicParams["sId"],
+        _mParams=generator_params,
+        _bDeleteBackup=_dicParams.get("bDeleteBackup", True),
+    )
 
     objX["generator_param_dict"] = json.dumps(generator_params)
 
