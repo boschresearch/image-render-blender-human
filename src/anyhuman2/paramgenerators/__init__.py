@@ -29,11 +29,11 @@
 
 import random
 
-from . import file
-from . import persona
+# from . import file
+# from . import persona
 from . import random_full
 from . import random_realistic
-from . import zwicky
+# from . import zwicky
 
 ######################################################################
 def ComputeParams(mode, params, overwrite, generator_params):
@@ -114,65 +114,3 @@ def GetParams(mode, params, generator_params):
 
     return new_params
 
-
-def ResolveRandomParamValue(mode, param, params, generator_params):
-    # get a set of parameters matching to generator mode
-    new_params = GetParams(mode, params, generator_params)
-
-    value = "random"
-    if param == "eyebrows_style":
-        value = random.randint(0, 10)
-    # elif param == 'face':
-    #     pass
-    elif param == "outfit_style":
-        value = new_params["outfit"]["outfit_style"]
-        pass
-    # elif param == 'outfit_color':
-    # pass
-    # elif param == 'footwear_style':
-    #     pass
-    else:
-        print(f"!!! param {param} could not be randomized")
-    # endif
-    return value
-
-
-######################################################################
-def ResolveRandomParamsRecursive(mode, rec_params, params, generator_params):
-    for key, value in rec_params.items():
-        print(key)
-        if isinstance(value, dict):
-            rec_params[key] = ResolveRandomParamsRecursive(
-                mode, value, params, generator_params
-            )
-        elif value == "random":
-            print(value)
-            rec_params[key] = ResolveRandomParamValue(
-                mode, key, params, generator_params
-            )
-        # endif
-    # endfor
-
-    return rec_params
-
-
-######################################################################
-def ResolveRandomParams(mode, params, generator_params):
-    """
-    Resolve all entires 'random' in a dict of human generation parameters.
-
-    Parameters
-    ----------
-    params : dict
-        dict of parameters created by a parameter generator
-    generator_params : dict
-        dictionary of settings of humgen plugin
-
-    Returns
-    -------
-    params
-        dictionary with parameters for human generation without random entries
-    """
-    params = ResolveRandomParamsRecursive(mode, params, params, generator_params)
-
-    return params

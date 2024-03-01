@@ -88,16 +88,16 @@ def RealisticRandomizeParams(params, generator_config):
             sFaceHair = random.choice(list(generator_config.dict_face_hair["male"].values())) # Facial hair
             dFaceHair = {
                 "set": sFaceHair,
-                "lightness": 0.10000000149011612,
-                "redness": 0.8999999761581421,
-                "roughness": 0.44999998807907104,
-                "salt_and_pepper": 0.0,
-                "roots": 0.0,
-                "root_lightness": 0.0,
-                "root_redness": 0.8999999761581421,
-                "roots_hue": 0.5,
-                "fast_or_accurate": 0.0,
-                "hue": 0.5
+                "lightness": random.uniform(0, 1.0),
+                "redness": random.uniform(0, 1.0),
+                "roughness": random.uniform(0, 1.0),
+                "salt_and_pepper": random.uniform(0, 1.0),
+                "roots": random.uniform(0, 1.0),
+                "root_lightness": random.uniform(0, 5.0),
+                "root_redness": random.uniform(0, 1.0),
+                "roots_hue": random.uniform(0, 1.0),
+                "fast_or_accurate": 1.0,
+                "hue": random.uniform(0, 1.0),
             }
         else: dFaceHair = {} # Facial hair
         # Regular hair
@@ -114,7 +114,16 @@ def RealisticRandomizeParams(params, generator_config):
                 'Eyebrows_008',
                 'Eyebrows_009'
                 ]
+    # Height generation, see HumGenV4 ...\height.py
 
+    height = random.uniform(140, 200) # in cm
+
+    if height > 184:
+        height_200 = (height - 184) / (200 - 184)
+        height_150 = 0.0
+    else:
+        height_150 = -((height - 150) / (184 - 150) - 1)
+        height_200 = 0.0
     # HumGenV4 Config
     NewHumGenV4Config = {
         "age": {
@@ -137,8 +146,8 @@ def RealisticRandomizeParams(params, generator_config):
             "Shin Thickness": 0.0,
             "Thigh Length": 0.0,
             "Thigh Thickness": 0.0,
-            "height_150": 0.02764713019132614,
-            "height_200": 0.25,
+            "height_150": height_150,
+            "height_200": height_200,
             "muscular": RandomUniformDiscrete(0, 1, 11), # From Anyhuman1
             "overweight": RandomUniformDiscrete(0, 1, 11), # From Anyhuman1
             "skinny": RandomUniformDiscrete(0, 0.5, 11), # From Anyhuman1
@@ -296,6 +305,7 @@ def RealisticRandomizeParams(params, generator_config):
 
     dictAnyHuman = {"dictCustom":
             {
+                "sGender": sGender,
                 "bOpenPoseHandLabels": False,
                 "bFacialRig": True ,
                 "sPoseFilename": None

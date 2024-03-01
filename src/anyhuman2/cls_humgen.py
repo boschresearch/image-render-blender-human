@@ -593,7 +593,7 @@ class HumGenWrapper:
         # Reading values from dictAnyhuman and splitting it to custom and HumGenV4 dicts
         dictCustom = generatedParams["dictCustom"]
         dictHumGenV4 = generatedParams["dictHumGen_V4"]
-        sGender = params["sGender"]
+        sGender = dictCustom["sGender"]
         # CONSTANTS
         HUMGEN_COLLECTION_NAME = "HumGen"
         HUMGEN_COLLECTION_NAME_NEW = "Persona"

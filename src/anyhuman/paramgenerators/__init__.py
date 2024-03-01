@@ -89,7 +89,7 @@ def GetParams(mode, params, generator_params):
     - RANDOM_FULL: randomize every parameter of its possible range
     - RANDOM_REALISTIC: randomize every parameter but within realistically apearing bounds
     - ZWICKY: randomize based on a Zwicky box like description
-    - FILE: Reads JSON which was exported using HumGenV4 as_dict() function
+    - FILE: specify a path to a json file with predefined values
 
     Parameters
     ----------
@@ -97,8 +97,6 @@ def GetParams(mode, params, generator_params):
         Mode for parameter computation, see above
     params : dict
         dictionary of parameters for the mode, see the implementation of the mode for details
-    generator_params:
-        TODO
 
     Returns
     -------
