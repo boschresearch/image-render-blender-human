@@ -56,9 +56,9 @@ def FullyRandomizeParams(params, generator_config):
         Dictionary of parameters for human generator
     """
     universal_params = GeneralRandomParameters(params, generator_config)
-    Male, dFaceHair, sRegularHair, sEyebrows = universal_params.RandomizeHair()
+    Male, dFaceHair, dBeardLength, sRegularHair, sEyebrows = universal_params.RandomizeHair()
     sGender = universal_params.GetGender()
-    height_150, height_200 = universal_params.RandomizeHeight()
+    height_150, height_200, height = universal_params.RandomizeHeight()
     outfit = universal_params.RandomizeOutfit()
     sFootwear = universal_params.RandomFootwear()
     sSkinTexture = universal_params.RandomizeSkin()
@@ -201,7 +201,7 @@ def FullyRandomizeParams(params, generator_config):
             "sclera_color": [random.uniform(0, 1.0), random.uniform(0, 1.0), random.uniform(0, 1.0), 1.00],
         },
         "height": {
-            "set": RandomUniformDiscrete(160, 185, 26) # From Anyhuman1
+            "set": height
         },
         "hair": {
             "eyebrows": {
@@ -247,7 +247,8 @@ def FullyRandomizeParams(params, generator_config):
                 "sGender": sGender,
                 "bOpenPoseHandLabels": False,
                 "bFacialRig": True ,
-                "sPoseFilename": None
+                "sPoseFilename": None,
+                "dBeardLength" : dBeardLength,
             },
         "dictHumGen_V4": NewHumGenV4Config
     }

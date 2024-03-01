@@ -281,7 +281,9 @@ class HumGenWrapper:
 
         self.generator_config.dict_poses = HumGenConfigValues.CreateDictionary(self, filtered_elements, 1)
         # enddef
-
+        
+        #Add info about humgenv4 addon path
+        self.generator_config.dict_info = {"HumGenV4 Path" : addon_path}
     # enddef
 
     def AddLabelsFromJSON(self, _sHandLabelFile: str):
@@ -344,6 +346,7 @@ class HumGenWrapper:
                 "bOpenPoseHandLabels": bOpenPoseHandLabelsPresent,
                 "bFacialRig": self.human_obj.expression.has_facial_rig,
                 "sPoseFilename": self.human_obj.pose.as_dict(),
+                "dBeardLength": self.dBeardLength
             },
             "dictHumGen_V4": self.human_obj.as_dict(),
         }
@@ -580,6 +583,7 @@ class HumGenWrapper:
         dictCustom = generatedParams["dictCustom"]
         dictHumGenV4 = generatedParams["dictHumGen_V4"]
         sGender = dictCustom["sGender"]
+        self.dBeardLength = dictCustom["dBeardLength"]
         # CONSTANTS
         HUMGEN_COLLECTION_NAME = "HumGen"
         HUMGEN_COLLECTION_NAME_NEW = "Persona"
@@ -589,6 +593,15 @@ class HumGenWrapper:
         # Use previously generated HumGenV4 compatible directory
         self.human_obj = self.Human.from_preset(dictHumGenV4)
 
+        # If facial hair is present, custom parameters must be loaded after human has been created
+        if sGender == 'male':
+            for i, key in enumerate(self.dBeardLength["hair_systems"]):
+                # obtain the particle system which is connected to the hair system
+                particle_system = self.human_obj.hair.particle_systems[key].settings.name
+                # Set the length of the respective particle system to the value in the dict
+                bpy.data.particles[particle_system].child_length = self.dBeardLength["hair_systems"][key]["length"]
+        else:
+            pass
         # Set facial rig
         if dictCustom["bFacialRig"] == True:
             self.human_obj.expression.load_facial_rig()

@@ -1,4 +1,6 @@
 import random
+import json
+import os
 class GeneralRandomParameters():
     """Class to generate universally needed random parameters
 
@@ -61,6 +63,8 @@ class GeneralRandomParameters():
             0...female, 1... female
         dFaceHair : dict
             dictionary containing information about gender specific face hair. Base appearance is chosen from dict_face_hair
+        dBeardLength : dict
+            dictionary which contains specific information about the particle systems used to generate facial hair   
         sRegularHair : string
             Relative path to a hair style
         sEyebrows : string
@@ -69,6 +73,7 @@ class GeneralRandomParameters():
         # Gender specific actions
         if self.sGender == "female":
             dFaceHair = {} # Facial hair
+            dBeardLength = {} # Beard length
             fMale = 0.0
         elif self.sGender == "male":
             sFaceHair = random.choice(list(self.generator_config.dict_face_hair["male"].values())) # Facial hair
@@ -86,6 +91,16 @@ class GeneralRandomParameters():
                 "fast_or_accurate": 1.0, # Accurate
                 "hue": random.uniform(0, 1.0),
             }
+            # Randomize facial hair concerning length
+            addon_path = self.generator_config.dict_info["HumGenV4 Path"]
+            face_hair_path = sFaceHair.replace('/', '\\')
+            with open(os.path.join(addon_path, face_hair_path), 'r') as f:
+                file = json.load(f)
+            dBeardLength = file
+            for key, value in enumerate(dBeardLength["hair_systems"]):
+                dBeardLength["hair_systems"][value].update({"length": random.uniform(0, 1.0)})
+
+
         # Eye brows are part of the hair particle and can not be accessed via a dictionary, there we provide them as list
         eyebrows = [
                 'Eyebrows_001',
@@ -101,7 +116,7 @@ class GeneralRandomParameters():
         sEyebrows = random.choice(eyebrows)
         # Regular hair
         sRegularHair = random.choice(list(self.generator_config.dict_regular_hair[self.sGender].values()))
-        return(fMale, dFaceHair, sRegularHair, sEyebrows)
+        return (fMale, dFaceHair, dBeardLength, sRegularHair, sEyebrows)
 
     def RandomizeSkin(self):
         """Select random skin texture from presets.
@@ -123,4 +138,4 @@ class GeneralRandomParameters():
             fHeight_150 = -((height - 150) / (184 - 150) - 1)
             fHeight_200 = 0.0
 
-        return(fHeight_150, fHeight_200)
+        return(fHeight_150, fHeight_200, height)
