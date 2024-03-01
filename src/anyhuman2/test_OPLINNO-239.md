@@ -1,4 +1,4 @@
-###About [OPLINNO-239](https://github.com/mnt1lr/image-render-blender-human/tree/feature/OPLINNO-239---add-WFLW-face-labels):
+### About [OPLINNO-239](https://github.com/mnt1lr/image-render-blender-human/tree/feature/OPLINNO-239---add-WFLW-face-labels):
 
 
 - JSON files
@@ -9,7 +9,7 @@
         - Openpose_Bones.json would contains openpose label bones
     - Following is standard structure for <X>_Bones.json is as follows, here WFLW is filled in for X representing this json contains WFLW labels
     - Contains
-        - Head, Tail, Envelope, Constraints (currently limited to COPY_LOCATION, STRETCH_TO, LIMIT_LOCATION & CHILD_OF)
+        - Head, Tail, Envelope, Constraints (currently limited to COPY_LOCATION, STRETCH_TO, LIMIT_LOCATION, CHILD_OF & DAMPED_TRACK)
     ```json
     {
     "sSkeletonType": "WFLW",
@@ -52,5 +52,20 @@
     }
     ```
 
-### TODO
-How to test [OPLINNO-239](https://github.com/mnt1lr/image-render-blender-human/tree/feature/OPLINNO-239---add-WFLW-face-labels)
+### Differences in vertex location of WFLW landmarks in Humgen v3 & Humgen v4 version
+    - all good with below few exceptions:
+        - OBJECT & POSE MODE:
+            - AT.Label;WFLW;WFLW_19_V1
+            - More distance b/w 51 & 52
+            - 33-41 & 42-50 - eye brows (both left and right side)
+            - 96 & 97   - iris
+        - EDIT MODE:
+            - No issues as in POSE & OBJECT mode, eyebrows labels are intact, but all labels are at a fixed offset from face
+    - TODO: fix above exceptions
+
+
+### How to test [OPLINNO-239](https://github.com/mnt1lr/image-render-blender-human/tree/feature/OPLINNO-239---add-WFLW-face-labels)
+- 1. In dev.py, enable `FILE` mode pass `src\\anyhuman2\\personas\\FILE_male.json` as `sFilename` under `mParamConfig` (line ~69). Make sure bOpenPoseHandLabels & bFacialRig are `True` in json file
+- 2. In ops.py pass `_dicParams` as argument like this  `objX = lHumanGenerator.CreateFullRandomHuman(_dicParams)`
+- 3. OPtionally you can disable `paramgenerators` logic temporarily as we don't need it in `FILE` mode, to avoid import errors
+- 4. Hit play by opening dev.py in blender debug mode, Fce labels should show up (of-course with exceptions as stated above)
