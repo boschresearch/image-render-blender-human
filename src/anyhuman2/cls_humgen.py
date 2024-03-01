@@ -281,10 +281,9 @@ class HumGenWrapper:
     # enddef
 
     def AddLabelsFromJSON(self, _sHandLabelFile: str):
-        xBoneLabel = BoneLabel(self.human_obj)
         objRig = self.human_obj.objects.rig
         objArmature = objRig.data
-        xBoneLabel.AddHandLabels(_sLabelFile=_sHandLabelFile, _objArmature=objArmature, _objRig=objRig)
+        self.xBoneLabel.AddHandLabels(_sLabelFile=_sHandLabelFile, _objArmature=objArmature, _objRig=objRig)
         return
 
     def CreateHumanFromJSON(self, _sJsonFile: str):
@@ -306,20 +305,39 @@ class HumGenWrapper:
             raises ...
         """
 
-        with open(_sJsonFile) as json_file:
-            dictAnyhuman = json.load(json_file)
+        try:
+            with open(_sJsonFile) as json_file:
+                dictAnyhuman = json.load(json_file)
+        except FileNotFoundError:
+            return
+        except json.JSONDecodeError as e:
+            print(f"Invalid JSON syntax: {e}")
+            return
 
-        self.human_obj = self.Human.from_preset(dictAnyhuman["dictHumGen_V4"])
+        try:
+            self.human_obj = self.Human.from_preset(dictAnyhuman["dictHumGen_V4"])
+        except KeyError as e:
+            print(f"ERROR: {e}")
+
         self.human_obj.name = (_sJsonFile.rsplit("\\", 1)[1]).rsplit(".", 1)[0]
+
+        try:
+            self.xBoneLabel = BoneLabel(_human=self.human_obj)
+        except AttributeError as e:
+            print("Human not generated successfully")
+            print(f"ERROR: {e}")
+            return
 
         if dictAnyhuman["dictCustom"]["bOpenPoseHandLabels"]:
             # TODO: clean code, pass _sHandLabelFile dynamically
-            sHandLabelFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
+            sHandLabelFile = "C:\\Catharsys\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
             self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
         # endif
 
         if dictAnyhuman["dictCustom"]["bFacialRig"]:
             self.human_obj.expression.load_facial_rig()
+            sWFLWLableFile = "C:\\Catharsys\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\WFLW_bones.json"
+            self.xBoneLabel.ImportSkeletonData(_sSkeletonDataFile=sWFLWLableFile)
         # endif
 
         return self.human_obj.objects.rig

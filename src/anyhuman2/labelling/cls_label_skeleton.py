@@ -32,6 +32,8 @@ class BoneLabel:
 
         self.lOpenPoseHandLabels = []
 
+    # ************************************* BEGIN HAND LABELS ********************************************************
+
     def LoadHandMappings(self, _sHandLabelsFile: str):
         try:
             with open(_sHandLabelsFile, "r") as json_file:
@@ -99,9 +101,10 @@ class BoneLabel:
         return
 
     # enddef
+    # ******************************************** END HAND LABELS ****************************************************
 
-    # ************************************* BEGIN EXPORT FUNCTIONS ********************************************************
-
+    # ************************************* BEGIN EXPORT FUNCTIONS ****************************************************
+    # TODO: Export only necessary labels, vertex groups - discard existing standard humgen labels to avoid ambiguity
     def ExportSkeletonData(self, _sExportOutputPath: str):
         # STEP 1: Extract bones of skeletons
         dicSkeletons = self.ExtractSkeletons(_objArmature=objArmature, _objHGBody=objHGBody, _objRig=objRig)
@@ -293,11 +296,11 @@ class BoneLabel:
         # STEP 1: Parse input json and extract skeletal bones with constraints and vertex groups
         dicSkeleton = self.ParseSkeleton(_sInSkeletonFile=_sSkeletonDataFile)
         # STEP 2: Add vertex groups to objHGBody (Mesh)
-        self.CreateVertexGroups(_objMesh=objHGBody, _lVertexGroups=dicSkeleton["lVertexGroups"])
+        self.CreateVertexGroups(_objMesh=self.objHGBody, _lVertexGroups=dicSkeleton["lVertexGroups"])
         # STEP 3: Add bones
-        self.ImportSkeletonBones(_dicSkeleton=dicSkeleton, _objArmature=objArmature, _objRig=objRig)
+        self.ImportSkeletonBones(_dicSkeleton=dicSkeleton, _objArmature=self.objArmature, _objRig=self.objRig)
         # STEP 4: Add constraints
-        self.AddConstraints(_dicSkeleton=dicSkeleton, _objArmature=objArmature, _objRig=objRig)
+        self.AddConstraints(_dicSkeleton=dicSkeleton, _objArmature=self.objArmature, _objRig=self.objRig)
 
         return {"FINISHED"}
 
@@ -342,6 +345,7 @@ class BoneLabel:
             objPoseBone = _objRig.pose.bones[sPoseBoneName]
 
             # add constraints
+            # TODO: Implement switch (lConstraints) statement for faster execution
             for objConstraint in dicBone["lConstraints"]:
                 if objConstraint["sType"] == "STRETCH_TO":
                     self.AddConstraintStretchTo(objPoseBone, objConstraint)
@@ -361,7 +365,7 @@ class BoneLabel:
     # enddef
 
     # add STRETCH_TO constraint
-    def AddConstraintStretchTo(_self, xPoseBone, _lStretchConstraint):
+    def AddConstraintStretchTo(_self, _xPoseBone, _lStretchConstraint):
         xNewConstraint = _xPoseBone.constraints.new("STRETCH_TO")
         xNewConstraint.target = bpy.data.objects[_lStretchConstraint["target"]]
         xNewConstraint.subtarget = _lStretchConstraint["subtarget"]
@@ -374,7 +378,7 @@ class BoneLabel:
     # add LIMIT_LOCATION constraint
     def AddConstraintLimitLocation(self, _xPoseBone, _lLimitLocationConstraint):
         xNewConstraint = _xPoseBone.constraints.new("LIMIT_LOCATION")
-        xNewConstraint.target = objHGBodyNew
+        xNewConstraint.target = self.objHGBody
         xNewConstraint.type = _lLimitLocationConstraint["sType"]
         xNewConstraint.max_x = _lLimitLocationConstraint["fMaxX"]
         xNewConstraint.max_y = _lLimitLocationConstraint["fMaxY"]
@@ -391,7 +395,7 @@ class BoneLabel:
     # add CHILD_OF constraint
     def AddConstraintChildOf(self, _xPoseBone, lChildOfConstraint):
         xNewConstraint = _xPoseBone.constraints.new("CHILD_OF")
-        xNewConstraint.target = objHGBodyNew
+        xNewConstraint.target = self.objHGBody
         xNewConstraint.subtarget = lChildOfConstraint["sSubtarget"]
         xNewConstraint.keep_axis = lChildOfConstraint["sKeepAxis"]
         xNewConstraint.volume = lChildOfConstraint["sVolume"]
@@ -402,7 +406,7 @@ class BoneLabel:
     # add COPY_LOCATION constraint
     def AddConstraintCopyLocation(self, _xPoseBone, _lConstraintCopyLocation):
         xNewConstraint = _xPoseBone.constraints.new("COPY_LOCATION")
-        xNewConstraint.target = objHGBodyNew
+        xNewConstraint.target = self.objHGBody
         xNewConstraint.subtarget = _lConstraintCopyLocation["sSubtarget"]
         xNewConstraint.use_x = _lConstraintCopyLocation["bUseX"]
         xNewConstraint.use_y = _lConstraintCopyLocation["bUseY"]
@@ -418,27 +422,39 @@ class BoneLabel:
 
     # Import bones and add to rig
     def ImportSkeletonBones(self, _dicSkeleton, _objArmature, _objRig):
-        sSkeletonType = _dicSkeleton["sSkeletonType"]
-        for dicBone in _dicSkeleton["lBones"]:
-            self.AddBone(sSkeletonType, dicBone, _objArmature, _objRig)
+        try:
+            sSkeletonType = _dicSkeleton["sSkeletonType"]
+            for dicBone in _dicSkeleton["lBones"]:
+                self.AddBone(sSkeletonType, dicBone, _objArmature, _objRig)
+        except ValueError as e:
+            print(f"ERROR: {e}")
 
     # enddef
 
     # import skeleton from json file
     def ParseSkeleton(self, _sInSkeletonFile):
-        with open(_sInSkeletonFile, "r") as sJsonFile:
-            dicSkeleton = json.load(sJsonFile)
-        return dicSkeleton
+        try:
+            with open(_sInSkeletonFile, "r") as sJsonFile:
+                dicSkeleton = json.load(sJsonFile)
+            return dicSkeleton
+        except FileNotFoundError:
+            print(f"{_sInSkeletonFile} not found")
+            return {}
 
     # enddef
 
     # import and create vertex groups
     def CreateVertexGroups(self, _objMesh, _lVertexGroups):
         for dicVertexGroup in _lVertexGroups:
-            if _objMesh.vertex_groups.find(dicVertexGroup["sName"]) == -1:
-                xVertexGroup = _objMesh.vertex_groups.new(name=dicVertexGroup["sName"])
-                # Default weight=1.0, type='ADD'
-                xVertexGroup.add(dicVertexGroup["lVertices"], 1.0, "ADD")
+            try:
+                # if a vertex group by the name dicVertexGroup["sName"] not already exist
+                if _objMesh.vertex_groups.find(dicVertexGroup["sName"]) == -1:
+                    # then create that vertex group
+                    xVertexGroup = _objMesh.vertex_groups.new(name=dicVertexGroup["sName"])
+                    # Default weight=1.0, type='ADD'
+                    xVertexGroup.add(dicVertexGroup["lVertices"], 1.0, "ADD")
+            except ValueError as e:
+                print(f"ERROR: {e}")
         # endfor
 
     # enddef
