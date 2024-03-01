@@ -114,6 +114,7 @@ def RealisticRandomizeParams(params, generator_config):
                 'Eyebrows_008',
                 'Eyebrows_009'
                 ]
+    sEyebrows = random.choice(eyebrows)
     # Height generation, see HumGenV4 ...\height.py
 
     height = random.uniform(140, 200) # in cm
@@ -266,7 +267,7 @@ def RealisticRandomizeParams(params, generator_config):
         },
         "hair": {
             "eyebrows": {
-                "set": random.choice(eyebrows),
+                "set": sEyebrows,
                 "lightness": 0.10000000149011612,
                 "redness": 0.8999999761581421,
                 "roughness": 0.44999998807907104,

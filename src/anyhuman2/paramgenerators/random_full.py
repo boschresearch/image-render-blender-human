@@ -29,9 +29,10 @@
 
 import random
 from ..tools import RandomUniformDiscrete
+from .GeneralRandomParameters import GeneralRandomParameters 
 
 ############################################################################################
-def FullyRandomizeParams(params, generator_params):
+def FullyRandomizeParams(params, generator_config):
     """
     Create a set of completely random parameters for human generation.
     This randomizer is intended for domain randomization purposes and tries
@@ -54,67 +55,14 @@ def FullyRandomizeParams(params, generator_params):
     dict
         Dictionary of parameters for human generator
     """
-    sGender = params.get("sGender", random.choice(["male", "female"]))
-    # Ignored Outfits
-    lIgnoredOutfitsFemale = ["Flight Suit", "Lab Tech", "Pirate", "BBQ"]
-    lIgnoredOutfitsMale = ["Lab Tech", "Pirate"]
+    universal_params = GeneralRandomParameters(params, generator_config)
+    Male, dFaceHair, sRegularHair, sEyebrows = universal_params.RandomizeHair()
+    sGender = universal_params.GetGender()
+    height_150, height_200 = universal_params.RandomizeHeight()
+    outfit = universal_params.RandomizeOutfit()
+    sFootwear = universal_params.RandomFootwear()
+    sSkinTexture = universal_params.RandomizeSkin()
 
-    
-    outfit_list = [
-        item
-        for item in generator_config.dict_clothes[sGender]
-        if item not in (lIgnoredOutfitsMale + lIgnoredOutfitsFemale)
-    ]
-
-    # Select an outfit
-    outfit = generator_config.dict_clothes[sGender][random.choice(outfit_list)].replace('/', '\\')
-    # Select footwear
-    footwear = random.choice(list(generator_config.dict_footwear[sGender].values())).replace('/', '\\')
-    # Gender specific actions
-    if sGender == "female":
-        sFaceHair = {} # Facial hair
-        Male = 0.0
-    elif sGender == "male":
-        sFaceHair = random.choice(list(generator_config.dict_face_hair["male"].values())) # Facial hair
-        Male = 1.0
-        dFaceHair = {
-            "set": sFaceHair,
-            "lightness": random.uniform(0, 1.0),
-            "redness": random.uniform(0, 1.0),
-            "roughness": random.uniform(0, 1.0),
-            "salt_and_pepper": random.uniform(0, 1.0),
-            "roots": random.uniform(0, 1.0),
-            "root_lightness": random.uniform(0, 5.0),
-            "root_redness": random.uniform(0, 1.0),
-            "roots_hue": random.uniform(0, 1.0),
-            "fast_or_accurate": 1.0,
-            "hue": random.uniform(0, 1.0),
-        }
-
-    # Eye brows are part of the hair particle and can not be accessed via a dictionary, there we provide them as list
-    eyebrows = [
-                'Eyebrows_001',
-                'Eyebrows_002',
-                'Eyebrows_003',
-                'Eyebrows_004',
-                'Eyebrows_005',
-                'Eyebrows_006',
-                'Eyebrows_007',
-                'Eyebrows_008',
-                'Eyebrows_009'
-                ]
-    # Regular hair
-    sRegularHair = random.choice(list(generator_config.dict_regular_hair["male"].values()))
-    # Height generation, see HumGenV4 ...\height.py
-
-    height = random.uniform(140, 200) # in cm
-
-    if height > 184:
-        height_200 = (height - 184) / (200 - 184)
-        height_150 = 0.0
-    else:
-        height_150 = -((height - 150) / (184 - 150) - 1)
-        height_200 = 0.0
     # HumGenV4 Config
     NewHumGenV4Config = {
         "age": {
@@ -241,7 +189,7 @@ def FullyRandomizeParams(params, generator_params):
             "roughness_multiplier": RandomUniformDiscrete(1.5, 2.0, 51), # From Anyhuman1
             "freckles": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
             "splotches": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
-            "texture.set": random.choice(list(generator_config.dict_textures[sGender].values())),
+            "texture.set": sSkinTexture,
             "cavity_strength": 0.0,
             "gender_specific": {
                 "mustache_shadow": 0.0,
@@ -257,7 +205,7 @@ def FullyRandomizeParams(params, generator_params):
         },
         "hair": {
             "eyebrows": {
-                "set": random.choice(eyebrows),
+                "set": sEyebrows,
                 "lightness": 0.10000000149011612,
                 "redness": 0.8999999761581421,
                 "roughness": 0.44999998807907104,
@@ -289,7 +237,7 @@ def FullyRandomizeParams(params, generator_params):
                 "set": outfit
             },
             "footwear": {
-                "set": footwear
+                "set": sFootwear
             }
         }
     }

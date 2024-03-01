@@ -39,8 +39,8 @@ def _testHumanGeneration():
         # "ZWICKY",
         # "ZWICKY_GRID",
         # "RANDOM_FULL_GRID",
-        # "RANDOM_FULL",
-          "RANDOM_REALISTIC",
+         "RANDOM_FULL",
+        #  "RANDOM_REALISTIC",
         # "RANDOM_REALISTIC_GRID",
         # "PERSONA",
         # "LEGACY",
@@ -66,7 +66,7 @@ def _testHumanGeneration():
                     "sId": "Seth",
                     "sMode": "FILE",
                     "mParamConfig": {
-                        "sFilename": "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\personas\\FILE_male.json"
+                        "sFilename": "C:\\Users\\mnt1lr\\Documents\\work\\Cathy_HumGenV4_Development\\image-render-setup\\repos\image-render-blender-human\\src\\anyhuman\\personas\\HG_Seth.json"
                     },
                 }
             )
@@ -112,7 +112,7 @@ def _testHumanGeneration():
             )
             bpy.context.scene.cursor.location[1] += dy
         # endif
-
+            
         # HumGen V4 test
         if "FULL_RANDOM" in active_tests:
             bpy.context.scene.cursor.location[0] = 0
@@ -120,7 +120,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.001",
                     "sMode": "FULL_RANDOM",
-                    "mParamConfig": {"sGender": "male", "bOpenPoseHandLabels": True},
+                    "mParamConfig": {"sGender": "female"},
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
@@ -128,7 +128,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.002",
                     "sMode": "FULL_RANDOM",
-                    "mParamConfig": {"sGender": "female", "bOpenPoseHandLabels": False},
+                    "mParamConfig": {"sGender": "male"},
                 }
             )
             bpy.context.scene.cursor.location[1] += dy
@@ -149,7 +149,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.001",
                     "sMode": "RANDOM_REALISTIC",
-                    "mParamConfig": {"sGender": "male"},
+                    "mParamConfig": {"gender": "male"},
                 }
             )
             bpy.context.scene.cursor.location[0] += dx
@@ -157,7 +157,7 @@ def _testHumanGeneration():
                 {
                     "sId": "Armature.002",
                     "sMode": "RANDOM_REALISTIC",
-                    "mParamConfig": {"sGender": "female"},
+                    "mParamConfig": {"gender": "female"},
                 }
             )
             bpy.context.scene.cursor.location[1] += dy
