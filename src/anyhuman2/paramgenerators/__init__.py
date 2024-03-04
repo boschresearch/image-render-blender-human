@@ -30,10 +30,10 @@
 import random
 
 # from . import file
-# from . import persona
+from . import persona
 from . import random_full
 from . import random_realistic
-# from . import zwicky
+from . import zwicky
 
 ######################################################################
 def ComputeParams(mode, params, overwrite, generator_params):
