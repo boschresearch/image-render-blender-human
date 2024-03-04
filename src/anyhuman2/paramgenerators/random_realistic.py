@@ -219,7 +219,7 @@ def RealisticRandomizeParams(params, generator_config):
                 "root_lightness": 0.5,
                 "root_redness": 0.0,
                 "roots_hue": 0.5,
-                "fast_or_accurate": 0.0,
+                "fast_or_accurate": 1.0, # 1.0: Accurate
                 "hue": 0.5
             },
             "regular_hair": {
@@ -229,10 +229,10 @@ def RealisticRandomizeParams(params, generator_config):
                 "roughness": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
                 "salt_and_pepper": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
                 "roots": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
-                "root_lightness": 0.0,
-                "root_redness": 0.8999999761581421,
-                "roots_hue": 0.5,
-                "fast_or_accurate": 0.0,
+                "root_lightness": RandomUniformDiscrete(0.1, 0.9, 9),
+                "root_redness": RandomUniformDiscrete(0.1, 0.9, 9),
+                "roots_hue": RandomUniformDiscrete(0.1, 0.9, 9),
+                "fast_or_accurate": # 1.0: Accurate
                 "hue": 0.5
             },
             "face_hair": dFaceHair
