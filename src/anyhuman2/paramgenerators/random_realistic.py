@@ -29,6 +29,7 @@
 
 import random
 from ..tools import RandomUniformDiscrete
+from .GeneralRandomParameters import GeneralRandomParameters
 
 ############################################################################################
 def RealisticRandomizeParams(params, generator_config):
@@ -45,7 +46,7 @@ def RealisticRandomizeParams(params, generator_config):
 
     Parameters
     ----------
-    config : dict
+    params : dict
         set of parameters controlling the randomization. E.g.
                 {
                     "sId": "Armature.002",
@@ -60,71 +61,13 @@ def RealisticRandomizeParams(params, generator_config):
     dict
         Dictionary of parameters for human generator
     """
-    sGender = params.get("sGender", random.choice(["male", "female"]))
-    # Ignored Outfits
-    lIgnoredOutfitsFemale = ["Flight Suit", "Lab Tech", "Pirate", "BBQ"]
-    lIgnoredOutfitsMale = ["Lab Tech", "Pirate"]
-
-    
-    outfit_list = [
-        item
-        for item in generator_config.dict_clothes[sGender]
-        if item not in (lIgnoredOutfitsMale + lIgnoredOutfitsFemale)
-    ]
-
-    # Select an outfit
-    outfit = generator_config.dict_clothes[sGender][random.choice(outfit_list)].replace('/', '\\')
-    # Select footwear
-    footwear = random.choice(list(generator_config.dict_footwear[sGender].values())).replace('/', '\\')
-    # Gender specific actions
-    if sGender == "female":
-        dFaceHair = {} # Facial hair
-        Male = 0.0
-        # Regular hair
-        sRegularHair = random.choice(list(generator_config.dict_regular_hair[sGender].values()))
-    elif sGender == "male":
-        Male = 1.0
-        if random.random() < 0.5:
-            sFaceHair = random.choice(list(generator_config.dict_face_hair["male"].values())) # Facial hair
-            dFaceHair = {
-                "set": sFaceHair,
-                "lightness": random.uniform(0, 1.0),
-                "redness": random.uniform(0, 1.0),
-                "roughness": random.uniform(0, 1.0),
-                "salt_and_pepper": random.uniform(0, 1.0),
-                "roots": random.uniform(0, 1.0),
-                "root_lightness": random.uniform(0, 5.0),
-                "root_redness": random.uniform(0, 1.0),
-                "roots_hue": random.uniform(0, 1.0),
-                "fast_or_accurate": 1.0,
-                "hue": random.uniform(0, 1.0),
-            }
-        else: dFaceHair = {} # Facial hair
-        # Regular hair
-        sRegularHair = random.choice(list(generator_config.dict_regular_hair[sGender].values()))
-    # Eye brows are part of the hair particle and can not be accessed via a dictionary, there we provide them as list
-    eyebrows = [
-                'Eyebrows_001',
-                'Eyebrows_002',
-                'Eyebrows_003',
-                'Eyebrows_004',
-                'Eyebrows_005',
-                'Eyebrows_006',
-                'Eyebrows_007',
-                'Eyebrows_008',
-                'Eyebrows_009'
-                ]
-    sEyebrows = random.choice(eyebrows)
-    # Height generation, see HumGenV4 ...\height.py
-
-    height = random.uniform(140, 200) # in cm
-
-    if height > 184:
-        height_200 = (height - 184) / (200 - 184)
-        height_150 = 0.0
-    else:
-        height_150 = -((height - 150) / (184 - 150) - 1)
-        height_200 = 0.0
+    universal_params = GeneralRandomParameters(params, generator_config)
+    Male, dFaceHair, dBeardLength, sRegularHair, sEyebrows = universal_params.RandomizeHair()
+    sGender = universal_params.GetGender()
+    height_150, height_200, height = universal_params.RandomizeHeight()
+    outfit = universal_params.RandomizeOutfit()
+    sFootwear = universal_params.RandomFootwear()
+    sSkinTexture = universal_params.RandomizeSkin()
     # HumGenV4 Config
     NewHumGenV4Config = {
         "age": {
@@ -251,7 +194,7 @@ def RealisticRandomizeParams(params, generator_config):
             "roughness_multiplier": RandomUniformDiscrete(1.5, 2.0, 51), # From Anyhuman1
             "freckles": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
             "splotches": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
-            "texture.set": random.choice(list(generator_config.dict_textures[sGender].values())),
+            "texture.set": sSkinTexture,
             "cavity_strength": 0.0,
             "gender_specific": {
                 "mustache_shadow": 0.0,
@@ -263,7 +206,7 @@ def RealisticRandomizeParams(params, generator_config):
             "sclera_color": [random.random(), random.random(), random.random(), 1.00],
         },
         "height": {
-            "set": RandomUniformDiscrete(160, 185, 26) # From Anyhuman1
+            "set": height
         },
         "hair": {
             "eyebrows": {
@@ -299,7 +242,7 @@ def RealisticRandomizeParams(params, generator_config):
                 "set": outfit
             },
             "footwear": {
-                "set": footwear
+                "set": sFootwear
             }
         }
         }
@@ -309,7 +252,8 @@ def RealisticRandomizeParams(params, generator_config):
                 "sGender": sGender,
                 "bOpenPoseHandLabels": False,
                 "bFacialRig": True ,
-                "sPoseFilename": None
+                "sPoseFilename": None,
+                "dBeardLength" : dBeardLength,
             },
         "dictHumGen_V4": NewHumGenV4Config
     }
