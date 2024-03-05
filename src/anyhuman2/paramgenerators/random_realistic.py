@@ -232,7 +232,7 @@ def RealisticRandomizeParams(params, generator_config):
                 "root_lightness": RandomUniformDiscrete(0.1, 0.9, 9),
                 "root_redness": RandomUniformDiscrete(0.1, 0.9, 9),
                 "roots_hue": RandomUniformDiscrete(0.1, 0.9, 9),
-                "fast_or_accurate": # 1.0: Accurate
+                "fast_or_accurate": 1.0, # 1.0: Accurate
                 "hue": 0.5
             },
             "face_hair": dFaceHair

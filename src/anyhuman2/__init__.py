@@ -39,7 +39,7 @@ except Exception:
 
 if bInBlenderContext is True:
     try:
-        bl_info = {
+        bl_info = { # needs to be removed 
             "name": "Generate a random Human",
             "blender": (2, 93, 0),
             "category": "Object",

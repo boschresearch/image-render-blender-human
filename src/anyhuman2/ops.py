@@ -89,6 +89,7 @@ def GenerateHuman(_dicParams, **kwargs):
     # print("Starting Generate Human")
 
     # set a seed for the following randomization
+    # used to generate reproducible humans
     if "xSeed" in _dicParams:
         import numpy as np
         import random
@@ -96,7 +97,9 @@ def GenerateHuman(_dicParams, **kwargs):
         np_seed = hash(_dicParams["xSeed"]) % (2**32)
 
         random.seed(_dicParams["xSeed"])
-        np.random.seed(np_seed)
+        # np.random.seed(np_seed)
+        # Own instance for random number generation
+        rnd = random.Random(np_seed)
 
     mode = _dicParams.get("sMode", "RANDOM_REALISTIC")
 
@@ -129,7 +132,7 @@ def GenerateHuman(_dicParams, **kwargs):
     #     objX = lHumanGenerator.CreateFullRandomHuman(params["sGender"])
     # else:
     #     objX = lHumanGenerator.CreateHuman(params, generated_params)
-    objX = lHumanGenerator.CreateHuman(params, generated_params)
+    objX = lHumanGenerator.CreateHuman(generated_params)
 
     # objX["generator_param_dict"] = json.dumps(generated_params)
 

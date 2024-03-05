@@ -74,11 +74,12 @@ def GetParams(mode, params, generator_params):
     """
     Computes a set of parameters for human generation.
     Currently available modes are:
-    - PERSONA: for a set of names ('alice', 'bob',  ...), return predefined values
+    - PERSONA: creates human from preset humans which are part of the humgenv4 package,
+                such as e.g. 'anna' (./models/female/Caucasian/Anna.json)  and 'david' (./models/male/Caucasian/David.json)
     - RANDOM_FULL: randomize every parameter of its possible range
-    - RANDOM_REALISTIC: randomize every parameter but within realistically apearing bounds
+    - RANDOM_REALISTIC: randomize every parameter but within realistically appearing bounds
     - ZWICKY: randomize based on a Zwicky box like description
-    - FILE: Reads JSON which was exported using HumGenV4 as_dict() function
+    - FILE: Reads a dictAnyhuman JSON which was exported using TODO: mention the export function
 
     Parameters
     ----------
@@ -86,8 +87,8 @@ def GetParams(mode, params, generator_params):
         Mode for parameter computation, see above
     params : dict
         dictionary of parameters for the mode, see the implementation of the mode for details
-    generator_params:
-        TODO
+    generator_params: dict
+        dictionary with humgenv4 internal dictionaries, see cls_humgen.
 
     Returns
     -------
