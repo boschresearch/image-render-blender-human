@@ -2,14 +2,14 @@
 
 
 - JSON files
-    - labelling/mapping/WFLW_Bones.json contains WFLW label bones for face
-    - similarly, if present
+    - [WFLW_Bones.json](https://github.com/mnt1lr/image-render-blender-human/blob/feature/OPLINNO-239---add-WFLW-face-labels/src/anyhuman2/labelling/mapping/WFLW_Bones.json) contains WFLW label bones for face
+    - similarly, if present under [mapping](https://github.com/mnt1lr/image-render-blender-human/tree/feature/OPLINNO-239---add-WFLW-face-labels/src/anyhuman2/labelling/mapping)
         - IMS_bones.json would contain IMS bones
-        - Std_Bones.json would contains std bones
-        - Openpose_Bones.json would contains openpose label bones
-    - Following is standard structure for <X>_Bones.json is as follows, here WFLW is filled in for X representing this json contains WFLW labels
+        - Std_Bones.json would contains std bone labels
+        - Openpose_Bones.json would contains openpose labels
+    - Following is standard structure for file <<X>>_Bones.json is as follows, here WFLW is filled in for X representing this json contains WFLW labels
     - Contains
-        - Head, Tail, Envelope, Constraints (currently limited to COPY_LOCATION, STRETCH_TO, LIMIT_LOCATION, CHILD_OF & DAMPED_TRACK)
+        - Head, Tail, Envelope, Constraints (currently limited to `COPY_LOCATION`, `STRETCH_TO`, `LIMIT_LOCATION`, `CHILD_OF` & `DAMPED_TRACK`)
     ```json
     {
     "sSkeletonType": "WFLW",
