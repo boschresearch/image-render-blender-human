@@ -403,10 +403,26 @@ class BoneLabel:
 
     # enddef
 
+    def AddTarget(self, _lConstraintCopyLocation):
+        sTarget = _lConstraintCopyLocation["sTarget"]
+        try:
+            objTarget = bpy.data.objects[sTarget]
+            if objTarget is not None:
+                return objTarget
+            elif sTarget.startswith("HG_Body"):
+                return self.objHGBody
+            else:
+                return None
+        except KeyError as e:
+            print(f"ERROR : {e}")
+            return None
+
+    # enddef
+
     # add COPY_LOCATION constraint
     def AddConstraintCopyLocation(self, _xPoseBone, _lConstraintCopyLocation):
         xNewConstraint = _xPoseBone.constraints.new("COPY_LOCATION")
-        xNewConstraint.target = self.objHGBody
+        xNewConstraint.target = self.AddTarget(_lConstraintCopyLocation)
         xNewConstraint.subtarget = _lConstraintCopyLocation["sSubtarget"]
         xNewConstraint.use_x = _lConstraintCopyLocation["bUseX"]
         xNewConstraint.use_y = _lConstraintCopyLocation["bUseY"]
