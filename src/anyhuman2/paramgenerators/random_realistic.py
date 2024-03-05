@@ -31,6 +31,7 @@ import random
 from ..tools import RandomUniformDiscrete
 from .GeneralRandomParameters import GeneralRandomParameters
 
+
 ############################################################################################
 def RealisticRandomizeParams(params, generator_config):
     """
@@ -70,11 +71,7 @@ def RealisticRandomizeParams(params, generator_config):
     sSkinTexture = universal_params.RandomizeSkin()
     # HumGenV4 Config
     NewHumGenV4Config = {
-        "age": {
-            "set": random.randrange(20, 81),
-            "age_color": 0.0,
-            "age_wrinkles": 0.0
-            },
+        "age": {"set": random.randrange(20, 81), "age_color": 0.0, "age_wrinkles": 0.0},
         "keys": {
             "Forearm Length": 0.0,
             "Forearm Thickness": 0.0,
@@ -92,9 +89,9 @@ def RealisticRandomizeParams(params, generator_config):
             "Thigh Thickness": 0.0,
             "height_150": height_150,
             "height_200": height_200,
-            "muscular": RandomUniformDiscrete(0, 1, 11), # From Anyhuman1
-            "overweight": RandomUniformDiscrete(0, 1, 11), # From Anyhuman1
-            "skinny": RandomUniformDiscrete(0, 0.5, 11), # From Anyhuman1
+            "muscular": RandomUniformDiscrete(0, 1, 11),  # From Anyhuman1
+            "overweight": RandomUniformDiscrete(0, 1, 11),  # From Anyhuman1
+            "skinny": RandomUniformDiscrete(0, 0.5, 11),  # From Anyhuman1
             "Back Muscles": 0.0,
             "Biceps": 0.0,
             "Calves Muscles": 0.0,
@@ -184,30 +181,25 @@ def RealisticRandomizeParams(params, generator_config):
             "aged_young": 0.0,
             "Male": Male,
             "LIVE_KEY_PERMANENT": 1.0,
-            "LIVE_KEY_TEMP_": 0.0
-            },
+            "LIVE_KEY_TEMP_": 0.0,
+        },
         "skin": {
-            "tone": RandomUniformDiscrete(0.1, 1.9, 51), # From Anyhuman1
-            "redness": RandomUniformDiscrete(-0.2, 0.8, 51), # From Anyhuman1
-            "saturation":RandomUniformDiscrete(0.1, 0.9, 51), # From Anyhuman1
-            "normal_strength": random.randint(1, 2), # From Anyhuman1
-            "roughness_multiplier": RandomUniformDiscrete(1.5, 2.0, 51), # From Anyhuman1
-            "freckles": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
-            "splotches": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
+            "tone": RandomUniformDiscrete(0.1, 1.9, 51),  # From Anyhuman1
+            "redness": RandomUniformDiscrete(-0.2, 0.8, 51),  # From Anyhuman1
+            "saturation": RandomUniformDiscrete(0.1, 0.9, 51),  # From Anyhuman1
+            "normal_strength": random.randint(1, 2),  # From Anyhuman1
+            "roughness_multiplier": RandomUniformDiscrete(1.5, 2.0, 51),  # From Anyhuman1
+            "freckles": RandomUniformDiscrete(0.0, 0.5, 101),  # From Anyhuman1
+            "splotches": RandomUniformDiscrete(0.0, 0.5, 101),  # From Anyhuman1
             "texture.set": sSkinTexture,
             "cavity_strength": 0.0,
-            "gender_specific": {
-                "mustache_shadow": 0.0,
-                "beard_shadow": 0.0
-            }
-            },
+            "gender_specific": {"mustache_shadow": 0.0, "beard_shadow": 0.0},
+        },
         "eyes": {
             "pupil_color": [random.random(), random.random(), random.random(), 1.00],
             "sclera_color": [random.random(), random.random(), random.random(), 1.00],
         },
-        "height": {
-            "set": height
-        },
+        "height": {"set": height},
         "hair": {
             "eyebrows": {
                 "set": sEyebrows,
@@ -219,43 +211,36 @@ def RealisticRandomizeParams(params, generator_config):
                 "root_lightness": 0.5,
                 "root_redness": 0.0,
                 "roots_hue": 0.5,
-                "fast_or_accurate": 1.0, # 1.0: Accurate
-                "hue": 0.5
+                "fast_or_accurate": 1.0,  # 1.0: Accurate
+                "hue": 0.5,
             },
             "regular_hair": {
                 "set": sRegularHair,
-                "lightness": RandomUniformDiscrete(0.1, 3.9, 39), # From Anyhuman1
-                "redness": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
-                "roughness": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
-                "salt_and_pepper": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
-                "roots": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
+                "lightness": RandomUniformDiscrete(0.1, 3.9, 39),  # From Anyhuman1
+                "redness": RandomUniformDiscrete(0.1, 0.9, 9),  # From Anyhuman1
+                "roughness": RandomUniformDiscrete(0.1, 0.9, 9),  # From Anyhuman1
+                "salt_and_pepper": RandomUniformDiscrete(0.1, 0.9, 9),  # From Anyhuman1
+                "roots": RandomUniformDiscrete(0.1, 0.9, 9),  # From Anyhuman1
                 "root_lightness": RandomUniformDiscrete(0.1, 0.9, 9),
                 "root_redness": RandomUniformDiscrete(0.1, 0.9, 9),
                 "roots_hue": RandomUniformDiscrete(0.1, 0.9, 9),
-                "fast_or_accurate": # 1.0: Accurate
-                "hue": 0.5
+                "fast_or_accurate": 1.0,  #: Accurate
+                "hue": 0.5,
             },
-            "face_hair": dFaceHair
+            "face_hair": dFaceHair,
         },
-        "clothing": {
-            "outfit": {
-                "set": outfit
-            },
-            "footwear": {
-                "set": sFootwear
-            }
-        }
-        }
+        "clothing": {"outfit": {"set": outfit}, "footwear": {"set": sFootwear}},
+    }
 
-    dictAnyHuman = {"dictCustom":
-            {
-                "sGender": sGender,
-                "bOpenPoseHandLabels": False,
-                "bFacialRig": True ,
-                "sPoseFilename": None,
-                "dBeardLength" : dBeardLength,
-            },
-        "dictHumGen_V4": NewHumGenV4Config
+    dictAnyHuman = {
+        "dictCustom": {
+            "sGender": sGender,
+            "bOpenPoseHandLabels": False,
+            "bFacialRig": True,
+            "sPoseFilename": None,
+            "dBeardLength": dBeardLength,
+        },
+        "dictHumGen_V4": NewHumGenV4Config,
     }
     return dictAnyHuman
 
