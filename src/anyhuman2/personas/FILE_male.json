@@ -5,6 +5,11 @@
         "bFacialRig": true,
         "sPoseFilename": {
             "set": null
+        },
+        "dBeardLength":{
+            "hair_systems":
+            [
+            ]
         }
     },
     "dictHumGen_V4": {
