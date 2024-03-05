@@ -29,11 +29,12 @@
 
 import random
 
-# from . import file
+from . import file
 from . import persona
 from . import random_full
 from . import random_realistic
 from . import zwicky
+
 
 ######################################################################
 def ComputeParams(mode, params, overwrite, generator_params):
@@ -63,11 +64,11 @@ def ComputeParams(mode, params, overwrite, generator_params):
     """
     new_params = GetParams(mode, params, generator_params)
 
-
     return new_params
 
 
 # enddef
+
 
 ######################################################################
 def GetParams(mode, params, generator_params):
@@ -108,9 +109,6 @@ def GetParams(mode, params, generator_params):
     elif mode == "FILE":
         new_params = file.FileParams(params)
     else:
-        raise NotImplementedError(
-            f"Please specify a valid mode for anyhuman parameter generation, not {mode}"
-        )
+        raise NotImplementedError(f"Please specify a valid mode for anyhuman parameter generation, not {mode}")
 
     return new_params
-
