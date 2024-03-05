@@ -333,13 +333,13 @@ class HumGenWrapper:
 
         if dictAnyhuman["dictCustom"]["bOpenPoseHandLabels"]:
             # TODO: clean code, pass _sHandLabelFile dynamically
-            sHandLabelFile = "C:\\Catharsys\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
+            sHandLabelFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
             self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
         # endif
 
         if dictAnyhuman["dictCustom"]["bFacialRig"]:
             self.human_obj.expression.load_facial_rig()
-            sWFLWLableFile = "C:\\Catharsys\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\WFLW_bones.json"
+            sWFLWLableFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\WFLW_bones.json"
             self.xBoneLabel.ImportSkeletonData(_sSkeletonDataFile=sWFLWLableFile)
         # endif
 
@@ -391,6 +391,9 @@ class HumGenWrapper:
             self.chosen_option = self.Human.get_preset_options(sGender)
             # Use previously generated HumGenV4 compatible directory
             self.human_obj = self.Human.from_preset(dictHumGenV4)
+            self.xBoneLabel = BoneLabel(_human=self.human_obj)
+            if self.xBoneLabel is None:
+                print("ERROR: Human not generated successfully, hence instance of BoneLabel not created")
             # If facial hair is present, custom parameters must be loaded after human has been created
             if sGender == "male":
                 for i, key in enumerate(self.dBeardLength["hair_systems"]):
@@ -402,8 +405,20 @@ class HumGenWrapper:
                 pass
             # endif
             # Set facial rig
-            if dictCustom["bFacialRig"] == True:
+            if dictCustom["bFacialRig"] is True:
                 self.human_obj.expression.load_facial_rig()
+                # TODO: pass sWFLWLableFile  dynamically
+                sWFLWLableFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\WFLW_bones.json"
+                # TODO: Fix eyebrow_WFLW labels
+                self.xBoneLabel.ImportSkeletonData(_sSkeletonDataFile=sWFLWLableFile)
+            else:
+                pass
+            # endif
+            # Add hand labels
+            if dictCustom["bOpenPoseHandLabels"] is True:
+                # TODO: pass sHandLabelFile dynamically
+                sHandLabelFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
+                self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
             else:
                 pass
             # endif
