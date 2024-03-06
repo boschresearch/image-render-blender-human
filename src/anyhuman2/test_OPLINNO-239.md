@@ -66,4 +66,5 @@
 
 ### How to test [OPLINNO-239](https://github.com/mnt1lr/image-render-blender-human/tree/feature/OPLINNO-239---add-WFLW-face-labels)
 - 1. In dev.py, enable `FILE` mode, pass `src\\anyhuman2\\personas\\FILE_male.json` as `sFilename` under `mParamConfig` (line ~69). Make sure bOpenPoseHandLabels & bFacialRig are `True` in json file
-- 2. Hit play by opening `dev.py` in blender debug mode, Face labels should show up (of-course with exceptions as stated above)
+- 2. change file input for sHandLabelFile & sWFLWLableFile (line. 291 & 297)
+- 3. Hit play by opening `dev.py` in blender debug mode, Face labels should show up (of-course with exceptions as stated above)
