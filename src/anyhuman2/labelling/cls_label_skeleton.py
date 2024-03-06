@@ -29,6 +29,8 @@ class BoneLabel:
         self.objRig = _human.objects.rig  # bpy.data.objects["HG_XXXX"]
         self.objArmature = _human.objects.rig.data  # bpy.data.armatures["metarig"]
         self.objHGBody = _human.objects.body  # bpy.data.armatures["HG_Body"]
+        self.objEyes = _human.objects.eyes
+        print(f"INFO: Working on Human:  {_human.name} ")
 
         self.lOpenPoseHandLabels = []
 
@@ -403,18 +405,15 @@ class BoneLabel:
 
     # enddef
 
+    # NOTE: Only supported targets = HG_Body & HG_Eyes
     def AddTarget(self, _lConstraintCopyLocation):
         sTarget = _lConstraintCopyLocation["sTarget"]
-        try:
-            objTarget = bpy.data.objects[sTarget]
-            if objTarget is not None:
-                return objTarget
-            elif sTarget.startswith("HG_Body"):
-                return self.objHGBody
-            else:
-                return None
-        except KeyError as e:
-            print(f"ERROR : {e}")
+        if sTarget.startswith("HG_Body"):
+            return self.objHGBody
+        elif sTarget.startswith("HG_Eyes"):
+            return self.objEyes
+        else:
+            print(f"{sTarget} not found")
             return None
 
     # enddef
@@ -463,12 +462,21 @@ class BoneLabel:
     def CreateVertexGroups(self, _objMesh, _lVertexGroups):
         for dicVertexGroup in _lVertexGroups:
             try:
-                # if a vertex group by the name dicVertexGroup["sName"] not already exist
-                if _objMesh.vertex_groups.find(dicVertexGroup["sName"]) == -1:
-                    # then create that vertex group
-                    xVertexGroup = _objMesh.vertex_groups.new(name=dicVertexGroup["sName"])
-                    # Default weight=1.0, type='ADD'
-                    xVertexGroup.add(dicVertexGroup["lVertices"], 1.0, "ADD")
+                if dicVertexGroup["sObject"].startswith("HG_Body"):
+                    # if a vertex group by the name dicVertexGroup["sName"] not already exist
+                    if _objMesh.vertex_groups.find(dicVertexGroup["sName"]) == -1:
+                        # then create that vertex group
+                        xVertexGroup = _objMesh.vertex_groups.new(name=dicVertexGroup["sName"])
+                        # Default weight=1.0, type='ADD'
+                        xVertexGroup.add(dicVertexGroup["lVertices"], 1.0, "ADD")
+                # TODO: better workaround required
+                if dicVertexGroup["sObject"].startswith("HG_Eyes"):
+                    # if a vertex group by the name dicVertexGroup["sName"] not already exist
+                    if self.objEyes.vertex_groups.find(dicVertexGroup["sName"]) == -1:
+                        # then create that vertex group
+                        xVertexGroup = self.objEyes.vertex_groups.new(name=dicVertexGroup["sName"])
+                        # Default weight=1.0, type='ADD'
+                        xVertexGroup.add(dicVertexGroup["lVertices"], 1.0, "ADD")
             except ValueError as e:
                 print(f"ERROR: {e}")
         # endfor
