@@ -12,43 +12,50 @@
         - Head, Tail, Envelope, Constraints (currently limited to `COPY_LOCATION`, `STRETCH_TO`, `LIMIT_LOCATION`, `CHILD_OF` & `DAMPED_TRACK`)
     ```json
     {
-    "sSkeletonType": "WFLW",
-    "lBones": [
-        {
-            "sType": "WFLW",
-            "sName": "WFLW_0_V1",
-            "lHead": [
-                0.29790136218070984,
-                1.3332699537277222,
-                0.8380638360977173
-            ],
-            "lTail": [
-                0.29790136218070984,
-                1.343269944190979,
-                0.8380638360977173
-            ],
-            "sParent": "head",
-            "fEnvelope": 0.25,
-            "fHeadRadius": 0.10000000149011612,
-            "lConstraints": [
-                {
-                    "sType": "COPY_LOCATION",
-                    "sBone": "AT.Label;WFLW;WFLW_0_V1",
-                    "sTarget": "HG_Body.001",
-                    "sSubtarget": "WFLW_0",
-                    "bUseX": true,
-                    "bUseY": true,
-                    "bUseZ": true,
-                    "bInvertX": false,
-                    "bInvertY": false,
-                    "bInvertZ": false,
-                    "sTargetSpace": "WORLD",
-                    "sOwnerSpace": "WORLD",
-                    "fInfluence": 1.0
-                }
-            ]
-        },{...},{...},{...}
-    ]
+        "sSkeletonType": "WFLW",
+        "lBones": [
+            {
+                "sType": "WFLW",
+                "sName": "WFLW_0_V1",
+                "lHead": [
+                    0.29790136218070984,
+                    1.3332699537277222,
+                    0.8380638360977173
+                ],
+                "lTail": [
+                    0.29790136218070984,
+                    1.343269944190979,
+                    0.8380638360977173
+                ],
+                "sParent": "head",
+                "fEnvelope": 0.25,
+                "fHeadRadius": 0.10000000149011612,
+                "lConstraints": [
+                    {
+                        "sType": "COPY_LOCATION",
+                        "sBone": "AT.Label;WFLW;WFLW_0_V1",
+                        "sTarget": "HG_Body.001",
+                        "sSubtarget": "WFLW_0",
+                        "bUseX": true,
+                        "bUseY": true,
+                        "bUseZ": true,
+                        "bInvertX": false,
+                        "bInvertY": false,
+                        "bInvertZ": false,
+                        "sTargetSpace": "WORLD",
+                        "sOwnerSpace": "WORLD",
+                        "fInfluence": 1.0
+                    }
+                ]
+            },{...},{...},{...}
+        ],
+        "lVertexGroups": [
+            {
+                "sObject": "HG_Eyes.001",
+                "sName": "eyeball.L",
+                "lVertices": [...]
+            },{...},{...}
+        ]
     }
     ```
 
