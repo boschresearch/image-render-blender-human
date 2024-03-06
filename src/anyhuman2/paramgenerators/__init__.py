@@ -27,7 +27,6 @@
 # -----
 ###
 
-import random
 
 # from . import file
 from . import persona

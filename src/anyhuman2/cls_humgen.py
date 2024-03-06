@@ -30,7 +30,6 @@
 import bpy
 import bmesh
 
-import random
 import os
 import os.path
 import colorsys
@@ -46,6 +45,7 @@ from anyblend.collection import RemoveCollection
 import addon_utils
 
 from .labelling.cls_label_skeleton import BoneLabel
+
 
 
 

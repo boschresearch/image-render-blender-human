@@ -26,8 +26,7 @@
 # All rights reserved.
 # -----
 ###
-
-import random
+from ..tools import RandomInstance
 from ..tools import RandomUniformDiscrete
 from .GeneralRandomParameters import GeneralRandomParameters
 
@@ -68,10 +67,11 @@ def RealisticRandomizeParams(params, generator_config):
     outfit = universal_params.RandomizeOutfit()
     sFootwear = universal_params.RandomFootwear()
     sSkinTexture = universal_params.RandomizeSkin()
+    rnd = RandomInstance().rnd
     # HumGenV4 Config
     NewHumGenV4Config = {
         "age": {
-            "set": random.randrange(20, 81),
+            "set": rnd.randrange(20, 81),
             "age_color": 0.0,
             "age_wrinkles": 0.0
             },
@@ -190,7 +190,7 @@ def RealisticRandomizeParams(params, generator_config):
             "tone": RandomUniformDiscrete(0.1, 1.9, 51), # From Anyhuman1
             "redness": RandomUniformDiscrete(-0.2, 0.8, 51), # From Anyhuman1
             "saturation":RandomUniformDiscrete(0.1, 0.9, 51), # From Anyhuman1
-            "normal_strength": random.randint(1, 2), # From Anyhuman1
+            "normal_strength": rnd.randint(1, 2), # From Anyhuman1
             "roughness_multiplier": RandomUniformDiscrete(1.5, 2.0, 51), # From Anyhuman1
             "freckles": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
             "splotches": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
@@ -202,8 +202,8 @@ def RealisticRandomizeParams(params, generator_config):
             }
             },
         "eyes": {
-            "pupil_color": [random.random(), random.random(), random.random(), 1.00],
-            "sclera_color": [random.random(), random.random(), random.random(), 1.00],
+            "pupil_color": [rnd.random(), rnd.random(), rnd.random(), 1.00],
+            "sclera_color": [rnd.random(), rnd.random(), rnd.random(), 1.00],
         },
         "height": {
             "set": height
