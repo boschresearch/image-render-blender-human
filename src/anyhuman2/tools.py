@@ -30,7 +30,15 @@ import bpy
 import mathutils
 import random
 
-
+############################################################################################
+# Own instance for random number generation
+class RandomInstance:
+    _instance = None
+    def __new__(cls, seed=None):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.rnd = random.Random(seed)
+        return cls._instance
 ############################################################################################
 def FixClothBoneWeights(skinMesh, clothMeshes, paramMaxDist=10.0):
 
@@ -155,7 +163,7 @@ def RandomUniformDiscrete(_fMin, _fMax, _iCount=101):
         raise RuntimeError("Count value has to be >= 2")
     # endif
 
-    fRand = random.randint(0, _iCount - 1) / (_iCount - 1)
+    fRand = RandomInstance().rnd.randint(0, _iCount - 1) / (_iCount - 1)
     fRand = fRand * (_fMax - _fMin) + _fMin
 
     return fRand

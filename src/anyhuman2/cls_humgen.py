@@ -30,7 +30,6 @@
 import bpy
 import bmesh
 
-import random
 import os
 import os.path
 import colorsys

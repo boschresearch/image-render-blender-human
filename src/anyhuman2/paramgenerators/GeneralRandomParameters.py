@@ -1,14 +1,22 @@
-import random
+
 import json
 import os
+from ..tools import RandomInstance
+
 class GeneralRandomParameters():
-    """Class to generate universally needed random parameters
+    """Class to generate universally needed random parameters for HumGenV4 Armatures
+        Uses own Random instance for reproducibility
 
     """
     def __init__(self, params, generator_config) :
         self.params = params
         self.generator_config = generator_config
-        self.sGender = self.params.get("sGender", random.choice(["male", "female"]))
+        if "xSeed" in params:
+            seed = hash(params["xSeed"]) % (2**32)
+            self.rnd = RandomInstance(seed).rnd
+        else:
+            self.rnd = RandomInstance().rnd
+        self.sGender = self.params.get("sGender", self.rnd.choice(["male", "female"]))
     
     def GetGender(self):
         return self.sGender
@@ -34,7 +42,7 @@ class GeneralRandomParameters():
         ]
 
         # Select an outfit
-        outfit = self.generator_config.dict_clothes[self.sGender][random.choice(outfit_list)].replace('/', os.sep)
+        outfit = self.generator_config.dict_clothes[self.sGender][self.rnd.choice(outfit_list)].replace('/', os.sep)
         return outfit
 
     def RandomFootwear(self):
@@ -45,7 +53,7 @@ class GeneralRandomParameters():
             dict consisting of subdirectories containing different models, outfits, footwear, hair styles,...
         """
         # Select footwear
-        footwear = random.choice(list(self.generator_config.dict_footwear[self.sGender].values())).replace('/', os.sep)
+        footwear = self.rnd.choice(list(self.generator_config.dict_footwear[self.sGender].values())).replace('/', os.sep)
         return footwear
 
     def RandomizeHair(self):
@@ -79,20 +87,20 @@ class GeneralRandomParameters():
             # Coin flip for beard or no beard
             fMale = 1.0
             dFaceHair = {} # Facial hair
-            if random.random() < 0.5:
-                sFaceHair = random.choice(list(self.generator_config.dict_face_hair["male"].values())) # Facial hair
+            if self.rnd.random() < 0.5:
+                sFaceHair = self.rnd.choice(list(self.generator_config.dict_face_hair["male"].values())) # Facial hair
                 dFaceHair = {
                     "set": sFaceHair,
-                    "lightness": random.uniform(0, 1.0),
-                    "redness": random.uniform(0, 1.0),
-                    "roughness": random.uniform(0, 1.0),
-                    "salt_and_pepper": random.uniform(0, 1.0),
-                    "roots": random.uniform(0, 1.0),
-                    "root_lightness": random.uniform(0, 5.0),
-                    "root_redness": random.uniform(0, 1.0),
-                    "roots_hue": random.uniform(0, 1.0),
+                    "lightness": self.rnd.uniform(0, 1.0),
+                    "redness": self.rnd.uniform(0, 1.0),
+                    "roughness": self.rnd.uniform(0, 1.0),
+                    "salt_and_pepper": self.rnd.uniform(0, 1.0),
+                    "roots": self.rnd.uniform(0, 1.0),
+                    "root_lightness": self.rnd.uniform(0, 5.0),
+                    "root_redness": self.rnd.uniform(0, 1.0),
+                    "roots_hue": self.rnd.uniform(0, 1.0),
                     "fast_or_accurate": 1.0, # Accurate
-                    "hue": random.uniform(0, 1.0),
+                    "hue": self.rnd.uniform(0, 1.0),
                 }
                 # Randomize facial hair concerning length
                 addon_path = self.generator_config.dict_info["HumGenV4 Path"]
@@ -101,7 +109,7 @@ class GeneralRandomParameters():
                     file = json.load(f)
                 dBeardLength = file
                 for key, value in enumerate(dBeardLength["hair_systems"]):
-                    dBeardLength["hair_systems"][value].update({"length": random.uniform(0, 1.0)})
+                    dBeardLength["hair_systems"][value].update({"length": self.rnd.uniform(0, 1.0)})
             else:
                 dBeardLength = {} # Empty
             # endif
@@ -120,15 +128,15 @@ class GeneralRandomParameters():
                 'Eyebrows_008',
                 'Eyebrows_009'
                 ]
-        sEyebrows = random.choice(eyebrows)
+        sEyebrows = self.rnd.choice(eyebrows)
         # Regular hair
-        sRegularHair = random.choice(list(self.generator_config.dict_regular_hair[self.sGender].values()))
+        sRegularHair = self.rnd.choice(list(self.generator_config.dict_regular_hair[self.sGender].values()))
         return (fMale, dFaceHair, dBeardLength, sRegularHair, sEyebrows)
 
     def RandomizeSkin(self):
         """Select random skin texture from presets.
         """
-        texture = random.choice(list(self.generator_config.dict_textures[self.sGender].values()))
+        texture = self.rnd.choice(list(self.generator_config.dict_textures[self.sGender].values()))
         return(texture)
 
     def RandomizeHeight(self): 
@@ -137,7 +145,7 @@ class GeneralRandomParameters():
 
 
         # Height generation, see HumGenV4 ...\height.py
-        height = random.uniform(140, 200) # in cm
+        height = self.rnd.uniform(140, 200) # in cm
         if height > 184:
             fHeight_200 = (height - 184) / (200 - 184)
             fHeight_150 = 0.0

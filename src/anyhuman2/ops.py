@@ -30,7 +30,6 @@ import bpy
 import mathutils
 import math
 
-import random
 
 import warnings
 import json
@@ -54,6 +53,8 @@ except Exception as xEx:
 # # endtry
 
 
+
+    
 ##############################################################################################################
 def GenerateHuman(_dicParams, **kwargs):
     """
@@ -90,16 +91,16 @@ def GenerateHuman(_dicParams, **kwargs):
 
     # set a seed for the following randomization
     # used to generate reproducible humans
-    if "xSeed" in _dicParams:
-        import numpy as np
-        import random
+    # if "xSeed" in _dicParams:
+    #     import numpy as np
 
-        np_seed = hash(_dicParams["xSeed"]) % (2**32)
+    #     np_seed = hash(_dicParams["xSeed"]) % (2**32)
 
-        random.seed(_dicParams["xSeed"])
-        # np.random.seed(np_seed)
-        # Own instance for random number generation
-        rnd = random.Random(np_seed)
+    #     random.seed(_dicParams["xSeed"])
+    #     # np.random.seed(np_seed)
+    #     RandomInstance(np_seed).rnd
+        
+
 
     mode = _dicParams.get("sMode", "RANDOM_REALISTIC")
 
@@ -155,12 +156,12 @@ def ModifyHumanPostCreation(_objX, _dicParams, sMode, **kwargs):
         Dictionary with configuration arguments
     """
 
-    if "xSeed" in _dicParams:
-        import numpy as np
-        import random
+    # if "xSeed" in _dicParams:
+    #     import numpy as np
+    #     import random
 
-        random.seed(_dicParams["xSeed"])
-        np.random.seed(hash(_dicParams["xSeed"]) % (2**32))
+    #     random.seed(_dicParams["xSeed"])
+    #     np.random.seed(hash(_dicParams["xSeed"]) % (2**32))
 
     # first, make sure that nothing is selected in the scene
     # and activate the human
