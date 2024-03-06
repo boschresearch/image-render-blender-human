@@ -47,52 +47,6 @@ import addon_utils
 
 from .labelling.cls_label_skeleton import BoneLabel
 
-color_dict = {
-    # color set from HG3D (see HG_COLORS.py)
-    "C0": {
-        "light_grayblue": (0.53, 0.75, 1.0, 1.0),
-        "light_blue": (0.36, 0.59, 1.0, 1.0),
-        "grey": (0.96, 1.0, 1.0, 1.0),
-        "dark_gray": (0.46, 0.48, 0.49, 1.0),
-        "darkest_gray": (0.18, 0.19, 0.2, 1.0),
-        "turquise": (0.27, 0.47, 0.48, 1.0),
-        "silver": (0.61, 0.76, 0.74, 1.0),
-        "purple": (0.48, 0.21, 0.43, 1.0),
-        "green": (0.35, 0.46, 0.15, 1.0),
-        "dark_blue": (0.12, 0.19, 0.34, 1.0),
-    },
-    "RANDOM_FULL": {
-        "light_grayblue": (0.53, 0.75, 1.0, 1.0),
-        "light_blue": (0.36, 0.59, 1.0, 1.0),
-        "silver": (0.61, 0.76, 0.74, 1.0),
-        "dark_blue": (0.12, 0.19, 0.34, 1.0),
-        "darkest_gray": (0.18, 0.19, 0.2, 1.0),
-        "turquise": (0.27, 0.47, 0.48, 1.0),
-        "purple": (0.48, 0.21, 0.43, 1.0),
-        "green": (0.35, 0.46, 0.15, 1.0),
-        "yellow": (0.48, 0.46, 0.14, 1.0),
-        "red": (0.48, 0.08, 0.06, 1.0),
-    },
-    "DARK": {
-        "dark_blue": (0.12, 0.19, 0.34, 1.0),
-        "darkest_gray": (0.18, 0.19, 0.2, 1.0),
-        "turquise": (0.27, 0.47, 0.48, 1.0),
-        "purple": (0.48, 0.21, 0.43, 1.0),
-        "green": (0.35, 0.46, 0.15, 1.0),
-        "red": (0.48, 0.08, 0.06, 1.0),
-    },
-    "BRIGHT": {
-        "light_grayblue": (0.53, 0.75, 1.0, 1.0),
-        "light_blue": (0.36, 0.59, 1.0, 1.0),
-        "silver": (0.61, 0.76, 0.74, 1.0),
-        "turquise": (0.27, 0.47, 0.48, 1.0),
-        "purple": (0.48, 0.21, 0.43, 1.0),
-        "green": (0.35, 0.46, 0.15, 1.0),
-        "yellow": (0.48, 0.46, 0.14, 1.0),
-        "red": (0.48, 0.08, 0.06, 1.0),
-    },
-}
-
 
 #########################################################################################################
 
@@ -289,6 +243,8 @@ class HumGenWrapper:
         self.xBoneLabel.AddHandLabels(_sLabelFile=_sHandLabelFile, _objArmature=objArmature, _objRig=objRig)
         return
 
+    # enddef
+
     def CreateHumanFromJSON(self, _sJsonFile: str):
         """_summary_
 
@@ -374,11 +330,16 @@ class HumGenWrapper:
 
     # enddef
 
-    def CreateHuman(self, params: dict, generatedParams: dict):
+    def CreateHuman(self, generatedParams: dict):
         """
-        Create human from a dictAnyhuman or a dictHumGen_V4 dictionary which is a composition of the standard
+        Create human from a dictAnyhuman (or a dictHumGen_V4 dictionary) which is a composition of the standard
         HumGenV4 as_dict() + some additional parameters such as gender, pose, labels,...
         dictAnyhuman: dictionary, containing information about the human that will be generated.
+        Parameters:
+            - params (dict): catharsys like dictionary
+            - generatedParams (dict): dictAnyhuman
+            Returns:
+            - dictName (dict)
         """
         # Reading values from dict and splitting it to custom and HumGenV4 dicts
         # case: anyhuman dictionary (= custom dict + humgen dict)
@@ -394,8 +355,8 @@ class HumGenWrapper:
             self.xBoneLabel = BoneLabel(_human=self.human_obj)
             if self.xBoneLabel is None:
                 print("ERROR: Human not generated successfully, hence instance of BoneLabel not created")
-            # If facial hair is present, custom parameters must be loaded after human has been created
-            if sGender == "male":
+            # If dbeardLength is not empty (False), custom parameters must be loaded after human has been created
+            if sGender == "male" and bool(dictCustom["dBeardLength"]) == True:
                 for i, key in enumerate(self.dBeardLength["hair_systems"]):
                     # obtain the particle system which is connected to the hair system
                     particle_system = self.human_obj.hair.particle_systems[key].settings.name
@@ -432,6 +393,9 @@ class HumGenWrapper:
                 dictHumGenV4 = generatedParams
             # endif
         # endif
+        return self.human_obj.props["body_obj"]
+
+    # enddef
 
 
 ###########################################################################################################

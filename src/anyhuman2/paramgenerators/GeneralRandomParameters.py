@@ -77,9 +77,10 @@ class GeneralRandomParameters():
             fMale = 0.0
         elif self.sGender == "male":
             # Coin flip for beard or no beard
+            fMale = 1.0
+            dFaceHair = {} # Facial hair
             if random.random() < 0.5:
                 sFaceHair = random.choice(list(self.generator_config.dict_face_hair["male"].values())) # Facial hair
-                fMale = 1.0
                 dFaceHair = {
                     "set": sFaceHair,
                     "lightness": random.uniform(0, 1.0),
