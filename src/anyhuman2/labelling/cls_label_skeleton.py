@@ -105,200 +105,13 @@ class BoneLabel:
     # enddef
     # ******************************************** END HAND LABELS ****************************************************
 
-    # ************************************* BEGIN EXPORT FUNCTIONS ****************************************************
-    # TODO: Export only necessary labels, vertex groups - discard existing standard humgen labels to avoid ambiguity
-    def ExportSkeletonData(self, _sExportOutputPath: str):
-        # STEP 1: Extract bones of skeletons
-        dicSkeletons = self.ExtractSkeletons(_objArmature=objArmature, _objHGBody=objHGBody, _objRig=objRig)
-        # STEP 2: Split skeletons and label them based on type (Std, Openpose)
-        dicLabelledSkeletons_a = self.SplitSkeletons(_dicSkeletons=dicSkeletons)
-        # STEP 3: Add vertex groups to each of labelled skeletons
-        self.ExportVertexGroups(_objHGBody=objHGBody, _dicLabelledSkeletons=dicLabelledSkeletons_a)
-        # STEP 4: Export each labelled skeleton
-        self.ExportSkeletons(_dicLabelledSkeletons=dicLabelledSkeletons_a, _sOutputPath=sExportOutputPath)
-        print("exported")
-        return {"FINISHED"}
-
-    # enddef
-
-    def ExportVertexGroups(self, _objHGBody, _dicLabelledSkeletons):
-        for sSkeletonType, dicSkeletonData in _dicLabelledSkeletons.items():
-            for group in _objHGBody.vertex_groups:
-                vertex_indices = [
-                    v.index for v in _objHGBody.data.vertices if group.index in [vg.group for vg in v.groups]
-                ]
-                dicVertexGroup = {"sName": group.name, "lVertices": vertex_indices}
-                dicSkeletonData["lVertexGroups"].append(dicVertexGroup)
-            # endfor
-        # endfor
-
-    # enddef
-
-    # Extract bones of all types of skeletons into a dictionary
-    def ExtractSkeletons(self, _objArmature, _objHGBody, _objRig):
-        dicSkeletons = {
-            # "lVertexGroups": [],
-            # "sSkeletonType": "Std",
-            "lBones": [
-                # {
-                #    "sRootBone": "head",
-                #    "sName": "RightEar",
-                #    "sParent": "spine"
-                #    "fEnvelope": 0.05,
-                #    "fHeadRadius": 0.02,
-                #    "lConstraints": []
-                # }
-            ]
-        }
-
-        bpy.context.view_layer.objects.active = _objRig
-        bpy.ops.object.mode_set(mode="POSE")
-
-        # Collect bone information
-        for objBone, bone in zip(_objArmature.bones, _objRig.pose.bones):
-            lPartsBySemiColon = bone.name.split(";")
-
-            if lPartsBySemiColon[0] == "AT.Label" and len(lPartsBySemiColon) == 3:
-                sSkeletonType = lPartsBySemiColon[1]
-                sBoneName = lPartsBySemiColon[2]
-
-                dicBone = {
-                    "sType": sSkeletonType,
-                    "sName": sBoneName,
-                    "lHead": list(bone.head),
-                    "lTail": list(bone.tail),
-                    "sParent": bone.parent.name if bone.parent else "",
-                    "fEnvelope": objBone.envelope_distance,
-                    "fHeadRadius": objBone.head_radius,
-                    "lConstraints": []
-                    # Add more bone properties as needed
-                }
-
-                for cons in bone.constraints:
-                    if cons.type == "STRETCH_TO":
-                        dicConstraint = {
-                            "sType": cons.type,
-                            "sBone": bone.name,
-                            "sTarget": cons.target.name if cons.target else "",
-                            "sSubtarget": cons.subtarget if cons.subtarget else "",
-                            "sVolume": cons.volume,
-                            "sKeepAxis": cons.keep_axis,
-                            "fInfluence": cons.influence,
-                        }
-                        dicBone["lConstraints"].append(dicConstraint)
-                    # endif cons.type == "STRETCH_TO"
-
-                    if cons.type == "LIMIT_LOCATION":
-                        dicConstraint = {
-                            "sType": cons.type,
-                            "sBone": bone.name,
-                            "fMinX": cons.min_x,
-                            "fMinY": cons.min_y,
-                            "fMinZ": cons.min_z,
-                            "fMaxX": cons.max_x,
-                            "fMaxY": cons.max_y,
-                            "fMaxZ": cons.max_z,
-                            "bAffectTransform": cons.use_transform_limit,
-                            "sOwnerSpace": cons.owner_space,
-                            "fInfluence": cons.influence,
-                        }
-                        dicBone["lConstraints"].append(dicConstraint)
-                    # endif cons.type == "LIMIT_LOCATION"
-
-                    if cons.type == "DAMPED_TRACK":
-                        dicConstraint = {
-                            "sType": cons.type,
-                            "sBone": bone.name,
-                            "sTarget": cons.target.name if cons.target else "",
-                            "sTrackAxis": cons.track_axis,
-                            "sOwnerSpace": cons.owner_space,
-                            "fInfluence": cons.influence,
-                        }
-                        dicBone["lConstraints"].append(dicConstraint)
-                    # endif cons.type == "DAMPED_TRACK"
-
-                    if cons.type == "CHILD_OF":
-                        dicConstraint = {
-                            "sType": cons.type,
-                            "sBone": bone.name,
-                            "sTarget": cons.target.name if cons.target else "",
-                            "sSubtarget": cons.subtarget if cons.subtarget else "",
-                            "bUseLocationX": cons.use_location_x,
-                            "bUseLocationY": cons.use_location_y,
-                            "bUseLocationZ": cons.use_location_z,
-                            "bUseRotationX": cons.use_rotation_x,
-                            "bUseRotationY": cons.use_rotation_y,
-                            "bUseRotationZ": cons.use_rotation_z,
-                            "bUseScaleX": cons.use_scale_x,
-                            "bUseScaleY": cons.use_scale_y,
-                            "bUseScaleZ": cons.use_scale_z,
-                            "fInfluence": cons.influence,
-                        }
-                        dicBone["lConstraints"].append(dicConstraint)
-                    # endif cons.type == "CHILD_OF"
-
-                    if cons.type == "COPY_LOCATION":
-                        dicConstraint = {
-                            "sType": cons.type,
-                            "sBone": bone.name,
-                            "sTarget": cons.target.name if cons.target else "",
-                            "sSubtarget": cons.subtarget if cons.subtarget else "",
-                            "bUseX": cons.use_x,
-                            "bUseY": cons.use_y,
-                            "bUseZ": cons.use_z,
-                            "bInvertX": cons.invert_x,
-                            "bInvertY": cons.invert_y,
-                            "bInvertZ": cons.invert_z,
-                            "sTargetSpace": cons.target_space,
-                            "sOwnerSpace": cons.owner_space,
-                            "fInfluence": cons.influence,
-                        }
-                        dicBone["lConstraints"].append(dicConstraint)
-                    # endif cons.type == "COPY_LOCATION"
-                # endfor cons in bone.constraints
-
-                dicSkeletons["lBones"].append(dicBone)
-
-        return dicSkeletons
-
-    # enddef
-
-    # split skeletons based on sSkeletonType
-    def SplitSkeletons(self, _dicSkeletons):
-        dicLabelledSkeletons = {}
-        for dicBone in _dicSkeletons["lBones"]:
-            sSkeletonType = dicBone["sType"]
-            if sSkeletonType not in dicLabelledSkeletons:
-                dicLabelledSkeletons[sSkeletonType] = {
-                    "sSkeletonType": sSkeletonType,
-                    "lBones": [],
-                    "lVertexGroups": [],
-                }
-            dicLabelledSkeletons[sSkeletonType]["lBones"].append(dicBone)
-        return dicLabelledSkeletons
-
-    # enddef
-
-    # ExportSkeletons
-    def ExportSkeletons(self, _dicLabelledSkeletons, _sOutputPath):
-        for sSkeletonType, dicSkeletonData in _dicLabelledSkeletons.items():
-            sFilename = f"{sSkeletonType}_bones.json"
-            sOutputFile = _sOutputPath + sFilename
-            with open(sOutputFile, "w") as sJsonFile:
-                json.dump(dicSkeletonData, sJsonFile, indent=4)
-            print(f"Saved {sSkeletonType} bones to {sFilename}")
-
-    # enddef
-
-    # ************************************* END EXPORT FUNCTIONS ********************************************************
-
-    # ************************************* BEGIN IMPORT FUNCTIONS ********************************************************
+    # ************************************* BEGIN IMPORT FUNCTIONS ****************************************************
 
     def ImportSkeletonData(self, _sSkeletonDataFile):
         # STEP 1: Parse input json and extract skeletal bones with constraints and vertex groups
         dicSkeleton = self.ParseSkeleton(_sInSkeletonFile=_sSkeletonDataFile)
         # STEP 2: Add vertex groups to objHGBody (Mesh)
-        self.CreateVertexGroups(_objMesh=self.objHGBody, _lVertexGroups=dicSkeleton["lVertexGroups"])
+        self.CreateVertexGroups(_objMesh=self.objHGBody, _lLabelVertices=dicSkeleton["lLabelVertices"])
         # STEP 3: Add bones
         self.ImportSkeletonBones(_dicSkeleton=dicSkeleton, _objArmature=self.objArmature, _objRig=self.objRig)
         # STEP 4: Add constraints
@@ -459,24 +272,23 @@ class BoneLabel:
     # enddef
 
     # import and create vertex groups
-    def CreateVertexGroups(self, _objMesh, _lVertexGroups):
-        for dicVertexGroup in _lVertexGroups:
+    def CreateVertexGroups(self, _objMesh, _lLabelVertices):
+        for dicVertexGroup in _lLabelVertices:
+            sObject = dicVertexGroup["sObject"]
             try:
-                if dicVertexGroup["sObject"].startswith("HG_Body"):
-                    # if a vertex group by the name dicVertexGroup["sName"] not already exist
-                    if _objMesh.vertex_groups.find(dicVertexGroup["sName"]) == -1:
-                        # then create that vertex group
-                        xVertexGroup = _objMesh.vertex_groups.new(name=dicVertexGroup["sName"])
-                        # Default weight=1.0, type='ADD'
-                        xVertexGroup.add(dicVertexGroup["lVertices"], 1.0, "ADD")
-                # TODO: better workaround required
-                if dicVertexGroup["sObject"].startswith("HG_Eyes"):
-                    # if a vertex group by the name dicVertexGroup["sName"] not already exist
-                    if self.objEyes.vertex_groups.find(dicVertexGroup["sName"]) == -1:
-                        # then create that vertex group
-                        xVertexGroup = self.objEyes.vertex_groups.new(name=dicVertexGroup["sName"])
-                        # Default weight=1.0, type='ADD'
-                        xVertexGroup.add(dicVertexGroup["lVertices"], 1.0, "ADD")
+                if sObject.startswith("HG_Body"):
+                    for dictLabel in dicVertexGroup["lLabels"]:
+                        if _objMesh.vertex_groups.find(dictLabel["sName"]) == -1:
+                            xVertexGroup = _objMesh.vertex_groups.new(name=dictLabel["sName"])
+                            xVertexGroup.add(dictLabel["lVertices"], 1.0, "ADD")
+                elif sObject.startswith("HG_Eyes"):
+                    for dictLabel in dicVertexGroup["lLabels"]:
+                        if self.objEyes.vertex_groups.find(dictLabel["sName"]) == -1:
+                            xVertexGroup = self.objEyes.vertex_groups.new(name=dictLabel["sName"])
+                            xVertexGroup.add(dictLabel["lVertices"], 1.0, "ADD")
+                else:
+                    print(f"Logic not implemented for Mesh/Object: {sObject}")
+
             except ValueError as e:
                 print(f"ERROR: {e}")
         # endfor
