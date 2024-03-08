@@ -1,0 +1,233 @@
+{
+    "dictCustom": {
+        "sGender": "male",
+        "sArmatureName": "Armature.002",
+        "bOpenPoseHandLabels": false,
+        "bFacialRig": true,
+        "sPoseFilename": null,
+        "dBeardLength": {
+            "blend_file": "HG_FH_Collection_1.blend",
+            "hair_systems": {
+                "fh_Mustache_High": {
+                    "length": 0.41135402464857007,
+                    "children_amount": 20
+                },
+                "fh_Side_Lines": {
+                    "length": 0.5719934775605786,
+                    "children_amount": 12
+                },
+                "fh_soul_patch": {
+                    "length": 0.8233878911347214,
+                    "children_amount": 10
+                },
+                "fh_sideburns_low": {
+                    "length": 0.2694038195380374,
+                    "children_amount": 20
+                },
+                "fh_beard_medium": {
+                    "length": 0.4729075868768595,
+                    "children_amount": 30
+                }
+            }
+        }
+    },
+    "dictHumGen_V4": {
+        "age": {
+            "set": 74,
+            "age_color": 0.0,
+            "age_wrinkles": 0.0
+        },
+        "keys": {
+            "Forearm Length": 0.0,
+            "Forearm Thickness": 0.0,
+            "Hand Length": 0.0,
+            "Hand Thickness": 0.0,
+            "Hand Width": 0.0,
+            "Upper Arm Length": 0.0,
+            "Upper Arm Thickness": 0.0,
+            "Neck Length": 0.0,
+            "Neck Thickness": 0.0,
+            "Foot Length": 0.0,
+            "Shin Length": 0.0,
+            "Shin Thickness": 0.0,
+            "Thigh Length": 0.0,
+            "Thigh Thickness": 0.0,
+            "height_150": 0.809480977337202,
+            "height_200": 0.0,
+            "muscular": 0.3,
+            "overweight": 0.7,
+            "skinny": 0.25,
+            "Back Muscles": 0.0,
+            "Biceps": 0.0,
+            "Calves Muscles": 0.0,
+            "Chest Muscles": 0.0,
+            "Forearm Muscles": 0.0,
+            "Hamstring Muscles": 0.0,
+            "Lower Butt Muscles": 0.0,
+            "Quad Muscles": 0.0,
+            "Shoulder Muscles": 0.0,
+            "Traps Muscles": 0.0,
+            "Triceps": 0.0,
+            "Upper Butt Muscles": 0.0,
+            "Stylized": 0.0,
+            "Belly Size": 0.0,
+            "Breast Size": 0.0,
+            "Chest Height": 0.0,
+            "Chest Width": 0.0,
+            "Hips Height": 0.0,
+            "Hips Size": 0.0,
+            "Shoulder Width": 0.0,
+            "Waist Thickness": 0.0,
+            "asian": 0.0,
+            "black": 0.5,
+            "caucasian": 0.0,
+            "variation_1": 0.0,
+            "variation_10": 0.0,
+            "variation_11": 0.0,
+            "variation_2": 0.0,
+            "variation_3": 0.0,
+            "variation_4": 1.0,
+            "variation_5": 0.0,
+            "variation_6": 0.0,
+            "variation_7": 0.0,
+            "variation_8": 0.0,
+            "variation_9": 0.0,
+            "cheek_fullness": 0.0,
+            "cheek_zygomatic_bone": 0.0,
+            "cheek_zygomatic_proc": 0.0,
+            "chin_dimple": 0.0,
+            "chin_height": 0.0,
+            "chin_size": 0.0,
+            "chin_width": 0.0,
+            "ear_antihelix_shape": 0.0,
+            "ear_height": 0.0,
+            "ear_lobe_size": 0.0,
+            "ear_turn": 0.0,
+            "ear_width": 0.0,
+            "Eye Depth": 0.0,
+            "Eye Distance": 0.0,
+            "Eye Height": 0.0,
+            "eyelid_fat_pad": 0.0,
+            "eyelid_rotation": 0.0,
+            "eyelid_shift_horizontal": 0.0,
+            "eyelid_shift_vertical": 0.0,
+            "eye_height": 0.0,
+            "eye_orbit_size": 0.0,
+            "eye_tilt": 0.0,
+            "eye_width": 0.0,
+            "jaw_location_horizontal": 0.0,
+            "jaw_location_vertical": 0.0,
+            "jaw_width": 0.0,
+            "muzzle_location_horizontal": 0.0,
+            "muzzle_location_vertical": 0.0,
+            "lip_cupid_bow": 0.0,
+            "lip_height": 0.0,
+            "lip_location": 0.0,
+            "lip_offset": 0.0,
+            "lip_width": 0.0,
+            "nose_angle": 0.0,
+            "nose_bridge_height": 0.0,
+            "nose_bridge_width": 0.0,
+            "nose_height": 0.0,
+            "nose_location": 0.0,
+            "nose_nostril_flare": 0.0,
+            "nose_nostril_turn": 0.0,
+            "nose_tip_angle": 0.0,
+            "nose_tip_length": 0.0,
+            "nose_tip_size": 0.0,
+            "nose_tip_width": 0.0,
+            "Eye Scale": 0.0,
+            "browridge_center_size": 0.0,
+            "browridge_loc_horizontal": 0.0,
+            "browridge_loc_vertical": 0.0,
+            "forehead_size": 0.0,
+            "temple_size": 0.0,
+            "aged_male": 0.0,
+            "aged_young": 0.0,
+            "Male": 1.0,
+            "LIVE_KEY_PERMANENT": 1.0,
+            "LIVE_KEY_TEMP_": 0.0
+        },
+        "skin": {
+            "tone": 0.82,
+            "redness": 0.03999999999999998,
+            "saturation": 0.7080000000000001,
+            "normal_strength": 2,
+            "roughness_multiplier": 1.61,
+            "freckles": 0.445,
+            "splotches": 0.485,
+            "texture.set": "textures/male/Default 8K/Male 05.png",
+            "cavity_strength": 0.0,
+            "gender_specific": {
+                "mustache_shadow": 0.0,
+                "beard_shadow": 0.0
+            }
+        },
+        "eyes": {
+            "pupil_color": [
+                0.40430419561083575,
+                0.587100211512715,
+                0.5150560383813416,
+                1.0
+            ],
+            "sclera_color": [
+                0.22934220720871634,
+                0.881596236490506,
+                0.6266283102166839,
+                1.0
+            ]
+        },
+        "height": {
+            "set": 156.47764677053513
+        },
+        "hair": {
+            "eyebrows": {
+                "set": "Eyebrows_004",
+                "lightness": 0.10000000149011612,
+                "redness": 0.8999999761581421,
+                "roughness": 0.44999998807907104,
+                "salt_and_pepper": 0.0,
+                "roots": 0.0,
+                "root_lightness": 0.5,
+                "root_redness": 0.0,
+                "roots_hue": 0.5,
+                "fast_or_accurate": 1.0,
+                "hue": 0.5
+            },
+            "regular_hair": {
+                "set": "hair/head/male/Regular/Flat top.json",
+                "lightness": 2.7,
+                "redness": 0.2,
+                "roughness": 0.4,
+                "salt_and_pepper": 0.7000000000000001,
+                "roots": 0.7000000000000001,
+                "root_lightness": 0.30000000000000004,
+                "root_redness": 0.8,
+                "roots_hue": 0.9,
+                "fast_or_accurate": 1.0,
+                "hue": 0.5
+            },
+            "face_hair": {
+                "set": "hair/face_hair/Beard/Groomed_Beard_1.json",
+                "lightness": 0.6452142105021174,
+                "redness": 0.6752984822197763,
+                "roughness": 0.928059932760615,
+                "salt_and_pepper": 0.6561583366143442,
+                "roots": 0.9920438799589103,
+                "root_lightness": 1.8227899753220222,
+                "root_redness": 0.7435489686905572,
+                "roots_hue": 0.6220221680822544,
+                "fast_or_accurate": 1.0,
+                "hue": 0.1557876449721326
+            }
+        },
+        "clothing": {
+            "outfit": {
+                "set": "outfits\\male\\Summer\\Beach_Day.blend"
+            },
+            "footwear": {
+                "set": "footwear\\male\\Extra Outfits Pack\\Pirate Boots.blend"
+            }
+        }
+    }
+}
