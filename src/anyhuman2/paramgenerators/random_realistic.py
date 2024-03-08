@@ -28,6 +28,7 @@
 ###
 from .GeneralRandomParameters import GeneralRandomParameters
 
+
 ############################################################################################
 def RealisticRandomizeParams(params, generator_config, rnd):
     """
@@ -69,11 +70,7 @@ def RealisticRandomizeParams(params, generator_config, rnd):
     sSkinTexture = universal_params.RandomizeSkin()
     # HumGenV4 Config
     NewHumGenV4Config = {
-        "age": {
-            "set": rnd.randrange(20, 81),
-            "age_color": 0.0,
-            "age_wrinkles": 0.0
-            },
+        "age": {"set": rnd.randrange(20, 81), "age_color": 0.0, "age_wrinkles": 0.0},
         "keys": {
             "Forearm Length": 0.0,
             "Forearm Thickness": 0.0,
@@ -183,8 +180,8 @@ def RealisticRandomizeParams(params, generator_config, rnd):
             "aged_young": 0.0,
             "Male": Male,
             "LIVE_KEY_PERMANENT": 1.0,
-            "LIVE_KEY_TEMP_": 0.0
-            },
+            "LIVE_KEY_TEMP_": 0.0,
+        },
         "skin": {
             "tone": universal_params.RandomUniformDiscrete(0.1, 1.9, 51), # From Anyhuman1
             "redness": universal_params.RandomUniformDiscrete(-0.2, 0.8, 51), # From Anyhuman1
@@ -195,18 +192,13 @@ def RealisticRandomizeParams(params, generator_config, rnd):
             "splotches": universal_params.RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
             "texture.set": sSkinTexture,
             "cavity_strength": 0.0,
-            "gender_specific": {
-                "mustache_shadow": 0.0,
-                "beard_shadow": 0.0
-            }
-            },
+            "gender_specific": {"mustache_shadow": 0.0, "beard_shadow": 0.0},
+        },
         "eyes": {
             "pupil_color": [rnd.random(), rnd.random(), rnd.random(), 1.00],
             "sclera_color": [rnd.random(), rnd.random(), rnd.random(), 1.00],
         },
-        "height": {
-            "set": height
-        },
+        "height": {"set": height},
         "hair": {
             "eyebrows": {
                 "set": sEyebrows,
@@ -218,8 +210,8 @@ def RealisticRandomizeParams(params, generator_config, rnd):
                 "root_lightness": 0.5,
                 "root_redness": 0.0,
                 "roots_hue": 0.5,
-                "fast_or_accurate": 1.0, # 1.0: Accurate
-                "hue": 0.5
+                "fast_or_accurate": 1.0,  # 1.0: Accurate
+                "hue": 0.5,
             },
             "regular_hair": {
                 "set": sRegularHair,
@@ -234,17 +226,10 @@ def RealisticRandomizeParams(params, generator_config, rnd):
                 "fast_or_accurate": 1.0, # 1.0: Accurate
                 "hue": 0.5
             },
-            "face_hair": dFaceHair
+            "face_hair": dFaceHair,
         },
-        "clothing": {
-            "outfit": {
-                "set": outfit
-            },
-            "footwear": {
-                "set": sFootwear
-            }
-        }
-        }
+        "clothing": {"outfit": {"set": outfit}, "footwear": {"set": sFootwear}},
+    }
 
     dictAnyHuman = {"dictCustom":
             {

@@ -34,6 +34,7 @@ from . import random_full
 from . import random_realistic
 # from . import zwicky
 
+
 ######################################################################
 def ComputeParams(mode, params, overwrite, generator_params, rnd) -> dict:
     """
@@ -63,11 +64,11 @@ def ComputeParams(mode, params, overwrite, generator_params, rnd) -> dict:
     """
     new_params:dict = GetParams(mode, params, generator_params, rnd)
 
-
     return new_params
 
 
 # enddef
+
 
 ######################################################################
 def GetParams(mode, params, generator_params, rnd):
@@ -109,9 +110,6 @@ def GetParams(mode, params, generator_params, rnd):
     elif mode == "FILE":
         new_params = file.FileParams(params)
     else:
-        raise NotImplementedError(
-            f"Please specify a valid mode for anyhuman parameter generation, not {mode}"
-        )
+        raise NotImplementedError(f"Please specify a valid mode for anyhuman parameter generation, not {mode}")
 
     return new_params
-
