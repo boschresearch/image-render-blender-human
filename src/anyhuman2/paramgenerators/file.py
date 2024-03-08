@@ -31,9 +31,20 @@
 import json
 
 ######################################################################
-def FileParams(params):
-    """ """
-    filename = (params["mParamConfig"]["sFilename"]).lower()
+def FileParams(params:dict) -> dict:
+    """_summary_
+
+    Parameters
+    ----------
+    params : dict
+        full dictionary as specified in the dev.py
+
+    Returns
+    -------
+    params : dict
+        dictionary read from filename
+    """
+    filename = params["mParamConfig"]["sFilename"].lower()
 
     with open(filename, "r") as file:
         params = json.load(file)
