@@ -33,7 +33,7 @@ import json
 ######################################################################
 def FileParams(params):
     """ """
-    filename = (params["sFilename"]).lower()
+    filename = (params["mParamConfig"]["sFilename"]).lower()
 
     with open(filename, "r") as file:
         params = json.load(file)

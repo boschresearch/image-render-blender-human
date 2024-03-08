@@ -1,8 +1,11 @@
 {
     "dictCustom": {
         "sGender": "male",
+        "sArmatureName":"Armature.001",
         "bOpenPoseHandLabels": true,
+        "sOpenposeHandLabelFile":"labelling//mapping//openpose_hand_humgen.json",
         "bFacialRig": true,
+        "sWFLWLableFile":"labelling//mapping//WFLW_bones.json",
         "sPoseFilename": {
             "set": null
         },

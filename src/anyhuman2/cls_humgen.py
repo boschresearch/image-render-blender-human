@@ -236,12 +236,13 @@ class HumGenWrapper:
 
     # enddef
 
-    def AddLabelsFromJSON(self, _sHandLabelFile: str):
-        objRig = self.human_obj.objects.rig
-        objArmature = objRig.data
-        self.xBoneLabel.AddHandLabels(_sLabelFile=_sHandLabelFile, _objArmature=objArmature, _objRig=objRig)
-        return
-
+    def GetAbsPath(self, _sFile: str):
+        sCurrentDirectory = os.path.dirname(os.path.abspath(__file__))
+        print(f"Incoming file: {Path(_sFile)}")
+        print(f"Current directory: {sCurrentDirectory}")
+        absPath = os.path.join(sCurrentDirectory, _sFile)
+        print(f"Absolute path: {absPath}")
+        return absPath
     # enddef
 
     def CreateHumanFromJSON(self, _sJsonFile: str):
@@ -278,25 +279,6 @@ class HumGenWrapper:
             print(f"ERROR: {e}")
 
         self.human_obj.name = (_sJsonFile.rsplit("\\", 1)[1]).rsplit(".", 1)[0]
-
-        try:
-            self.xBoneLabel = BoneLabel(_human=self.human_obj)
-        except AttributeError as e:
-            print("Human not generated successfully")
-            print(f"ERROR: {e}")
-            return
-
-        if dictAnyhuman["dictCustom"]["bOpenPoseHandLabels"]:
-            # TODO: clean code, pass _sHandLabelFile dynamically
-            sHandLabelFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
-            self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
-        # endif
-
-        if dictAnyhuman["dictCustom"]["bFacialRig"]:
-            self.human_obj.expression.load_facial_rig()
-            sWFLWLableFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\WFLW_bones.json"
-            self.xBoneLabel.ImportSkeletonData(_sSkeletonDataFile=sWFLWLableFile)
-        # endif
 
         return self.human_obj.objects.rig
 
@@ -341,12 +323,12 @@ class HumGenWrapper:
             - dictName (dict)
         """
         # Armature name
-        
+
 
         # ToDo: try except keyerror implementieren
         # Reading values from dict and splitting it to custom and HumGenV4 dicts
         # case: anyhuman dictionary (= custom dict + humgen dict
-        
+
         try:
             if "dictCustom" in generatedParams.keys():
                 dictCustom:dict = generatedParams["dictCustom"]
@@ -374,7 +356,28 @@ class HumGenWrapper:
                 else:
                     pass
                 # endif
-            # case: only humgen dictionary 
+                # initialize xBoneLabel class
+                try:
+                    self.xBoneLabel = BoneLabel(_human=self.human_obj)
+                except AttributeError as e:
+                    print("Human not generated successfully")
+                    print(f"ERROR: {e}")
+                    return
+                # add hand labels
+                if "sOpenposeHandLabelFile" in dictCustom:
+                    sHandLabelFile = dictCustom["sOpenposeHandLabelFile"]
+                    objRig = self.human_obj.objects.rig
+                    objArmature = objRig.data
+                    sJsonFile = self.GetAbsPath(_sFile=sHandLabelFile)
+                    self.xBoneLabel.AddHandLabels(_sLabelFile=sJsonFile, _objArmature=objArmature, _objRig=objRig)
+                # endif
+                # add WFLW labels
+                if "sWFLWLableFile" in dictCustom:
+                    sWFLWLableFile = dictCustom["sWFLWLableFile"]
+                    sJsonFile = self.GetAbsPath(_sFile=sWFLWLableFile)
+                    self.xBoneLabel.ImportSkeletonData(_sSkeletonDataFile=sJsonFile)
+                # endif
+            # case: only humgen dictionary
             else:
                 if generatedParams["keys"]["Male"] >= 0.5:
                     sGender = "male"
@@ -384,13 +387,13 @@ class HumGenWrapper:
                     dictHumGenV4 = generatedParams
                 # endif
             # endif
-            # Rename 
+            # Rename
             if sName is not None:
                 self.human_obj.name = sName
             return self.human_obj.props['body_obj']
         except KeyError:
             print("KeyError: Please check if the dictionary contains the required keys.")
-            
+
     # enddef
 
 
