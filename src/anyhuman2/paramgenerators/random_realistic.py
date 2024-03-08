@@ -26,12 +26,10 @@
 # All rights reserved.
 # -----
 ###
-from ..tools import RandomInstance
-from ..tools import RandomUniformDiscrete
 from .GeneralRandomParameters import GeneralRandomParameters
 
 ############################################################################################
-def RealisticRandomizeParams(params, generator_config):
+def RealisticRandomizeParams(params, generator_config, rnd):
     """
     Create a set of completely random realistic parameters for human generation.
     This randomizer is intended for the generation of visually
@@ -60,14 +58,15 @@ def RealisticRandomizeParams(params, generator_config):
     dict
         Dictionary of parameters for human generator
     """
-    universal_params = GeneralRandomParameters(params, generator_config)
+    
+    universal_params = GeneralRandomParameters(params, generator_config, rnd)
+    sArmatureName = universal_params.ArmatureName()
     Male, dFaceHair, dBeardLength, sRegularHair, sEyebrows = universal_params.RandomizeHair()
     sGender = universal_params.GetGender()
     height_150, height_200, height = universal_params.RandomizeHeight()
     outfit = universal_params.RandomizeOutfit()
     sFootwear = universal_params.RandomFootwear()
     sSkinTexture = universal_params.RandomizeSkin()
-    rnd = RandomInstance().rnd
     # HumGenV4 Config
     NewHumGenV4Config = {
         "age": {
@@ -92,9 +91,9 @@ def RealisticRandomizeParams(params, generator_config):
             "Thigh Thickness": 0.0,
             "height_150": height_150,
             "height_200": height_200,
-            "muscular": RandomUniformDiscrete(0, 1, 11), # From Anyhuman1
-            "overweight": RandomUniformDiscrete(0, 1, 11), # From Anyhuman1
-            "skinny": RandomUniformDiscrete(0, 0.5, 11), # From Anyhuman1
+            "muscular": universal_params.RandomUniformDiscrete(0, 1, 11), # From Anyhuman1
+            "overweight": universal_params.RandomUniformDiscrete(0, 1, 11), # From Anyhuman1
+            "skinny": universal_params.RandomUniformDiscrete(0, 0.5, 11), # From Anyhuman1
             "Back Muscles": 0.0,
             "Biceps": 0.0,
             "Calves Muscles": 0.0,
@@ -187,13 +186,13 @@ def RealisticRandomizeParams(params, generator_config):
             "LIVE_KEY_TEMP_": 0.0
             },
         "skin": {
-            "tone": RandomUniformDiscrete(0.1, 1.9, 51), # From Anyhuman1
-            "redness": RandomUniformDiscrete(-0.2, 0.8, 51), # From Anyhuman1
-            "saturation":RandomUniformDiscrete(0.1, 0.9, 51), # From Anyhuman1
+            "tone": universal_params.RandomUniformDiscrete(0.1, 1.9, 51), # From Anyhuman1
+            "redness": universal_params.RandomUniformDiscrete(-0.2, 0.8, 51), # From Anyhuman1
+            "saturation":universal_params.RandomUniformDiscrete(0.1, 0.9, 51), # From Anyhuman1
             "normal_strength": rnd.randint(1, 2), # From Anyhuman1
-            "roughness_multiplier": RandomUniformDiscrete(1.5, 2.0, 51), # From Anyhuman1
-            "freckles": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
-            "splotches": RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
+            "roughness_multiplier": universal_params.RandomUniformDiscrete(1.5, 2.0, 51), # From Anyhuman1
+            "freckles": universal_params.RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
+            "splotches": universal_params.RandomUniformDiscrete(0.0, 0.5, 101), # From Anyhuman1
             "texture.set": sSkinTexture,
             "cavity_strength": 0.0,
             "gender_specific": {
@@ -224,14 +223,14 @@ def RealisticRandomizeParams(params, generator_config):
             },
             "regular_hair": {
                 "set": sRegularHair,
-                "lightness": RandomUniformDiscrete(0.1, 3.9, 39), # From Anyhuman1
-                "redness": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
-                "roughness": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
-                "salt_and_pepper": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
-                "roots": RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
-                "root_lightness": RandomUniformDiscrete(0.1, 0.9, 9),
-                "root_redness": RandomUniformDiscrete(0.1, 0.9, 9),
-                "roots_hue": RandomUniformDiscrete(0.1, 0.9, 9),
+                "lightness": universal_params.RandomUniformDiscrete(0.1, 3.9, 39), # From Anyhuman1
+                "redness": universal_params.RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
+                "roughness": universal_params.RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
+                "salt_and_pepper": universal_params.RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
+                "roots": universal_params.RandomUniformDiscrete(0.1, 0.9, 9), # From Anyhuman1
+                "root_lightness": universal_params.RandomUniformDiscrete(0.1, 0.9, 9),
+                "root_redness": universal_params.RandomUniformDiscrete(0.1, 0.9, 9),
+                "roots_hue": universal_params.RandomUniformDiscrete(0.1, 0.9, 9),
                 "fast_or_accurate": 1.0, # 1.0: Accurate
                 "hue": 0.5
             },
@@ -250,6 +249,7 @@ def RealisticRandomizeParams(params, generator_config):
     dictAnyHuman = {"dictCustom":
             {
                 "sGender": sGender,
+                "sArmatureName" : sArmatureName,
                 "bOpenPoseHandLabels": False,
                 "bFacialRig": True ,
                 "sPoseFilename": None,
