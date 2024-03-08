@@ -27,12 +27,10 @@
 # -----
 ###
 
-from ..tools import RandomUniformDiscrete
-from ..tools import RandomInstance
 from .GeneralRandomParameters import GeneralRandomParameters 
 
 ############################################################################################
-def FullyRandomizeParams(params, generator_config):
+def FullyRandomizeParams(params, generator_config, rnd):
     """
     Create a set of completely random parameters for human generation.
     This randomizer is intended for domain randomization purposes and tries
@@ -55,14 +53,14 @@ def FullyRandomizeParams(params, generator_config):
     dict
         Dictionary of parameters for human generator
     """
-    universal_params = GeneralRandomParameters(params, generator_config)
+    universal_params:dict = GeneralRandomParameters(params, generator_config, rnd)
+    sArmatureName:str = universal_params.ArmatureName()
     Male, dFaceHair, dBeardLength, sRegularHair, sEyebrows = universal_params.RandomizeHair()
-    sGender = universal_params.GetGender()
+    sGender:str = universal_params.GetGender()
     height_150, height_200, height = universal_params.RandomizeHeight()
-    outfit = universal_params.RandomizeOutfit()
-    sFootwear = universal_params.RandomFootwear()
-    sSkinTexture = universal_params.RandomizeSkin()
-    rnd = RandomInstance().rnd
+    outfit:str = universal_params.RandomizeOutfit()
+    sFootwear:str = universal_params.RandomFootwear()
+    sSkinTexture:str = universal_params.RandomizeSkin()
     # HumGenV4 Config
     NewHumGenV4Config = {
         "age": {
@@ -245,6 +243,7 @@ def FullyRandomizeParams(params, generator_config):
     dictAnyHuman = {"dictCustom":
             {
                 "sGender": sGender,
+                "sArmatureName" : sArmatureName,
                 "bOpenPoseHandLabels": False,
                 "bFacialRig": True ,
                 "sPoseFilename": None,

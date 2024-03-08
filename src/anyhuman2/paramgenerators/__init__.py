@@ -32,11 +32,11 @@ from . import file
 from . import persona
 from . import random_full
 from . import random_realistic
-from . import zwicky
+# from . import zwicky
 
 
 ######################################################################
-def ComputeParams(mode, params, overwrite, generator_params):
+def ComputeParams(mode, params, overwrite, generator_params, rnd) -> dict:
     """
     Computes a set of parameters for human generation.
     Currently available modes are:
@@ -45,6 +45,7 @@ def ComputeParams(mode, params, overwrite, generator_params):
     - RANDOM_REALISTIC: randomize every parameter but within realistically apearing bounds
     - ZWICKY: randomize based on a Zwicky box like description
     - FILE: specify a path to a json file with predefined values
+    -
 
     Parameters
     ----------
@@ -61,7 +62,7 @@ def ComputeParams(mode, params, overwrite, generator_params):
         dictionary with parameters for human generation
 
     """
-    new_params = GetParams(mode, params, generator_params)
+    new_params:dict = GetParams(mode, params, generator_params, rnd)
 
     return new_params
 
@@ -70,7 +71,7 @@ def ComputeParams(mode, params, overwrite, generator_params):
 
 
 ######################################################################
-def GetParams(mode, params, generator_params):
+def GetParams(mode, params, generator_params, rnd):
     """
     Computes a set of parameters for human generation.
     Currently available modes are:
@@ -99,9 +100,9 @@ def GetParams(mode, params, generator_params):
     new_params = {}
 
     if mode == "RANDOM_FULL":
-        new_params = random_full.FullyRandomizeParams(params, generator_params)
+        new_params = random_full.FullyRandomizeParams(params, generator_params, rnd)
     elif mode == "RANDOM_REALISTIC":
-        new_params = random_realistic.RealisticRandomizeParams(params, generator_params)
+        new_params = random_realistic.RealisticRandomizeParams(params, generator_params, rnd)
     elif mode == "ZWICKY":
         new_params = zwicky.ZwickyParams(params, generator_params)
     elif mode == "PERSONA":

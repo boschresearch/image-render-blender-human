@@ -1,27 +1,35 @@
 
 import json
 import os
-from ..tools import RandomInstance
+
 
 class GeneralRandomParameters():
     """Class to generate universally needed random parameters for HumGenV4 Armatures
         Uses own Random instance for reproducibility
-
+ 
     """
-    def __init__(self, params, generator_config) :
-        self.params = params
-        self.generator_config = generator_config
-        if "xSeed" in params:
-            seed = hash(params["xSeed"]) % (2**32)
-            self.rnd = RandomInstance(seed).rnd
-        else:
-            self.rnd = RandomInstance().rnd
-        self.sGender = self.params.get("sGender", self.rnd.choice(["male", "female"]))
+    def __init__(self, params:dict, generator_config:dict, rnd) :
+        self.params:dict = params
+        self.generator_config:dict = generator_config
+        self.rnd = rnd
+        self.sGender:str = self.params.get("sGender", self.rnd.choice(["male", "female"]))
+        
     
-    def GetGender(self):
+    def GetGender(self) -> str:
         return self.sGender
+    
+    def ArmatureName(self) -> str:
+        """Name the armature if any information is available
+        """
+        if "sId" in self.params:
+            sArmatureName = self.params["sId"]
+        elif "sPersonaId" in self.params:
+            sArmatureName = self.params["sPersonaId"].title()
+        else:
+            sArmatureName = None
+        return sArmatureName
 
-    def RandomizeOutfit(self):
+    def RandomizeOutfit(self) -> str:
         """Function to select a random outfit
             lIgnoredOutfitsFemale... List of female outfits which are ignored
             lIgnoredOutfitsMale... List of male outfits which are ignored
@@ -45,7 +53,7 @@ class GeneralRandomParameters():
         outfit = self.generator_config.dict_clothes[self.sGender][self.rnd.choice(outfit_list)].replace('/', os.sep)
         return outfit
 
-    def RandomFootwear(self):
+    def RandomFootwear(self) -> str:
         """Function that selects a footwear from a sub dictionary of generator_config
         Parameters
         ----------
@@ -56,7 +64,7 @@ class GeneralRandomParameters():
         footwear = self.rnd.choice(list(self.generator_config.dict_footwear[self.sGender].values())).replace('/', os.sep)
         return footwear
 
-    def RandomizeHair(self):
+    def RandomizeHair(self) -> tuple:
         """Function to randomize different hairs such as regular hair (normal head hair), face hair (beard) for male
            armature, a select a random eyebrow.
     
@@ -133,13 +141,13 @@ class GeneralRandomParameters():
         sRegularHair = self.rnd.choice(list(self.generator_config.dict_regular_hair[self.sGender].values()))
         return (fMale, dFaceHair, dBeardLength, sRegularHair, sEyebrows)
 
-    def RandomizeSkin(self):
+    def RandomizeSkin(self) -> str:
         """Select random skin texture from presets.
         """
         texture = self.rnd.choice(list(self.generator_config.dict_textures[self.sGender].values()))
         return(texture)
 
-    def RandomizeHeight(self): 
+    def RandomizeHeight(self) -> tuple: 
         """Function to generate a randomly sized armature.
         """
 
@@ -155,3 +163,34 @@ class GeneralRandomParameters():
         # endif
 
         return(fHeight_150, fHeight_200, height)
+    
+    ############################################################################################
+    def RandomUniformDiscrete(self, _fMin, _fMax, _iCount=101):
+        """Returns uniformly distributed random values over _iCount equally spaced discrete values in range [_fMin, _fMax]
+
+        Parameters
+        ----------
+        _fMin : float
+            minimal value
+        _fMax : float
+            maximal value
+        _iCount : int
+            number of discrete values
+
+        Returns
+        -------
+        float
+            a random value
+        """
+
+        if _iCount < 2:
+            raise RuntimeError("Count value has to be >= 2")
+        # endif
+
+        fRand = self.rnd.randint(0, _iCount - 1) / (_iCount - 1)
+        fRand = fRand * (_fMax - _fMin) + _fMin
+
+        return fRand
+
+
+# enddef

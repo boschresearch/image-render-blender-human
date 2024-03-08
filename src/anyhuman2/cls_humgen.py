@@ -336,64 +336,61 @@ class HumGenWrapper:
         dictAnyhuman: dictionary, containing information about the human that will be generated.
         Parameters:
             - params (dict): catharsys like dictionary
-            - generatedParams (dict): dictAnyhuman
+            - generatedParams (dict): dictAnyhuman or standard HumGenV4 dict
             Returns:
             - dictName (dict)
         """
-        # Reading values from dict and splitting it to custom and HumGenV4 dicts
-        # case: anyhuman dictionary (= custom dict + humgen dict)
-        if "dictCustom" in generatedParams.keys():
-            dictCustom = generatedParams["dictCustom"]
-            dictHumGenV4 = generatedParams["dictHumGen_V4"]
-            sGender = dictCustom["sGender"]
-            self.dBeardLength = dictCustom["dBeardLength"]
-            # Get preset for selected gender
-            self.chosen_option = self.Human.get_preset_options(sGender)
-            # Use previously generated HumGenV4 compatible directory
-            self.human_obj = self.Human.from_preset(dictHumGenV4)
-            self.xBoneLabel = BoneLabel(_human=self.human_obj)
-            if self.xBoneLabel is None:
-                print("ERROR: Human not generated successfully, hence instance of BoneLabel not created")
-            # If dbeardLength is not empty (False), custom parameters must be loaded after human has been created
-            if sGender == "male" and bool(dictCustom["dBeardLength"]) == True:
-                for i, key in enumerate(self.dBeardLength["hair_systems"]):
-                    # obtain the particle system which is connected to the hair system
-                    particle_system = self.human_obj.hair.particle_systems[key].settings.name
-                    # Set the length of the respective particle system to the value in the dict
-                    bpy.data.particles[particle_system].child_length = self.dBeardLength["hair_systems"][key]["length"]
-            else:
-                pass
-            # endif
-            # Set facial rig
-            if dictCustom["bFacialRig"] is True:
-                self.human_obj.expression.load_facial_rig()
-                # TODO: pass sWFLWLableFile  dynamically
-                sWFLWLableFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\WFLW_bones.json"
-                # TODO: Fix eyebrow_WFLW labels
-                self.xBoneLabel.ImportSkeletonData(_sSkeletonDataFile=sWFLWLableFile)
-            else:
-                pass
-            # endif
-            # Add hand labels
-            if dictCustom["bOpenPoseHandLabels"] is True:
-                # TODO: pass sHandLabelFile dynamically
-                sHandLabelFile = "C:\\h4\\image-render-setup\\repos\\image-render-blender-human\\src\\anyhuman2\\labelling\\mapping\\openpose_hand_humgen.json"
-                self.AddLabelsFromJSON(_sHandLabelFile=sHandLabelFile)
-            else:
-                pass
-            # endif
-        # case: only humgen dictionary
-        else:
-            if generatedParams["keys"]["Male"] >= 0.5:
-                sGender = "male"
-                dictHumGenV4 = generatedParams
-            else:
-                sGender = "female"
-                dictHumGenV4 = generatedParams
-            # endif
-        # endif
-        return self.human_obj.props["body_obj"]
+        # Armature name
+        
 
+        # ToDo: try except keyerror implementieren
+        # Reading values from dict and splitting it to custom and HumGenV4 dicts
+        # case: anyhuman dictionary (= custom dict + humgen dict
+        
+        try:
+            if "dictCustom" in generatedParams.keys():
+                dictCustom:dict = generatedParams["dictCustom"]
+                dictHumGenV4:dict = generatedParams["dictHumGen_V4"]
+                sGender:str = dictCustom["sGender"]
+                sName:str = dictCustom["sArmatureName"]
+                self.dBeardLength:dict = dictCustom["dBeardLength"]
+                # Get preset for selected gender
+                self.chosen_option = self.Human.get_preset_options(sGender)
+                # Use previously generated HumGenV4 compatible directory
+                self.human_obj = self.Human.from_preset(dictHumGenV4)
+                # If dbeardLength is not empty (False), custom parameters must be loaded after human has been created
+                if sGender == 'male' and bool(dictCustom["dBeardLength"]) == True:
+                    for i, key in enumerate(self.dBeardLength["hair_systems"]):
+                        # obtain the particle system which is connected to the hair system
+                        particle_system = self.human_obj.hair.particle_systems[key].settings.name
+                        # Set the length of the respective particle system to the value in the dict
+                        bpy.data.particles[particle_system].child_length = self.dBeardLength["hair_systems"][key]["length"]
+                else:
+                    pass
+                # endif
+                # Set facial rig
+                if dictCustom["bFacialRig"] == True :
+                    self.human_obj.expression.load_facial_rig()
+                else:
+                    pass
+                # endif
+            # case: only humgen dictionary 
+            else:
+                if generatedParams["keys"]["Male"] >= 0.5:
+                    sGender = "male"
+                    dictHumGenV4 = generatedParams
+                else:
+                    sGender = "female"
+                    dictHumGenV4 = generatedParams
+                # endif
+            # endif
+            # Rename 
+            if sName is not None:
+                self.human_obj.name = sName
+            return self.human_obj.props['body_obj']
+        except KeyError:
+            print("KeyError: Please check if the dictionary contains the required keys.")
+            
     # enddef
 
 

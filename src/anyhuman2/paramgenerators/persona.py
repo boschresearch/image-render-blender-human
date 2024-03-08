@@ -28,18 +28,54 @@
 ###
 
 import json
-from pathlib import Path
+import os
 
 ######################################################################
 def PersonaParams(params, generator_params):
-    """ """
-    persona_id = (params["sPersonaId"]).lower()
+    """ Create a anyhuman from a humgenv4 preset. 
 
-    filename = Path.joinpath(generator_params.persona_path, persona_id + ".json")
-    with open(filename, "r") as file:
-        params = json.load(file)
+    Parameters
+    ----------
+    params : dict
+        catharsys dictionary
+    generator_params : dict
+        _description_
 
-    return params
+    Returns
+    -------
+    _type_
+        _description_
+    """
+    
+    persona_id = params["sPersonaId"].title()
+    if params["sId"] in params:
+        sArmatureName = params["sId"]
+    elif params["sPersonaId"] in params:
+        sArmatureName = params["sPersonaId"].title()
+    else:
+        sArmatureName = None
+
+    HumGenV4AddOnPath = generator_params.dict_info["HumGenV4 Path"]
+    # Determine if persona_id is valid humgen preset and the gender of the preset 
+    for gender, model in generator_params.dict_models.items():
+        if persona_id in model:
+            filename = generator_params.dict_models[gender][persona_id]
+            FullPath = os.path.join(HumGenV4AddOnPath, filename.replace("/", os.sep))
+            with open(FullPath, "r") as file:
+                dictHumGen_V4 = json.load(file)
+
+    dictAnyhuman = {
+        "dictCustom": {
+            "sGender": gender,
+            "sArmatureName": sArmatureName,
+            "bOpenPoseHandLabels": None,
+            "bFacialRig": None,
+            "sPoseFilename": None,
+            "dBeardLength": None
+        },
+        "dictHumGen_V4": dictHumGen_V4,
+    }
+    return dictAnyhuman
 
 
 # enddef

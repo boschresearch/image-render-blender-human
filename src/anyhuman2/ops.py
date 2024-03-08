@@ -32,7 +32,7 @@ import math
 
 
 import warnings
-import json
+import random
 
 from typing import Optional
 from anybase import convert
@@ -87,42 +87,31 @@ def GenerateHuman(_dicParams, **kwargs):
         Blender object
     """
 
-    # print("Starting Generate Human")
-
     # set a seed for the following randomization
     # used to generate reproducible humans
-    # if "xSeed" in _dicParams:
-    #     import numpy as np
+    if "xSeed" in _dicParams:
+        import numpy as np
 
-    #     np_seed = hash(_dicParams["xSeed"]) % (2**32)
+        np_seed = hash(_dicParams["xSeed"]) % (2**32)
 
-    #     random.seed(_dicParams["xSeed"])
-    #     # np.random.seed(np_seed)
-    #     RandomInstance(np_seed).rnd
-        
+        random.seed(_dicParams["xSeed"])
+        # np.random.seed(np_seed)
+        rnd = random.Random(np_seed)
+    else:
+        rnd = random.Random(None)
+    # endif
 
 
-    mode = _dicParams.get("sMode", "RANDOM_REALISTIC")
+    mode:str = _dicParams.get("sMode", "RANDOM_REALISTIC")
 
-    lHumanGenerator = SingletonHumGenWrapper()
-
-    params = _dicParams.get("mParamConfig", {})
-
-    if "sGender" in _dicParams:
-        warnings.warn(
-            "Warning: Using sGender directly in the params of GenerateHuman is deprecated,"
-            " please set it in mParamConfig instead",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        params["gender"] = _dicParams["sGender"]
+    xHumanGenerator = SingletonHumGenWrapper()
 
     overwrite = _dicParams.get("mOverwrite", {})
 
     # gender = _dicParams["sGender"]
 
     # first compute the parameters that should be used for the creation of the human
-    generated_params = ComputeParams(mode, params, overwrite, lHumanGenerator.generator_config)
+    generated_params:dict = ComputeParams(mode, _dicParams, overwrite, xHumanGenerator.generator_config, rnd)
 
     # apply
     # params['posefilename'] =_dicParams.get('sPosefile')
@@ -133,7 +122,7 @@ def GenerateHuman(_dicParams, **kwargs):
     #     objX = lHumanGenerator.CreateFullRandomHuman(params["sGender"])
     # else:
     #     objX = lHumanGenerator.CreateHuman(params, generated_params)
-    objX = lHumanGenerator.CreateHuman(generated_params)
+    objX = xHumanGenerator.CreateHuman(generated_params)
 
     # objX["generator_param_dict"] = json.dumps(generated_params)
 
@@ -141,7 +130,6 @@ def GenerateHuman(_dicParams, **kwargs):
 
 
 # enddef
-
 
 ##############################################################################################################
 def ModifyHumanPostCreation(_objX, _dicParams, sMode, **kwargs):
